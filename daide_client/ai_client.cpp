@@ -5,7 +5,6 @@
 // Release 8~2~b
 
 #include "stdafx.h"
-#include "string.h"
 #include "socket.h"
 #include "error_log.h"
 #include "ai_client.h"

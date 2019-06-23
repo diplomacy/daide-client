@@ -15,7 +15,6 @@
  **/
 
 #include "stdafx.h"
-#include "string.h"
 #include "socket.h"
 #include "error_log.h"
 #include "map_and_units.h"
@@ -138,13 +137,13 @@ void BaseBot::send_orders_to_server() {
 
 void BaseBot::send_name_and_version_to_server(const char *name, const char *version) {
     TokenMessage name_message;
-    String name_in_quotes;
-    String version_in_quotes;
+    string name_in_quotes;
+    string version_in_quotes;
     TokenMessage name_tokens;
     TokenMessage version_tokens;
 
-    name_in_quotes = "'" + (String) (name) + "'";
-    version_in_quotes = "'" + (String) (version) + "'";
+    name_in_quotes = "'" + (string) (name) + "'";
+    version_in_quotes = "'" + (string) (version) + "'";
     name_tokens.set_message_from_text((string) ((const char *) (name_in_quotes)));
     version_tokens.set_message_from_text((string) ((const char *) (version_in_quotes)));
 
@@ -924,7 +923,7 @@ void BaseBot::send_broadcast_to_server(TokenMessage broadcast_message) {
 
 void BaseBot::process_ccd(TokenMessage &incoming_message) {
     Token cd_power;
-    String message;
+    string message;
     bool is_new_disconnection = false;
 
     cd_power = incoming_message.get_submessage(1).get_token();
@@ -1066,7 +1065,7 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
     int param_start;                    // Start of the next parameter
     int param_end;                        // End of the next parameter
     char param_token;                    // The token specifying the parameter type
-    String parameter;                    // The parameter
+    string parameter;                    // The parameter
     bool extracted_ok = true;            // Whether the parameters were OK
 
     parameters.ip_specified = false;
@@ -1075,38 +1074,38 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
     parameters.log_level_specified = false;
     parameters.reconnection_specified = false;
 
-    String m_command_line = GetCommandLineA();
+    string m_command_line = GetCommandLineA();
 
     // Strip the program name off the command line
     if (m_command_line[0] == '"') {
         // Program name is in quotes.
-        param_start = m_command_line.Find('"', 1);
+        param_start = m_command_line.find('"', 1);
 
-        if (param_start != -1) {
-            m_command_line = m_command_line.Mid(param_start + 1);
+        if (param_start != string::npos) {
+            m_command_line = m_command_line.substr(param_start + 1);
         }
     } else {
         // Program name is not quoted, so is terminated by a space
-        param_start = m_command_line.Find(' ');
+        param_start = m_command_line.find(' ');
 
-        if (param_start != -1) {
-            m_command_line = m_command_line.Mid(param_start);
+        if (param_start != string::npos) {
+            m_command_line = m_command_line.substr(param_start);
         }
     }
 
-    param_start = m_command_line.Find('-', 0);
+    param_start = m_command_line.find('-', 0);
 
-    while (param_start != -1) {
+    while (param_start != string::npos) {
         param_token = m_command_line[param_start + 1];
 
-        param_end = m_command_line.Find(' ', param_start);
+        param_end = m_command_line.find(' ', param_start);
 
-        if (param_end == -1) {
-            parameter = m_command_line.Mid(param_start + 2);
+        if (param_end == string::npos) {
+            parameter = m_command_line.substr(param_start + 2);
 
-            search_start = m_command_line.GetLength();
+            search_start = m_command_line.size();
         } else {
-            parameter = m_command_line.Left(param_end).Mid(param_start + 2);
+            parameter = m_command_line.substr(0, param_end).substr(param_start + 2);
 
             search_start = param_end;
         }
@@ -1128,14 +1127,14 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
 
             case 'p': {
                 parameters.port_specified = true;
-                parameters.port_number = atoi(parameter);
+                parameters.port_number = stoi(parameter);
 
                 break;
             }
 
             case 'l': {
                 parameters.log_level_specified = true;
-                parameters.log_level = atoi(parameter);
+                parameters.log_level = stoi(parameter);
 
                 break;
             }
@@ -1143,9 +1142,9 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
             case 'r': {
                 if (parameter[3] == ':') {
                     parameters.reconnection_specified = true;
-                    parameters.reconnect_power = parameter.Left(3);
-                    parameters.reconnect_power.MakeUpper();
-                    parameters.reconnect_passcode = atoi(parameter.Mid(4));
+                    parameters.reconnect_power = parameter.substr(0, 3);
+                    for (auto &c : parameters.reconnect_power) { c = toupper(c); }
+                    parameters.reconnect_passcode = stoi(parameter.substr(4));
                 } else {
                     display("-r should be followed by 'POW:passcode'\nPOW should be three characters");
                 }
@@ -1154,14 +1153,14 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
             }
 
             default: {
-                display("Usage: " + String(BOT_FAMILY) +
+                display("Usage: " + string(BOT_FAMILY) +
                         ".exe [-sServerName|-iIPAddress] [-pPortNumber] [-lLogLevel] [-rPOW:passcode]");
 
                 extracted_ok = false;
             }
         }
 
-        param_start = m_command_line.Find('-', search_start);
+        param_start = m_command_line.find('-', search_start);
     }
 
     if ((parameters.ip_specified) && (parameters.name_specified)) {

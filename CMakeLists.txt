@@ -32,8 +32,6 @@ add_executable(daide_client
         daide_client/socket.h
         daide_client/stdafx.cpp
         daide_client/stdafx.h
-        daide_client/string.cpp
-        daide_client/string.h
         daide_client/token_message.cpp
         daide_client/token_message.h
         daide_client/token_text_map.cpp

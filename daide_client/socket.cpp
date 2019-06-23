@@ -7,7 +7,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "string.h"
 #include "socket.h"
 #include "resource.h"
 #include "error_log.h"
@@ -250,7 +249,7 @@ bool Socket::Connect(const char *address, int port) {
     hints.ai_protocol = IPPROTO_TCP;
 
     ADDRINFOA* ai;
-    if (getaddrinfo(address, String(port), &hints, &ai)) {
+    if (getaddrinfo(address, string(port), &hints, &ai)) {
         log_error("Failure %d during getaddrinfo", WSAGetLastError());
         return false;
     }

@@ -17,18 +17,16 @@
 #ifndef _DAN_TYPES_H
 #define _DAN_TYPES_H
 
-#include "string.h"
-
 typedef struct {
     bool ip_specified;            // Whether the IP address was specified
     bool name_specified;        // Whether the server name was specified
-    String server_name;            // The name of the server machine
+    string server_name;            // The name of the server machine
     bool port_specified;        // Whether the port number was specified
     unsigned short port_number;    // The port number of the server (in host order)
     bool log_level_specified;    // Whether the log level was specified
     int log_level;                // The level to log at
     bool reconnection_specified;// Whether the reconnection parameters have been provided
-    String reconnect_power;        // Power to reconnect as
+    string reconnect_power;        // Power to reconnect as
     int reconnect_passcode;        // Passcode to reconnect as
 } COMMAND_LINE_PARAMETERS;
 
