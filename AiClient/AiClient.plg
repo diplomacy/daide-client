@@ -1,0 +1,72 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: AiClient - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x809 /fo"Release/AiClient.res" /d "NDEBUG" "C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\AiClient.rc"" 
+Creating temporary file "C:\Users\John\AppData\Local\Temp\RSP5723.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Release/AiClient.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\adjudicator.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\AiClient.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\BaseBot.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\error_log.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\JPN_Socket.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\JPN_String.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\map_and_units.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\token_message.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\token_text_map.cpp"
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\RandBot.cpp"
+]
+Creating command line "cl.exe @C:\Users\John\AppData\Local\Temp\RSP5723.tmp" 
+Creating temporary file "C:\Users\John\AppData\Local\Temp\RSP5724.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Release/AiClient.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Users\John\Documents\CProgs\AiClient 8~2\Source 8~2~b\AiClient\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\Users\John\AppData\Local\Temp\RSP5724.tmp" 
+Creating temporary file "C:\Users\John\AppData\Local\Temp\RSP5725.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/AiClient.pdb" /machine:I386 /out:"Release/AiClient.exe" 
+".\Release\adjudicator.obj"
+".\Release\AiClient.obj"
+".\Release\BaseBot.obj"
+".\Release\error_log.obj"
+".\Release\JPN_Socket.obj"
+".\Release\JPN_String.obj"
+".\Release\map_and_units.obj"
+".\Release\StdAfx.obj"
+".\Release\token_message.obj"
+".\Release\token_text_map.obj"
+".\Release\AiClient.res"
+".\Release\RandBot.obj"
+]
+Creating command line "link.exe @C:\Users\John\AppData\Local\Temp\RSP5725.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+adjudicator.cpp
+AiClient.cpp
+BaseBot.cpp
+error_log.cpp
+JPN_Socket.cpp
+JPN_String.cpp
+map_and_units.cpp
+token_message.cpp
+token_text_map.cpp
+RandBot.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+AiClient.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
