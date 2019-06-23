@@ -529,7 +529,7 @@ void DumbBot::generate_debug() {
 
     fp = fopen((const char *) (filename), "w");
 
-    if (fp == NULL) {
+    if (fp == nullptr) {
         display("Couldn't open debug file " + filename);
     } else {
         fprintf(fp, "Province,Coast,Attack,Defence,Strength,Competition,Proximities,,,,,,,,,,Value\n");
@@ -628,7 +628,7 @@ void DumbBot::generate_movement_orders() {
 
             try_next_province = true;
 
-            while (try_next_province == true) {
+            while (try_next_province) {
                 // Consider the next destination in the map
                 next_destination_itr = destination_itr;
                 next_destination_itr++;
@@ -911,7 +911,7 @@ void DumbBot::generate_retreat_orders() {
                 // Determine whether to try the next option instead
                 try_next_province = true;
 
-                while (try_next_province == true) {
+                while (try_next_province) {
                     next_destination_itr = destination_itr;
                     next_destination_itr++;
 

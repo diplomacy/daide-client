@@ -1577,7 +1577,7 @@ bool MapAndUnits::get_variant_setting(const Token &variant_option, Token *parame
 
             // Get the parameter
             if ((variant_submessage.get_message_length() > 1)
-                && (parameter != NULL)) {
+                && (parameter != nullptr)) {
                 *parameter = variant_submessage.get_token(1);
             }
         }
@@ -1597,7 +1597,7 @@ MapAndUnits::COAST_SET *MapAndUnits::get_adjacent_coasts(PROVINCE_INDEX &unit_lo
     unit_itr = units.find(unit_location);
 
     if (unit_itr == units.end()) {
-        adjacent_coasts = NULL;
+        adjacent_coasts = nullptr;
     } else {
         adjacent_coasts = get_adjacent_coasts(unit_itr->second.coast_id);
     }
@@ -1613,7 +1613,7 @@ MapAndUnits::COAST_SET *MapAndUnits::get_dislodged_unit_adjacent_coasts(
     unit_itr = dislodged_units.find(dislodged_unit_location);
 
     if (unit_itr == dislodged_units.end()) {
-        adjacent_coasts = NULL;
+        adjacent_coasts = nullptr;
     } else {
         adjacent_coasts = get_adjacent_coasts(unit_itr->second.coast_id);
     }
@@ -1683,7 +1683,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
         } else {
             unit_record = find_unit(order.get_submessage(0), units);
 
-            if (unit_record == NULL) {
+            if (unit_record == nullptr) {
                 order_result = TOKEN_ORDER_NOTE_NSU;
             } else if (unit_record->nationality != power_index) {
                 order_result = TOKEN_ORDER_NOTE_NYU;
@@ -1696,7 +1696,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
         } else {
             unit_record = find_unit(order.get_submessage(0), dislodged_units);
 
-            if (unit_record == NULL) {
+            if (unit_record == nullptr) {
                 order_result = TOKEN_ORDER_NOTE_NRN;
             } else if (unit_record->nationality != power_index) {
                 order_result = TOKEN_ORDER_NOTE_NYU;
@@ -1728,7 +1728,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                 // Support to hold
                 supported_unit = find_unit(order.get_submessage(2), units);
 
-                if (supported_unit == NULL) {
+                if (supported_unit == nullptr) {
                     order_result = TOKEN_ORDER_NOTE_NSU;
                 } else if ((check_orders_on_submission)
                            && !can_move_to_province(unit_record, supported_unit->coast_id.province_index)) {
@@ -1747,7 +1747,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                 supported_unit = find_unit(order.get_submessage(2), units);
                 support_destination = order.get_submessage(4).get_token();
 
-                if (supported_unit == NULL) {
+                if (supported_unit == nullptr) {
                     order_result = TOKEN_ORDER_NOTE_NSU;
                 } else if ((check_orders_on_submission)
                            && !has_route_to_province(supported_unit, support_destination.get_subtoken(),
@@ -1771,7 +1771,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
             convoyed_unit = find_unit(order.get_submessage(2), units);
             convoy_destination = order.get_submessage(4).get_token();
 
-            if (convoyed_unit == NULL) {
+            if (convoyed_unit == nullptr) {
                 order_result = TOKEN_ORDER_NOTE_NSU;
             } else if ((check_orders_on_submission)
                        && (unit_record->unit_type != TOKEN_UNIT_FLT)) {
@@ -1809,12 +1809,12 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                                 convoy_via_list.get_submessage(step_counter).get_token().get_subtoken());
 
                         if (convoying_unit_itr == units.end()) {
-                            convoying_unit = NULL;
+                            convoying_unit = nullptr;
                         } else {
                             convoying_unit = &(convoying_unit_itr->second);
                         }
 
-                        if (convoying_unit == NULL) {
+                        if (convoying_unit == nullptr) {
                             order_result = TOKEN_ORDER_NOTE_NSF;
                         } else if (game_map[convoying_unit->coast_id.province_index].is_land) {
                             order_result = TOKEN_ORDER_NOTE_NAS;
@@ -1919,7 +1919,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
             } else {
                 unit_record = find_unit(order.get_submessage(0), units);
 
-                if (unit_record == NULL) {
+                if (unit_record == nullptr) {
                     order_result = TOKEN_ORDER_NOTE_NSU;
                 } else if (unit_record->nationality != power_index) {
                     order_result = TOKEN_ORDER_NOTE_NYU;
@@ -1946,7 +1946,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
 }
 
 MapAndUnits::UNIT_AND_ORDER *MapAndUnits::find_unit(TokenMessage &unit_to_find, UNITS &units_map) {
-    UNIT_AND_ORDER *found_unit = NULL;
+    UNIT_AND_ORDER *found_unit = nullptr;
     UNITS::iterator unit_itr;
     bool error = false;
     TokenMessage nationality;
@@ -2604,7 +2604,7 @@ bool MapAndUnits::unorder_adjustment(TokenMessage &not_sub_message, int power_in
 
     if (order_valid) {
         if ((order_token == TOKEN_ORDER_BLD) || (order_token == TOKEN_ORDER_REM)) {
-            if ((winter_record->is_building == true) ^ (order_token == TOKEN_ORDER_BLD)) {
+            if (winter_record->is_building ^ (order_token == TOKEN_ORDER_BLD)) {
                 order_valid = false;
             } else {
                 winter_order_unit = order.get_submessage(0);

@@ -243,12 +243,12 @@ void MapAndUnits::check_for_illegal_move_orders() {
                         convoying_unit_itr = units.find(*convoy_step_itr);
 
                         if (convoying_unit_itr == units.end()) {
-                            convoying_unit = NULL;
+                            convoying_unit = nullptr;
                         } else {
                             convoying_unit = &(convoying_unit_itr->second);
                         }
 
-                        if (convoying_unit == NULL) {
+                        if (convoying_unit == nullptr) {
                             unit_record->order_type_copy = HOLD_ORDER;
                             unit_record->illegal_order = true;
                             unit_record->illegal_reason = TOKEN_ORDER_NOTE_NSF;
@@ -608,7 +608,7 @@ bool MapAndUnits::resolve_attacks_on_non_subverted_convoys() {
             }
 
             // If the convoy is broken, then revert all units involved to hold
-            if (convoy_broken == true) {
+            if (convoy_broken) {
                 for (convoying_fleet_itr = convoyed_army->convoy_step_list.begin();
                      convoying_fleet_itr != convoyed_army->convoy_step_list.end();
                      convoying_fleet_itr++) {
@@ -710,7 +710,7 @@ bool MapAndUnits::check_for_futile_convoys() {
             }
 
             // If the convoy is broken, then revert all units involved to hold
-            if (convoy_broken == true) {
+            if (convoy_broken) {
                 for (convoying_fleet_itr = subverted_convoy_army->convoy_step_list.begin();
                      convoying_fleet_itr != subverted_convoy_army->convoy_step_list.end();
                      convoying_fleet_itr++) {
@@ -1490,10 +1490,10 @@ void MapAndUnits::cut_support(PROVINCE_INDEX attacked_province) {
             || (cut_unit->order_type_copy == SUPPORT_TO_MOVE_ORDER)) {
             supported_unit = &(units[cut_unit->other_source_province]);
         } else {
-            supported_unit = NULL;
+            supported_unit = nullptr;
         }
 
-        if (supported_unit != NULL) {
+        if (supported_unit != nullptr) {
             supported_unit->supports.erase(cut_unit->coast_id.province_index);
 
             if (cut_unit->is_support_to_dislodge) {

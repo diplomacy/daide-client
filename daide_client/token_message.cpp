@@ -20,16 +20,16 @@
 
 TokenMessage::TokenMessage() {
     // Set the message to blank
-    m_message = NULL;
+    m_message = nullptr;
     m_message_length = NO_MESSAGE;
-    m_submessage_starts = NULL;
+    m_submessage_starts = nullptr;
     m_submessage_count = NO_MESSAGE;
 }
 
 TokenMessage::TokenMessage(const Token *message)    // The message to set it to
 {
-    m_message = NULL;
-    m_submessage_starts = NULL;
+    m_message = nullptr;
+    m_submessage_starts = nullptr;
 
     // Set the message as specified
     set_message(message);
@@ -38,8 +38,8 @@ TokenMessage::TokenMessage(const Token *message)    // The message to set it to
 TokenMessage::TokenMessage(const Token *message,    // The message to set it to
                            int message_length)        // The length of the message
 {
-    m_message = NULL;
-    m_submessage_starts = NULL;
+    m_message = nullptr;
+    m_submessage_starts = nullptr;
 
     // Set the message as specified
     set_message(message, message_length);
@@ -47,8 +47,8 @@ TokenMessage::TokenMessage(const Token *message,    // The message to set it to
 
 TokenMessage::TokenMessage(const Token &token)    // The token to set it to
 {
-    m_message = NULL;
-    m_submessage_starts = NULL;
+    m_message = nullptr;
+    m_submessage_starts = nullptr;
 
     // Set the message as specified
     set_message(&token, 1);
@@ -56,50 +56,50 @@ TokenMessage::TokenMessage(const Token &token)    // The token to set it to
 
 TokenMessage::TokenMessage(const TokenMessage &message_to_copy)    // The message to copy
 {
-    m_message = NULL;
-    m_submessage_starts = NULL;
+    m_message = nullptr;
+    m_submessage_starts = nullptr;
 
-    if (message_to_copy.m_message != NULL) {
+    if (message_to_copy.m_message != nullptr) {
         set_message(message_to_copy.m_message, message_to_copy.m_message_length);
     } else {
         // Set the message to blank
-        m_message = NULL;
+        m_message = nullptr;
         m_message_length = NO_MESSAGE;
-        m_submessage_starts = NULL;
+        m_submessage_starts = nullptr;
         m_submessage_count = NO_MESSAGE;
     }
 }
 
 TokenMessage::~TokenMessage() {
-    if (m_message != NULL) {
+    if (m_message != nullptr) {
         delete[] m_message;
-        m_message = NULL;
+        m_message = nullptr;
     }
 
-    if (m_submessage_starts != NULL) {
+    if (m_submessage_starts != nullptr) {
         delete[] m_submessage_starts;
-        m_submessage_starts = NULL;
+        m_submessage_starts = nullptr;
     }
 }
 
 TokenMessage &TokenMessage::operator=(const TokenMessage &message_to_copy)        // The message to copy
 {
     // Delete any old message
-    if (m_message != NULL) {
+    if (m_message != nullptr) {
         delete[] m_message;
-        m_message = NULL;
+        m_message = nullptr;
     }
 
-    if (m_submessage_starts != NULL) {
+    if (m_submessage_starts != nullptr) {
         delete[] m_submessage_starts;
-        m_submessage_starts = NULL;
+        m_submessage_starts = nullptr;
     }
 
     m_message_length = NO_MESSAGE;
     m_submessage_count = NO_MESSAGE;
 
     // Copy the message
-    if (message_to_copy.m_message != NULL) {
+    if (message_to_copy.m_message != nullptr) {
         set_message(message_to_copy.m_message, message_to_copy.m_message_length);
     }
 
@@ -111,7 +111,7 @@ bool TokenMessage::get_message(Token message[],        // Buffer to copy message
 const {
     bool message_copied = true;            // Whether the message is set
 
-    if (m_message == NULL) {
+    if (m_message == nullptr) {
         message_copied = false;
     }
 
@@ -172,8 +172,8 @@ TokenMessage TokenMessage::get_submessage(int submessage_index)        // Index 
     TokenMessage submessage;            // The submessage to return
     int submessage_length;                // Length of the submessage to copy
 
-    if (m_message != NULL) {
-        if (m_submessage_starts == NULL) {
+    if (m_message != nullptr) {
+        if (m_submessage_starts == nullptr) {
             find_submessages();
         }
 
@@ -202,7 +202,7 @@ int TokenMessage::get_submessage_start(int submessage_index) {
         || (submessage_index < 0)) {
         submessage_start = NO_MESSAGE;
     } else {
-        if (m_submessage_starts == NULL) {
+        if (m_submessage_starts == nullptr) {
             find_submessages();
         }
 
@@ -223,7 +223,7 @@ bool TokenMessage::submessage_is_single_token(int submessage_index) {
         || (submessage_index < 0)) {
         is_single = false;
     } else {
-        if (m_submessage_starts == NULL) {
+        if (m_submessage_starts == nullptr) {
             find_submessages();
         }
 
@@ -244,14 +244,14 @@ int TokenMessage::set_message(const Token *message)        // Message to set it 
     int token_counter = 0;
 
     // Delete any old message
-    if (m_message != NULL) {
+    if (m_message != nullptr) {
         delete[] m_message;
-        m_message = NULL;
+        m_message = nullptr;
     }
 
-    if (m_submessage_starts != NULL) {
+    if (m_submessage_starts != nullptr) {
         delete[] m_submessage_starts;
-        m_submessage_starts = NULL;
+        m_submessage_starts = nullptr;
     }
 
     m_message_length = NO_MESSAGE;
@@ -307,14 +307,14 @@ int TokenMessage::set_message(const Token *message,        // Message to set it 
     int token_counter = 0;
 
     // Delete any old message
-    if (m_message != NULL) {
+    if (m_message != nullptr) {
         delete[] m_message;
-        m_message = NULL;
+        m_message = nullptr;
     }
 
-    if (m_submessage_starts != NULL) {
+    if (m_submessage_starts != nullptr) {
         delete[] m_submessage_starts;
-        m_submessage_starts = NULL;
+        m_submessage_starts = nullptr;
     }
 
     m_message_length = NO_MESSAGE;
@@ -542,7 +542,7 @@ string TokenMessage::get_message_as_text() const {
 TokenMessage TokenMessage::enclose() const {
     TokenMessage new_message;
 
-    if (m_message == NULL) {
+    if (m_message == nullptr) {
         // Create a new buffer
         new_message.m_message = new Token[3];
 
@@ -581,7 +581,7 @@ TokenMessage TokenMessage::enclose() const {
 void TokenMessage::enclose_this() {
     Token *new_message;                    // The enclosed message
 
-    if (m_message == NULL) {
+    if (m_message == nullptr) {
         // Create a new buffer
         new_message = new Token[3];
 
@@ -599,7 +599,7 @@ void TokenMessage::enclose_this() {
         // Update the submessages
         m_submessage_count = 1;
 
-        if (m_submessage_starts != NULL) {
+        if (m_submessage_starts != nullptr) {
             m_submessage_starts[0] = 0;
             m_submessage_starts[1] = 2;
         }
@@ -627,7 +627,7 @@ void TokenMessage::enclose_this() {
         // Update the submessages
         m_submessage_count = 1;
 
-        if (m_submessage_starts != NULL) {
+        if (m_submessage_starts != nullptr) {
             m_submessage_starts[0] = 0;
             m_submessage_starts[1] = m_message_length;
         }
@@ -638,9 +638,9 @@ TokenMessage TokenMessage::operator&(const TokenMessage &other_message)        /
 {
     TokenMessage new_message;            // The new message
 
-    if (m_message == NULL) {
+    if (m_message == nullptr) {
         new_message = other_message.enclose();
-    } else if (other_message.m_message == NULL) {
+    } else if (other_message.m_message == nullptr) {
         new_message = *this + other_message.enclose();
     } else {
         // Create a new buffer
@@ -673,9 +673,9 @@ TokenMessage TokenMessage::operator+(const TokenMessage &other_message)        /
 {
     TokenMessage new_message;            // The new message
 
-    if (m_message == NULL) {
+    if (m_message == nullptr) {
         new_message = other_message;
-    } else if (other_message.m_message == NULL) {
+    } else if (other_message.m_message == nullptr) {
         new_message = *this;
     } else {
         // Create a new buffer
@@ -746,10 +746,10 @@ bool TokenMessage::operator<(const TokenMessage &other) const {
     int token_counter = 0;
     int tokens_to_compare = (m_message_length < other.m_message_length) ? m_message_length : other.m_message_length;
 
-    if (other.m_message == NULL) {
+    if (other.m_message == nullptr) {
         is_less_than = false;
         difference_found = true;
-    } else if (m_message == NULL) {
+    } else if (m_message == nullptr) {
         is_less_than = true;
         difference_found = true;
     }
@@ -782,8 +782,8 @@ bool TokenMessage::operator==(const TokenMessage &other) const {
     bool difference_found = false;
     int token_counter = 0;
 
-    if ((other.m_message == NULL)
-        || (m_message == NULL)
+    if ((other.m_message == nullptr)
+        || (m_message == nullptr)
         || (m_message_length != other.m_message_length)) {
         difference_found = true;
     }

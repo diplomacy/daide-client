@@ -17,8 +17,8 @@
 #include "stdafx.h"
 #include "error_log.h"
 
-FILE *bad_log = NULL;
-FILE *big_log = NULL;
+FILE *bad_log = nullptr;
+FILE *big_log = nullptr;
 bool logging_enabled = true;
 
 const char BAD_LOG_FILENAME[] = "badlog.txt";
@@ -46,11 +46,11 @@ void log(char *format, ...) {
 #endif
 
     if (logging_enabled) {
-        if (big_log == NULL) {
+        if (big_log == nullptr) {
             big_log = open(BIG_LOG_FILENAME, "w");
         }
 
-        if (big_log != NULL) {
+        if (big_log != nullptr) {
             fprintf(big_log, "== %s\n", buffer);
 
             fflush(big_log);
@@ -65,11 +65,11 @@ void log_error(char *format, ...) {
 
     va_start(arg_list, format);
 
-    if (bad_log == NULL) {
+    if (bad_log == nullptr) {
         bad_log = open(BAD_LOG_FILENAME, "w");
     }
 
-    if (bad_log != NULL) {
+    if (bad_log != nullptr) {
         vfprintf(bad_log, format, arg_list);
         fprintf(bad_log, "\n");
 
@@ -93,11 +93,11 @@ void log_error(char *format, ...) {
 
 void log_daide_message(bool is_incoming, TokenMessage &message) {
     if (logging_enabled) {
-        if (big_log == NULL) {
+        if (big_log == nullptr) {
             big_log = open(BIG_LOG_FILENAME, "w");
         }
 
-        if (big_log != NULL) {
+        if (big_log != nullptr) {
             if (is_incoming) {
                 fprintf(big_log, ">> ");
             } else {
@@ -112,11 +112,11 @@ void log_daide_message(bool is_incoming, TokenMessage &message) {
 }
 
 void close_logs() {
-    if (bad_log != NULL) {
+    if (bad_log != nullptr) {
         fclose(bad_log);
     }
 
-    if (big_log != NULL) {
+    if (big_log != nullptr) {
         fclose(big_log);
     }
 }

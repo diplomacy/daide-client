@@ -335,15 +335,15 @@ public:
 
     // Get the details of the variant (returns false if variant not set in HLO command)
     bool get_variant_setting(const Token &variant_option,    // Variant to check
-                             Token *parameter = NULL);    // OUTPUT: Parameter for variant (if one was provided)
+                             Token *parameter = nullptr);    // OUTPUT: Parameter for variant (if one was provided)
 
     // Get the adjacency list for a coast
     COAST_SET *get_adjacent_coasts(COAST_ID &coast);
 
-    // Get the adjacency list for a unit. Returns NULL if no unit in the given province.
+    // Get the adjacency list for a unit. Returns nullptr if no unit in the given province.
     COAST_SET *get_adjacent_coasts(PROVINCE_INDEX &unit_location);
 
-    // Get the adjacency list for a dislodged unit. Returns NULL if no dislodged unit in the given province.
+    // Get the adjacency list for a dislodged unit. Returns nullptr if no dislodged unit in the given province.
     COAST_SET *get_dislodged_unit_adjacent_coasts(PROVINCE_INDEX &dislodged_unit_location);
 
     // Functions for the adjudicator

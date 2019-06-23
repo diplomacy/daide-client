@@ -40,7 +40,7 @@ bool BaseBot::initialise() {
     COMMAND_LINE_PARAMETERS parameters;
     extract_parameters(parameters);
 
-    srand((int) time(NULL)); // init random number generator
+    srand((int) time(nullptr)); // init random number generator
 
     const int MAX_COMPUTER_NAME_LEN = 1000;
     // Max length of a computer name
