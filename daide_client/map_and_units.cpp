@@ -485,7 +485,7 @@ int MapAndUnits::set_units(TokenMessage &now_message) {
     TokenMessage turn_message;
     TokenMessage unit;
     int unit_counter;
-    PROVINCE_SET::iterator home_centre_iterator;
+    PROVINCE_SET::iterator home_centre_itr;
 
     // Check we have a map
     if (number_of_provinces != NO_MAP) {
@@ -525,12 +525,12 @@ int MapAndUnits::set_units(TokenMessage &now_message) {
                 // Build the list of open home centres
                 open_home_centres.clear();
 
-                for (home_centre_iterator = home_centres.begin();
-                     home_centre_iterator != home_centres.end();
-                     home_centre_iterator++) {
-                    if ((game_map[*home_centre_iterator].owner == power_played)
-                        && (units.find(*home_centre_iterator) == units.end())) {
-                        open_home_centres.insert(*home_centre_iterator);
+                for (home_centre_itr = home_centres.begin();
+                     home_centre_itr != home_centres.end();
+                     home_centre_itr++) {
+                    if ((game_map[*home_centre_itr].owner == power_played)
+                        && (units.find(*home_centre_itr) == units.end())) {
+                        open_home_centres.insert(*home_centre_itr);
                     }
                 }
 
@@ -645,7 +645,7 @@ int MapAndUnits::store_result(TokenMessage &ord_message) {
     TokenMessage unit;                // The unit in the orders
     Token order_type;                // The token indicating the order type
     POWER_INDEX power;                // The power which owns the order
-    WINTER_ORDERS::iterator adjustment_orders_iterator;
+    WINTER_ORDERS::iterator adjustment_orders_itr;
     // Iterator to the winter orders for this power
     WINTER_ORDERS_FOR_POWER new_adjustment_orders;
     // A set of adjustment orders for a power
@@ -684,28 +684,28 @@ int MapAndUnits::store_result(TokenMessage &ord_message) {
         // If it is a winter season
         if (season == TOKEN_SEASON_WIN) {
             // Find the adjustment orders for this power
-            adjustment_orders_iterator = last_adjustment_results.find(power);
+            adjustment_orders_itr = last_adjustment_results.find(power);
 
             // If they don't exist, then create them
-            if (adjustment_orders_iterator == last_adjustment_results.end()) {
+            if (adjustment_orders_itr == last_adjustment_results.end()) {
                 new_adjustment_orders.builds_or_disbands.clear();
                 new_adjustment_orders.number_of_waives = 0;
 
-                adjustment_orders_iterator = last_adjustment_results.insert(
+                adjustment_orders_itr = last_adjustment_results.insert(
                         WINTER_ORDERS::value_type(power, new_adjustment_orders)).first;
             }
 
             // Add it to the adjustment results
             if (order_type == TOKEN_ORDER_WVE) {
-                adjustment_orders_iterator->second.number_of_waives++;
+                adjustment_orders_itr->second.number_of_waives++;
             } else if (order_type == TOKEN_ORDER_BLD) {
-                adjustment_orders_iterator->second.builds_or_disbands.insert(
+                adjustment_orders_itr->second.builds_or_disbands.insert(
                         BUILDS_OR_DISBANDS::value_type(get_coast_from_unit(unit), TOKEN_RESULT_SUC));
-                adjustment_orders_iterator->second.is_building = true;
+                adjustment_orders_itr->second.is_building = true;
             } else {
-                adjustment_orders_iterator->second.builds_or_disbands.insert(
+                adjustment_orders_itr->second.builds_or_disbands.insert(
                         BUILDS_OR_DISBANDS::value_type(get_coast_from_unit(unit), TOKEN_RESULT_SUC));
-                adjustment_orders_iterator->second.is_building = false;
+                adjustment_orders_itr->second.is_building = false;
             }
         } else {
             // Set up the new unit
@@ -897,15 +897,15 @@ void MapAndUnits::set_build_order(COAST_ID location) {
 
 bool MapAndUnits::set_remove_order(PROVINCE_INDEX unit) {
     bool unit_ordered = true;                // Whether the unit was ordered successfully
-    UNITS::iterator unit_iterator;            // Iterator to the unit to remove
+    UNITS::iterator unit_itr;            // Iterator to the unit to remove
 
-    unit_iterator = units.find(unit);
+    unit_itr = units.find(unit);
 
-    if (unit_iterator == units.end()) {
+    if (unit_itr == units.end()) {
         unit_ordered = false;
     } else {
         our_winter_orders.builds_or_disbands.insert(
-                BUILDS_OR_DISBANDS::value_type(unit_iterator->second.coast_id, Token(0)));
+                BUILDS_OR_DISBANDS::value_type(unit_itr->second.coast_id, Token(0)));
         our_winter_orders.is_building = false;
     }
 
@@ -953,18 +953,18 @@ bool MapAndUnits::cancel_remove_order(PROVINCE_INDEX location) {
 }
 
 bool MapAndUnits::any_orders_entered() {
-    UNITS::iterator unit_iterator;            // The unit we are working on
+    UNITS::iterator unit_itr;            // The unit we are working on
     bool order_entered = false;                // Whether any orders have been entered
 
     if ((current_season == TOKEN_SEASON_SPR) || (current_season == TOKEN_SEASON_FAL)) {
-        for (unit_iterator = units.begin(); unit_iterator != units.end(); unit_iterator++) {
-            if (unit_iterator->second.order_type != NO_ORDER) {
+        for (unit_itr = units.begin(); unit_itr != units.end(); unit_itr++) {
+            if (unit_itr->second.order_type != NO_ORDER) {
                 order_entered = true;
             }
         }
     } else if ((current_season == TOKEN_SEASON_SUM) || (current_season == TOKEN_SEASON_AUT)) {
-        for (unit_iterator = dislodged_units.begin(); unit_iterator != dislodged_units.end(); unit_iterator++) {
-            if (unit_iterator->second.order_type != NO_ORDER) {
+        for (unit_itr = dislodged_units.begin(); unit_itr != dislodged_units.end(); unit_itr++) {
+            if (unit_itr->second.order_type != NO_ORDER) {
                 order_entered = true;
             }
         }
@@ -980,45 +980,45 @@ bool MapAndUnits::any_orders_entered() {
 
 TokenMessage MapAndUnits::build_sub_command() {
     TokenMessage sub_message;                // The sub message
-    UNITS::iterator unit_iterator;            // The unit we are working on
+    UNITS::iterator unit_itr;            // The unit we are working on
     TokenMessage unit_order;                // The order for one unit
-    BUILDS_OR_DISBANDS::iterator build_iterator;
+    BUILDS_OR_DISBANDS::iterator build_itr;
     // Iterator to loop through the builds
     int waive_counter;                        // Counter to loop through the waives
 
     sub_message = TOKEN_COMMAND_SUB;
 
     if ((current_season == TOKEN_SEASON_SPR) || (current_season == TOKEN_SEASON_FAL)) {
-        for (unit_iterator = units.begin(); unit_iterator != units.end(); unit_iterator++) {
-            if ((unit_iterator->second.nationality == power_played.get_subtoken())
-                && (unit_iterator->second.order_type != NO_ORDER)) {
-                unit_order = describe_movement_order(&(unit_iterator->second));
+        for (unit_itr = units.begin(); unit_itr != units.end(); unit_itr++) {
+            if ((unit_itr->second.nationality == power_played.get_subtoken())
+                && (unit_itr->second.order_type != NO_ORDER)) {
+                unit_order = describe_movement_order(&(unit_itr->second));
 
                 sub_message = sub_message & unit_order;
             }
         }
     } else if ((current_season == TOKEN_SEASON_SUM) || (current_season == TOKEN_SEASON_AUT)) {
-        for (unit_iterator = dislodged_units.begin(); unit_iterator != dislodged_units.end(); unit_iterator++) {
-            if ((unit_iterator->second.nationality == power_played.get_subtoken())
-                && (unit_iterator->second.order_type != NO_ORDER)) {
-                unit_order = describe_retreat_order(&(unit_iterator->second));
+        for (unit_itr = dislodged_units.begin(); unit_itr != dislodged_units.end(); unit_itr++) {
+            if ((unit_itr->second.nationality == power_played.get_subtoken())
+                && (unit_itr->second.order_type != NO_ORDER)) {
+                unit_order = describe_retreat_order(&(unit_itr->second));
 
                 sub_message = sub_message & unit_order;
             }
         }
     } else {
-        for (build_iterator = our_winter_orders.builds_or_disbands.begin();
-             build_iterator != our_winter_orders.builds_or_disbands.end();
-             build_iterator++) {
+        for (build_itr = our_winter_orders.builds_or_disbands.begin();
+             build_itr != our_winter_orders.builds_or_disbands.end();
+             build_itr++) {
             unit_order = power_played;
 
-            if (build_iterator->first.coast_token == TOKEN_UNIT_AMY) {
+            if (build_itr->first.coast_token == TOKEN_UNIT_AMY) {
                 unit_order = unit_order + TOKEN_UNIT_AMY;
             } else {
                 unit_order = unit_order + TOKEN_UNIT_FLT;
             }
 
-            unit_order = unit_order + describe_coast(build_iterator->first);
+            unit_order = unit_order + describe_coast(build_itr->first);
 
             unit_order.enclose_this();
 
@@ -1042,14 +1042,14 @@ TokenMessage MapAndUnits::build_sub_command() {
 }
 
 void MapAndUnits::clear_all_orders() {
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
 
-    for (unit_iterator = units.begin(); unit_iterator != units.end(); unit_iterator++) {
-        unit_iterator->second.order_type = NO_ORDER;
+    for (unit_itr = units.begin(); unit_itr != units.end(); unit_itr++) {
+        unit_itr->second.order_type = NO_ORDER;
     }
 
-    for (unit_iterator = dislodged_units.begin(); unit_iterator != dislodged_units.end(); unit_iterator++) {
-        unit_iterator->second.order_type = NO_ORDER;
+    for (unit_itr = dislodged_units.begin(); unit_itr != dislodged_units.end(); unit_itr++) {
+        unit_itr->second.order_type = NO_ORDER;
     }
 
     our_winter_orders.builds_or_disbands.clear();
@@ -1075,7 +1075,7 @@ MapAndUnits::COAST_ID MapAndUnits::get_coast_id(TokenMessage &coast, Token unit_
 
 TokenMessage MapAndUnits::describe_movement_order(UNIT_AND_ORDER *unit) {
     TokenMessage order;
-    UNIT_LIST::iterator convoy_step_iterator;
+    UNIT_LIST::iterator convoy_step_itr;
     TokenMessage convoy_via;
 
     switch (unit->order_type) {
@@ -1118,10 +1118,10 @@ TokenMessage MapAndUnits::describe_movement_order(UNIT_AND_ORDER *unit) {
         case MOVE_BY_CONVOY_ORDER: {
             order = describe_unit(unit) + TOKEN_ORDER_CTO + describe_coast(unit->move_dest);
 
-            for (convoy_step_iterator = unit->convoy_step_list.begin();
-                 convoy_step_iterator != unit->convoy_step_list.end();
-                 convoy_step_iterator++) {
-                convoy_via = convoy_via + game_map[*convoy_step_iterator].province_token;
+            for (convoy_step_itr = unit->convoy_step_list.begin();
+                 convoy_step_itr != unit->convoy_step_list.end();
+                 convoy_step_itr++) {
+                convoy_via = convoy_via + game_map[*convoy_step_itr].province_token;
             }
 
             order = order + TOKEN_ORDER_VIA & convoy_via;
@@ -1301,7 +1301,7 @@ string MapAndUnits::describe_movement_result(UNIT_AND_ORDER &unit) {
 
 string MapAndUnits::describe_movement_order_string(UNIT_AND_ORDER &unit, UNITS &unit_set) {
     string order;
-    UNIT_LIST::iterator convoy_step_iterator;
+    UNIT_LIST::iterator convoy_step_itr;
     string convoy_via;
 
     switch (unit.order_type) {
@@ -1343,10 +1343,10 @@ string MapAndUnits::describe_movement_order_string(UNIT_AND_ORDER &unit, UNITS &
         case MOVE_BY_CONVOY_ORDER: {
             order = describe_unit_string(unit);
 
-            for (convoy_step_iterator = unit.convoy_step_list.begin();
-                 convoy_step_iterator != unit.convoy_step_list.end();
-                 convoy_step_iterator++) {
-                order = order + " - " + describe_province_string(*convoy_step_iterator);
+            for (convoy_step_itr = unit.convoy_step_list.begin();
+                 convoy_step_itr != unit.convoy_step_list.end();
+                 convoy_step_itr++) {
+                order = order + " - " + describe_province_string(*convoy_step_itr);
             }
 
             order = order + " - " + describe_coast_string(unit.move_dest);
@@ -1394,15 +1394,15 @@ string MapAndUnits::describe_retreat_order_string(UNIT_AND_ORDER &unit) {
 template<class SetType>
 typename SetType::value_type get_from_set(SetType my_set, int item_index) {
     int item_counter;
-    SetType::iterator set_iterator;
+    SetType::iterator set_itr;
 
-    set_iterator = my_set.begin();
+    set_itr = my_set.begin();
 
     for (item_counter = 0; item_counter < item_index; item_counter++) {
-        set_iterator++;
+        set_itr++;
     }
 
-    return (*set_iterator);
+    return (*set_itr);
 }
 
 string MapAndUnits::describe_adjustment_result(WINTER_ORDERS_FOR_POWER &orders, int order_index) {
@@ -1502,25 +1502,25 @@ MapAndUnits::COAST_ID MapAndUnits::find_result_unit_initial_location(
         bool &retreated_to_province,
         bool &moved_to_province,
         bool &unit_found) {
-    UNITS::iterator unit_iterator;                // Iterator to step through the units
-    WINTER_ORDERS::iterator winter_iterator;    // Iterator through the orders for winter
+    UNITS::iterator unit_itr;                // Iterator to step through the units
+    WINTER_ORDERS::iterator winter_itr;    // Iterator through the orders for winter
     COAST_ID initial_location;                    // The initial location of the unit
-    BUILDS_OR_DISBANDS::iterator build_iterator;// Iterator to step through the builds for a power
+    BUILDS_OR_DISBANDS::iterator build_itr;// Iterator to step through the builds for a power
 
     is_new_build = false;
     retreated_to_province = false;
     moved_to_province = false;
     unit_found = false;
 
-    for (winter_iterator = last_adjustment_results.begin();
-         winter_iterator != last_adjustment_results.end();
-         winter_iterator++) {
-        if (winter_iterator->second.is_building) {
-            for (build_iterator = winter_iterator->second.builds_or_disbands.begin();
-                 build_iterator != winter_iterator->second.builds_or_disbands.end();
-                 build_iterator++) {
-                if (build_iterator->first.province_index == province_index) {
-                    initial_location = build_iterator->first;
+    for (winter_itr = last_adjustment_results.begin();
+         winter_itr != last_adjustment_results.end();
+         winter_itr++) {
+        if (winter_itr->second.is_building) {
+            for (build_itr = winter_itr->second.builds_or_disbands.begin();
+                 build_itr != winter_itr->second.builds_or_disbands.end();
+                 build_itr++) {
+                if (build_itr->first.province_index == province_index) {
+                    initial_location = build_itr->first;
                     is_new_build = true;
                     unit_found = true;
                 }
@@ -1529,12 +1529,12 @@ MapAndUnits::COAST_ID MapAndUnits::find_result_unit_initial_location(
     }
 
     if (!unit_found) {
-        for (unit_iterator = last_retreat_results.begin();
-             unit_iterator != last_retreat_results.end();
-             unit_iterator++) {
-            if ((unit_iterator->second.move_dest.province_index == province_index)
-                && (unit_iterator->second.unit_moves)) {
-                initial_location = unit_iterator->second.coast_id;
+        for (unit_itr = last_retreat_results.begin();
+             unit_itr != last_retreat_results.end();
+             unit_itr++) {
+            if ((unit_itr->second.move_dest.province_index == province_index)
+                && (unit_itr->second.unit_moves)) {
+                initial_location = unit_itr->second.coast_id;
                 retreated_to_province = true;
                 unit_found = true;
             }
@@ -1542,18 +1542,18 @@ MapAndUnits::COAST_ID MapAndUnits::find_result_unit_initial_location(
     }
 
     if (!unit_found) {
-        for (unit_iterator = last_movement_results.begin();
-             unit_iterator != last_movement_results.end();
-             unit_iterator++) {
-            if ((unit_iterator->second.move_dest.province_index == province_index)
-                && (unit_iterator->second.unit_moves)) {
-                initial_location = unit_iterator->second.coast_id;
+        for (unit_itr = last_movement_results.begin();
+             unit_itr != last_movement_results.end();
+             unit_itr++) {
+            if ((unit_itr->second.move_dest.province_index == province_index)
+                && (unit_itr->second.unit_moves)) {
+                initial_location = unit_itr->second.coast_id;
                 moved_to_province = true;
                 unit_found = true;
-            } else if ((unit_iterator->second.coast_id.province_index == province_index)
-                       && !unit_iterator->second.unit_moves
-                       && !unit_iterator->second.dislodged) {
-                initial_location = unit_iterator->second.coast_id;
+            } else if ((unit_itr->second.coast_id.province_index == province_index)
+                       && !unit_itr->second.unit_moves
+                       && !unit_itr->second.dislodged) {
+                initial_location = unit_itr->second.coast_id;
                 unit_found = true;
             }
         }
@@ -1592,14 +1592,14 @@ MapAndUnits::COAST_SET *MapAndUnits::get_adjacent_coasts(COAST_ID &coast) {
 
 MapAndUnits::COAST_SET *MapAndUnits::get_adjacent_coasts(PROVINCE_INDEX &unit_location) {
     COAST_SET *adjacent_coasts;
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
 
-    unit_iterator = units.find(unit_location);
+    unit_itr = units.find(unit_location);
 
-    if (unit_iterator == units.end()) {
+    if (unit_itr == units.end()) {
         adjacent_coasts = NULL;
     } else {
-        adjacent_coasts = get_adjacent_coasts(unit_iterator->second.coast_id);
+        adjacent_coasts = get_adjacent_coasts(unit_itr->second.coast_id);
     }
 
     return adjacent_coasts;
@@ -1608,14 +1608,14 @@ MapAndUnits::COAST_SET *MapAndUnits::get_adjacent_coasts(PROVINCE_INDEX &unit_lo
 MapAndUnits::COAST_SET *MapAndUnits::get_dislodged_unit_adjacent_coasts(
         PROVINCE_INDEX &dislodged_unit_location) {
     COAST_SET *adjacent_coasts;
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
 
-    unit_iterator = dislodged_units.find(dislodged_unit_location);
+    unit_itr = dislodged_units.find(dislodged_unit_location);
 
-    if (unit_iterator == dislodged_units.end()) {
+    if (unit_itr == dislodged_units.end()) {
         adjacent_coasts = NULL;
     } else {
-        adjacent_coasts = get_adjacent_coasts(unit_iterator->second.coast_id);
+        adjacent_coasts = get_adjacent_coasts(unit_itr->second.coast_id);
     }
 
     return adjacent_coasts;
@@ -1661,7 +1661,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
     UNIT_AND_ORDER *convoyed_unit;
     Token convoy_destination;
     TokenMessage convoy_via_list;
-    UNITS::iterator convoying_unit_iterator;
+    UNITS::iterator convoying_unit_itr;
     UNIT_AND_ORDER *convoying_unit;
     int previous_province;
     int step_counter;
@@ -1670,7 +1670,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
     TokenMessage winter_order_unit;
     COAST_ID build_location;
     COAST_ID build_province;
-    BUILDS_OR_DISBANDS::iterator match_iterator;
+    BUILDS_OR_DISBANDS::iterator match_itr;
 
     order_token_message = order.get_submessage(1);
 
@@ -1805,13 +1805,13 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                          (step_counter < convoy_via_list.get_message_length()) &&
                          (order_result == TOKEN_ORDER_NOTE_MBV);
                          step_counter++) {
-                        convoying_unit_iterator = units.find(
+                        convoying_unit_itr = units.find(
                                 convoy_via_list.get_submessage(step_counter).get_token().get_subtoken());
 
-                        if (convoying_unit_iterator == units.end()) {
+                        if (convoying_unit_itr == units.end()) {
                             convoying_unit = NULL;
                         } else {
-                            convoying_unit = &(convoying_unit_iterator->second);
+                            convoying_unit = &(convoying_unit_itr->second);
                         }
 
                         if (convoying_unit == NULL) {
@@ -1899,11 +1899,11 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                     build_province.province_index = build_location.province_index;
                     build_province.coast_token = 0;
 
-                    match_iterator = winter_record->builds_or_disbands.lower_bound(build_province);
+                    match_itr = winter_record->builds_or_disbands.lower_bound(build_province);
 
                     if ((check_orders_on_submission)
-                        && (match_iterator != winter_record->builds_or_disbands.end())
-                        && (match_iterator->first.province_index == build_province.province_index)) {
+                        && (match_itr != winter_record->builds_or_disbands.end())
+                        && (match_itr->first.province_index == build_province.province_index)) {
                         order_result = TOKEN_ORDER_NOTE_ESC;
                     } else {
                         // Legal build
@@ -1947,7 +1947,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
 
 MapAndUnits::UNIT_AND_ORDER *MapAndUnits::find_unit(TokenMessage &unit_to_find, UNITS &units_map) {
     UNIT_AND_ORDER *found_unit = NULL;
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
     bool error = false;
     TokenMessage nationality;
     TokenMessage unit_type;
@@ -1977,22 +1977,22 @@ MapAndUnits::UNIT_AND_ORDER *MapAndUnits::find_unit(TokenMessage &unit_to_find, 
     }
 
     if (!error) {
-        unit_iterator = units_map.find(province_token.get_subtoken());
+        unit_itr = units_map.find(province_token.get_subtoken());
 
-        if (unit_iterator == units_map.end()) {
+        if (unit_itr == units_map.end()) {
             error = true;
         } else {
             if ((province_token.get_subtoken() >= number_of_provinces)
-                || (unit_iterator->second.coast_id.coast_token != coast)
-                || (unit_iterator->second.nationality != nationality.get_token().get_subtoken())
-                || (unit_iterator->second.unit_type != unit_type.get_token())) {
+                || (unit_itr->second.coast_id.coast_token != coast)
+                || (unit_itr->second.nationality != nationality.get_token().get_subtoken())
+                || (unit_itr->second.unit_type != unit_type.get_token())) {
                 error = true;
             }
         }
     }
 
     if (!error) {
-        found_unit = &(unit_iterator->second);
+        found_unit = &(unit_itr->second);
     }
 
     return found_unit;
@@ -2045,8 +2045,8 @@ bool MapAndUnits::has_route_to_province(UNIT_AND_ORDER *unit, PROVINCE_INDEX pro
     PROVINCE_SET checked_provinces;                    // Provinces which have already been checked
     PROVINCE_SET provinces_to_check;                // Provinces still to check
     PROVINCE_INDEX province_being_checked;            // Province currently being processed
-    PROVINCE_COASTS::iterator coast_iterator;        // Iterator through the coasts of a province
-    COAST_SET::iterator adjacent_iterator;        // Iterator through the adjacent coasts to a province
+    PROVINCE_COASTS::iterator coast_itr;        // Iterator through the coasts of a province
+    COAST_SET::iterator adjacent_itr;        // Iterator through the adjacent coasts to a province
 
     // First check if it can move directly
     has_route = can_move_to_province(unit, province_index);
@@ -2059,13 +2059,13 @@ bool MapAndUnits::has_route_to_province(UNIT_AND_ORDER *unit, PROVINCE_INDEX pro
         checked_provinces.insert(unit->coast_id.province_index);
 
         // Add all the adjacent provinces to the province to check list
-        for (coast_iterator = game_map[unit->coast_id.province_index].coast_info.begin();
-             coast_iterator != game_map[unit->coast_id.province_index].coast_info.end();
-             coast_iterator++) {
-            for (adjacent_iterator = coast_iterator->second.adjacent_coasts.begin();
-                 adjacent_iterator != coast_iterator->second.adjacent_coasts.end();
-                 adjacent_iterator++) {
-                provinces_to_check.insert(adjacent_iterator->province_index);
+        for (coast_itr = game_map[unit->coast_id.province_index].coast_info.begin();
+             coast_itr != game_map[unit->coast_id.province_index].coast_info.end();
+             coast_itr++) {
+            for (adjacent_itr = coast_itr->second.adjacent_coasts.begin();
+                 adjacent_itr != coast_itr->second.adjacent_coasts.end();
+                 adjacent_itr++) {
+                provinces_to_check.insert(adjacent_itr->province_index);
             }
         }
 
@@ -2097,13 +2097,13 @@ bool MapAndUnits::has_route_to_province(UNIT_AND_ORDER *unit, PROVINCE_INDEX pro
                     // Sea province, so check if occupied. If it is then add all adjacent provinces
                     if (units.find(province_being_checked) != units.end()) {
                         // Add all the adjacent provinces to the province to check list
-                        for (coast_iterator = game_map[province_being_checked].coast_info.begin();
-                             coast_iterator != game_map[province_being_checked].coast_info.end();
-                             coast_iterator++) {
-                            for (adjacent_iterator = coast_iterator->second.adjacent_coasts.begin();
-                                 adjacent_iterator != coast_iterator->second.adjacent_coasts.end();
-                                 adjacent_iterator++) {
-                                provinces_to_check.insert(adjacent_iterator->province_index);
+                        for (coast_itr = game_map[province_being_checked].coast_info.begin();
+                             coast_itr != game_map[province_being_checked].coast_info.end();
+                             coast_itr++) {
+                            for (adjacent_itr = coast_itr->second.adjacent_coasts.begin();
+                                 adjacent_itr != coast_itr->second.adjacent_coasts.end();
+                                 adjacent_itr++) {
+                                provinces_to_check.insert(adjacent_itr->province_index);
                             }
                         }
                     }
@@ -2133,13 +2133,13 @@ int MapAndUnits::get_adjudication_results(TokenMessage ord_messages[]) {
 
 int MapAndUnits::get_movement_results(TokenMessage ord_messages[]) {
     int unit_counter = 0;
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
     UNIT_AND_ORDER *unit;
 
-    for (unit_iterator = units.begin();
-         unit_iterator != units.end();
-         unit_iterator++) {
-        unit = &(unit_iterator->second);
+    for (unit_itr = units.begin();
+         unit_itr != units.end();
+         unit_itr++) {
+        unit = &(unit_itr->second);
 
         ord_messages[unit_counter] = describe_movement_result(unit);
 
@@ -2153,7 +2153,7 @@ TokenMessage MapAndUnits::describe_movement_result(UNIT_AND_ORDER *unit) {
     TokenMessage movement_result;
     TokenMessage order;
     TokenMessage result;
-    UNIT_LIST::iterator convoy_step_iterator;
+    UNIT_LIST::iterator convoy_step_itr;
     TokenMessage convoy_via;
 
     movement_result = TOKEN_COMMAND_ORD + describe_turn();
@@ -2238,10 +2238,10 @@ TokenMessage MapAndUnits::describe_movement_result(UNIT_AND_ORDER *unit) {
         case MOVE_BY_CONVOY_ORDER: {
             order = describe_unit(unit) + TOKEN_ORDER_CTO + describe_coast(unit->move_dest);
 
-            for (convoy_step_iterator = unit->convoy_step_list.begin();
-                 convoy_step_iterator != unit->convoy_step_list.end();
-                 convoy_step_iterator++) {
-                convoy_via = convoy_via + game_map[*convoy_step_iterator].province_token;
+            for (convoy_step_itr = unit->convoy_step_list.begin();
+                 convoy_step_itr != unit->convoy_step_list.end();
+                 convoy_step_itr++) {
+                convoy_via = convoy_via + game_map[*convoy_step_itr].province_token;
             }
 
             order = order + TOKEN_ORDER_VIA & convoy_via;
@@ -2298,13 +2298,13 @@ TokenMessage MapAndUnits::describe_unit(UNIT_AND_ORDER *unit) {
 
 int MapAndUnits::get_retreat_results(TokenMessage ord_messages[]) {
     int unit_counter = 0;
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
     UNIT_AND_ORDER *unit;
 
-    for (unit_iterator = dislodged_units.begin();
-         unit_iterator != dislodged_units.end();
-         unit_iterator++) {
-        unit = &(unit_iterator->second);
+    for (unit_itr = dislodged_units.begin();
+         unit_itr != dislodged_units.end();
+         unit_itr++) {
+        unit = &(unit_itr->second);
 
         ord_messages[unit_counter] = describe_retreat_result(unit);
 
@@ -2355,16 +2355,16 @@ int MapAndUnits::get_adjustment_results(TokenMessage ord_messages[]) {
     POWER_INDEX power_counter;
     int order_counter = 0;
     WINTER_ORDERS_FOR_POWER *orders;
-    BUILDS_OR_DISBANDS::iterator order_iterator;
+    BUILDS_OR_DISBANDS::iterator order_itr;
     int waive_counter;
 
     for (power_counter = 0; power_counter < number_of_powers; power_counter++) {
         orders = &(winter_orders[power_counter]);
 
-        for (order_iterator = orders->builds_or_disbands.begin();
-             order_iterator != orders->builds_or_disbands.end();
-             order_iterator++) {
-            ord_messages[order_counter] = describe_build_result(power_counter, orders, order_iterator);
+        for (order_itr = orders->builds_or_disbands.begin();
+             order_itr != orders->builds_or_disbands.end();
+             order_itr++) {
+            ord_messages[order_counter] = describe_build_result(power_counter, orders, order_itr);
 
             order_counter++;
         }
@@ -2384,19 +2384,19 @@ int MapAndUnits::get_adjustment_results(TokenMessage ord_messages[]) {
 TokenMessage MapAndUnits::describe_build_result(
         POWER_INDEX power_counter,
         WINTER_ORDERS_FOR_POWER *orders,
-        BUILDS_OR_DISBANDS::iterator order_iterator) {
+        BUILDS_OR_DISBANDS::iterator order_itr) {
     TokenMessage build_result_message;
     TokenMessage order;
 
     order = Token(CATEGORY_POWER, power_counter);
 
-    if (order_iterator->first.coast_token == TOKEN_UNIT_AMY) {
+    if (order_itr->first.coast_token == TOKEN_UNIT_AMY) {
         order = order + TOKEN_UNIT_AMY;
     } else {
         order = order + TOKEN_UNIT_FLT;
     }
 
-    order = order + describe_coast(order_iterator->first);
+    order = order + describe_coast(order_itr->first);
 
     order.enclose_this();
 
@@ -2429,37 +2429,37 @@ TokenMessage MapAndUnits::describe_waive(POWER_INDEX power_counter) {
 }
 
 void MapAndUnits::get_unit_positions(TokenMessage *now_message) {
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
 
     *now_message = TOKEN_COMMAND_NOW + describe_turn();
 
-    for (unit_iterator = units.begin();
-         unit_iterator != units.end();
-         unit_iterator++) {
-        *now_message = *now_message + describe_unit(&(unit_iterator->second));
+    for (unit_itr = units.begin();
+         unit_itr != units.end();
+         unit_itr++) {
+        *now_message = *now_message + describe_unit(&(unit_itr->second));
     }
 
-    for (unit_iterator = dislodged_units.begin();
-         unit_iterator != dislodged_units.end();
-         unit_iterator++) {
-        *now_message = *now_message + describe_dislodged_unit(&(unit_iterator->second));
+    for (unit_itr = dislodged_units.begin();
+         unit_itr != dislodged_units.end();
+         unit_itr++) {
+        *now_message = *now_message + describe_dislodged_unit(&(unit_itr->second));
     }
 }
 
 TokenMessage MapAndUnits::describe_dislodged_unit(UNIT_AND_ORDER *unit) {
     TokenMessage unit_message;
     TokenMessage retreat_locations;
-    COAST_SET::iterator retreat_iterator;
+    COAST_SET::iterator retreat_itr;
 
     unit_message = Token(CATEGORY_POWER, unit->nationality)
                    + unit->unit_type
                    + describe_coast(unit->coast_id)
                    + TOKEN_PARAMETER_MRT;
 
-    for (retreat_iterator = unit->retreat_options.begin();
-         retreat_iterator != unit->retreat_options.end();
-         retreat_iterator++) {
-        retreat_locations = retreat_locations + describe_coast(*retreat_iterator);
+    for (retreat_itr = unit->retreat_options.begin();
+         retreat_itr != unit->retreat_options.end();
+         retreat_itr++) {
+        retreat_locations = retreat_locations + describe_coast(*retreat_itr);
     }
 
     unit_message = (unit_message & retreat_locations).enclose();
@@ -2518,12 +2518,12 @@ int MapAndUnits::get_centre_count(Token power) {
 
 int MapAndUnits::get_unit_count(Token power) {
     int unit_count = 0;
-    UNITS::iterator unit_iterator;
+    UNITS::iterator unit_itr;
 
-    for (unit_iterator = units.begin();
-         unit_iterator != units.end();
-         unit_iterator++) {
-        if (unit_iterator->second.nationality == power.get_subtoken()) {
+    for (unit_itr = units.begin();
+         unit_itr != units.end();
+         unit_itr++) {
+        if (unit_itr->second.nationality == power.get_subtoken()) {
             unit_count++;
         }
     }
@@ -2532,40 +2532,40 @@ int MapAndUnits::get_unit_count(Token power) {
 }
 
 bool MapAndUnits::check_if_all_orders_received(POWER_INDEX power_index) {
-    UNITS::iterator unit_iterator;                // Iterator to step through the units
-    WINTER_ORDERS::iterator winter_iterator;    // Iterator to step through the winter orders
+    UNITS::iterator unit_itr;                // Iterator to step through the units
+    WINTER_ORDERS::iterator winter_itr;    // Iterator to step through the winter orders
     bool all_ordered = true;                    // Whether all units have been ordered
 
     if ((current_season == TOKEN_SEASON_SPR)
         || (current_season == TOKEN_SEASON_FAL)) {
         // Go through all units and determine if any haven't been ordered
-        for (unit_iterator = units.begin();
-             unit_iterator != units.end();
-             unit_iterator++) {
-            if ((unit_iterator->second.nationality == power_index)
-                && (unit_iterator->second.order_type == NO_ORDER)) {
+        for (unit_itr = units.begin();
+             unit_itr != units.end();
+             unit_itr++) {
+            if ((unit_itr->second.nationality == power_index)
+                && (unit_itr->second.order_type == NO_ORDER)) {
                 all_ordered = false;
             }
         }
     } else if ((current_season == TOKEN_SEASON_SUM)
                || (current_season == TOKEN_SEASON_AUT)) {
         // Go through all dislodged units and determine if any haven't been ordered
-        for (unit_iterator = dislodged_units.begin();
-             unit_iterator != dislodged_units.end();
-             unit_iterator++) {
-            if ((unit_iterator->second.nationality == power_index)
-                && (unit_iterator->second.order_type == NO_ORDER)) {
+        for (unit_itr = dislodged_units.begin();
+             unit_itr != dislodged_units.end();
+             unit_itr++) {
+            if ((unit_itr->second.nationality == power_index)
+                && (unit_itr->second.order_type == NO_ORDER)) {
                 all_ordered = false;
             }
         }
     } else if (current_season == TOKEN_SEASON_WIN) {
         // Find the record for this power
-        winter_iterator = winter_orders.find(power_index);
+        winter_itr = winter_orders.find(power_index);
 
-        if (winter_iterator != winter_orders.end()) {
-            if (winter_iterator->second.number_of_orders_required
-                > ((int) winter_iterator->second.builds_or_disbands.size()
-                   + winter_iterator->second.number_of_waives)) {
+        if (winter_itr != winter_orders.end()) {
+            if (winter_itr->second.number_of_orders_required
+                > ((int) winter_itr->second.builds_or_disbands.size()
+                   + winter_itr->second.number_of_waives)) {
                 all_ordered = false;
             }
         }
@@ -2583,7 +2583,7 @@ bool MapAndUnits::unorder_adjustment(TokenMessage &not_sub_message, int power_in
     WINTER_ORDERS_FOR_POWER *winter_record;
     TokenMessage winter_order_unit;
     COAST_ID build_location;
-    BUILDS_OR_DISBANDS::iterator match_iterator;
+    BUILDS_OR_DISBANDS::iterator match_itr;
 
     sub_message = not_sub_message.get_submessage(1);
     order = sub_message.get_submessage(1);
@@ -2620,11 +2620,11 @@ bool MapAndUnits::unorder_adjustment(TokenMessage &not_sub_message, int power_in
                 if (winter_order_unit.get_token(0).get_subtoken() != power_index) {
                     order_valid = false;
                 } else {
-                    match_iterator = winter_record->builds_or_disbands.find(build_location);
+                    match_itr = winter_record->builds_or_disbands.find(build_location);
 
-                    if (match_iterator != winter_record->builds_or_disbands.end()) {
+                    if (match_itr != winter_record->builds_or_disbands.end()) {
                         // Found the matching build/removal. Delete it.
-                        winter_record->builds_or_disbands.erase(match_iterator);
+                        winter_record->builds_or_disbands.erase(match_itr);
                     } else {
                         order_valid = false;
                     }

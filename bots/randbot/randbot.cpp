@@ -28,19 +28,19 @@ typename SetType::value_type get_random_set_member(SetType my_set) {
     int set_size = my_set.size();
     int rand_selection = rand() / 37 % set_size;
     int item_counter;
-    SetType::iterator set_iterator;
+    SetType::iterator set_itr;
 
-    set_iterator = my_set.begin();
+    set_itr = my_set.begin();
 
     for (item_counter = 0; item_counter < rand_selection; item_counter++) {
-        set_iterator++;
+        set_itr++;
     }
 
-    return (*set_iterator);
+    return (*set_itr);
 }
 
 void RandBot::process_now_message(TokenMessage &incoming_message) {
-    MapAndUnits::UNIT_SET::iterator unit_iterator;
+    MapAndUnits::UNIT_SET::iterator unit_itr;
     MapAndUnits::UNIT_AND_ORDER *unit_info;
     MapAndUnits::COAST_DETAILS *province_coast_info;
     MapAndUnits::COAST_ID move_destination;
@@ -52,22 +52,22 @@ void RandBot::process_now_message(TokenMessage &incoming_message) {
         if ((m_map_and_units->current_season == TOKEN_SEASON_SPR)
             || (m_map_and_units->current_season == TOKEN_SEASON_FAL)) {
             // Order all units to hold.
-            for (unit_iterator = m_map_and_units->our_units.begin();
-                 unit_iterator != m_map_and_units->our_units.end();
-                 unit_iterator++) {
-                unit_info = &(m_map_and_units->units[*unit_iterator]);
+            for (unit_itr = m_map_and_units->our_units.begin();
+                 unit_itr != m_map_and_units->our_units.end();
+                 unit_itr++) {
+                unit_info = &(m_map_and_units->units[*unit_itr]);
                 province_coast_info = &(m_map_and_units->game_map[unit_info->coast_id.province_index]
                         .coast_info[unit_info->coast_id.coast_token]);
                 move_destination = get_random_set_member<MapAndUnits::COAST_SET>(province_coast_info->adjacent_coasts);
-                m_map_and_units->set_move_order(*unit_iterator, move_destination);
+                m_map_and_units->set_move_order(*unit_itr, move_destination);
             }
         } else if ((m_map_and_units->current_season == TOKEN_SEASON_SUM)
                    || (m_map_and_units->current_season == TOKEN_SEASON_AUT)) {
             // Order all dislodged units to disband.
-            for (unit_iterator = m_map_and_units->our_dislodged_units.begin();
-                 unit_iterator != m_map_and_units->our_dislodged_units.end();
-                 unit_iterator++) {
-                m_map_and_units->set_disband_order(*unit_iterator);
+            for (unit_itr = m_map_and_units->our_dislodged_units.begin();
+                 unit_itr != m_map_and_units->our_dislodged_units.end();
+                 unit_itr++) {
+                m_map_and_units->set_disband_order(*unit_itr);
             }
         } else {
             if (m_map_and_units->our_units.size() > m_map_and_units->our_centres.size()) {

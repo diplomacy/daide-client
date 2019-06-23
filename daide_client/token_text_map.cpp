@@ -22,25 +22,25 @@ TokenTextMap *TokenTextMap::instance() {
 }
 
 void TokenTextMap::clear_category(BYTE category) {
-    TOKEN_TO_TEXT_MAP::iterator token_to_text_iterator;
+    TOKEN_TO_TEXT_MAP::iterator token_to_text_itr;
     LANGUAGE_TOKEN category_value = (LANGUAGE_TOKEN) (category) << 8;
     LANGUAGE_TOKEN next_category_value = (LANGUAGE_TOKEN) (category + 1) << 8;
     string token_string;
 
     // Find the first element in the specified category
-    token_to_text_iterator = m_token_to_text_map.lower_bound(category_value);
+    token_to_text_itr = m_token_to_text_map.lower_bound(category_value);
 
     // While the end of the category is not found
-    while ((token_to_text_iterator != m_token_to_text_map.end())
-           && (token_to_text_iterator->first < next_category_value)) {
+    while ((token_to_text_itr != m_token_to_text_map.end())
+           && (token_to_text_itr->first < next_category_value)) {
         // Get the string for the current token
-        token_string = token_to_text_iterator->second;
+        token_string = token_to_text_itr->second;
 
         // Erase the entry from the text to token map
         m_text_to_token_map.erase(token_string);
 
         // Erase the entry from the token to text map
-        token_to_text_iterator = m_token_to_text_map.erase(token_to_text_iterator);
+        token_to_text_itr = m_token_to_text_map.erase(token_to_text_itr);
     }
 }
 

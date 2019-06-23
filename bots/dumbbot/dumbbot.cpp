@@ -171,23 +171,23 @@ void DumbBot::send_nme_or_obs() {
 void DumbBot::process_mdf_message(TokenMessage &incoming_message) {
     int province_counter;
     MapAndUnits::PROVINCE_COASTS *province_coasts;
-    MapAndUnits::PROVINCE_COASTS::iterator coast_iterator;
+    MapAndUnits::PROVINCE_COASTS::iterator coast_itr;
     MapAndUnits::COAST_SET *adjacent_coasts;
-    MapAndUnits::COAST_SET::iterator adjacent_coast_iterator;
+    MapAndUnits::COAST_SET::iterator adjacent_coast_itr;
 
     // Build the set of adjacent provinces
     for (province_counter = 0; province_counter < m_map_and_units->number_of_provinces; province_counter++) {
         province_coasts = &(m_map_and_units->game_map[province_counter].coast_info);
 
-        for (coast_iterator = province_coasts->begin();
-             coast_iterator != province_coasts->end();
-             coast_iterator++) {
-            adjacent_coasts = &(coast_iterator->second.adjacent_coasts);
+        for (coast_itr = province_coasts->begin();
+             coast_itr != province_coasts->end();
+             coast_itr++) {
+            adjacent_coasts = &(coast_itr->second.adjacent_coasts);
 
-            for (adjacent_coast_iterator = adjacent_coasts->begin();
-                 adjacent_coast_iterator != adjacent_coasts->end();
-                 adjacent_coast_iterator++) {
-                m_adjacent_provinces[province_counter].insert(adjacent_coast_iterator->province_index);
+            for (adjacent_coast_itr = adjacent_coasts->begin();
+                 adjacent_coast_itr != adjacent_coasts->end();
+                 adjacent_coast_itr++) {
+                m_adjacent_provinces[province_counter].insert(adjacent_coast_itr->province_index);
             }
         }
     }
@@ -223,24 +223,24 @@ void DumbBot::process_sco_message(TokenMessage &incoming_message) {
 
 DumbBot::WEIGHTING DumbBot::calculate_defence_value(int province_index) {
     WEIGHTING defence_value = 0;
-    ADJACENT_PROVINCE_SET::iterator adjacent_province_iterator;
-    MapAndUnits::UNITS::iterator adjacent_unit_iterator;
+    ADJACENT_PROVINCE_SET::iterator adjacent_province_itr;
+    MapAndUnits::UNITS::iterator adjacent_unit_itr;
     MapAndUnits::COAST_SET *adjacent_unit_adjacent_coasts;
     MapAndUnits::COAST_ID coast_id;
 
     // For each adjacent province
-    for (adjacent_province_iterator = m_adjacent_provinces[province_index].begin();
-         adjacent_province_iterator != m_adjacent_provinces[province_index].end();
-         adjacent_province_iterator++) {
+    for (adjacent_province_itr = m_adjacent_provinces[province_index].begin();
+         adjacent_province_itr != m_adjacent_provinces[province_index].end();
+         adjacent_province_itr++) {
         // If there is a unit there
-        adjacent_unit_iterator = m_map_and_units->units.find(*adjacent_province_iterator);
+        adjacent_unit_itr = m_map_and_units->units.find(*adjacent_province_itr);
 
-        if (adjacent_unit_iterator != m_map_and_units->units.end()) {
+        if (adjacent_unit_itr != m_map_and_units->units.end()) {
             // If it would increase the defence value
-            if ((m_power_size[adjacent_unit_iterator->second.nationality] > defence_value)
-                && (adjacent_unit_iterator->second.nationality != m_map_and_units->power_played.get_subtoken())) {
+            if ((m_power_size[adjacent_unit_itr->second.nationality] > defence_value)
+                && (adjacent_unit_itr->second.nationality != m_map_and_units->power_played.get_subtoken())) {
                 // If it can move to this province
-                adjacent_unit_adjacent_coasts = &(m_map_and_units->game_map[*adjacent_province_iterator].coast_info[adjacent_unit_iterator->second.coast_id.coast_token].adjacent_coasts);
+                adjacent_unit_adjacent_coasts = &(m_map_and_units->game_map[*adjacent_province_itr].coast_info[adjacent_unit_itr->second.coast_id.coast_token].adjacent_coasts);
 
                 coast_id.province_index = province_index;
                 coast_id.coast_token = Token(0);
@@ -248,7 +248,7 @@ DumbBot::WEIGHTING DumbBot::calculate_defence_value(int province_index) {
                 if ((adjacent_unit_adjacent_coasts->lower_bound(coast_id) != adjacent_unit_adjacent_coasts->end())
                     && (adjacent_unit_adjacent_coasts->lower_bound(coast_id)->province_index == province_index)) {
                     // Update the defence value
-                    defence_value = m_power_size[adjacent_unit_iterator->second.nationality];
+                    defence_value = m_power_size[adjacent_unit_itr->second.nationality];
                 }
             }
         }
@@ -270,7 +270,7 @@ int DumbBot::get_power_index(Token power_token) {
 }
 
 void DumbBot::process_now_message(TokenMessage &incoming_message) {
-    MapAndUnits::UNIT_SET::iterator unit_iterator;
+    MapAndUnits::UNIT_SET::iterator unit_itr;
 
     if ((m_map_and_units->current_season == TOKEN_SEASON_SPR)
         || (m_map_and_units->current_season == TOKEN_SEASON_SUM)) {
@@ -323,16 +323,16 @@ void DumbBot::process_now_message(TokenMessage &incoming_message) {
 void DumbBot::calculate_factors(WEIGHTING proximity_attack_weight, WEIGHTING proximity_defence_weight) {
     int province_counter;
     MapAndUnits::PROVINCE_COASTS *province_coasts;
-    MapAndUnits::PROVINCE_COASTS::iterator province_coast_iterator;
+    MapAndUnits::PROVINCE_COASTS::iterator province_coast_itr;
     MapAndUnits::COAST_ID coast_id;
     int previous_province;
     WEIGHTING previous_weight;
     int proximity_counter;
     MapAndUnits::COAST_SET *adjacent_coasts;
-    MapAndUnits::COAST_SET::iterator coast_iterator;
-    PROXIMITY_MAP::iterator proximity_iterator;
+    MapAndUnits::COAST_SET::iterator coast_itr;
+    PROXIMITY_MAP::iterator proximity_itr;
     int adjacent_unit_count[MapAndUnits::MAX_PROVINCES][MapAndUnits::MAX_POWERS];
-    MapAndUnits::UNITS::iterator unit_iterator;
+    MapAndUnits::UNITS::iterator unit_itr;
     int power_counter;
 
     // Initialise arrays to 0
@@ -362,10 +362,10 @@ void DumbBot::calculate_factors(WEIGHTING proximity_attack_weight, WEIGHTING pro
         province_coasts = &(m_map_and_units->game_map[province_counter].coast_info);
         coast_id.province_index = province_counter;
 
-        for (province_coast_iterator = province_coasts->begin();
-             province_coast_iterator != province_coasts->end();
-             province_coast_iterator++) {
-            coast_id.coast_token = province_coast_iterator->first;
+        for (province_coast_itr = province_coasts->begin();
+             province_coast_itr != province_coasts->end();
+             province_coast_itr++) {
+            coast_id.coast_token = province_coast_itr->first;
 
             (m_proximity_map[0])[coast_id] = m_attack_value[province_counter] * proximity_attack_weight
                                              + m_defence_value[province_counter] * proximity_defence_weight;
@@ -383,41 +383,41 @@ void DumbBot::calculate_factors(WEIGHTING proximity_attack_weight, WEIGHTING pro
     // The divide by 5 is just to keep all values of proximity[ n ] in the same range.
     // The average coast has 4 adjacent coasts, plus itself.
     for (proximity_counter = 1; proximity_counter < PROXIMITY_DEPTH; proximity_counter++) {
-        for (proximity_iterator = m_proximity_map[proximity_counter].begin();
-             proximity_iterator != m_proximity_map[proximity_counter].end();
-             proximity_iterator++) {
-            adjacent_coasts = &(m_map_and_units->game_map[proximity_iterator->first.province_index].coast_info[proximity_iterator->first.coast_token].adjacent_coasts);
+        for (proximity_itr = m_proximity_map[proximity_counter].begin();
+             proximity_itr != m_proximity_map[proximity_counter].end();
+             proximity_itr++) {
+            adjacent_coasts = &(m_map_and_units->game_map[proximity_itr->first.province_index].coast_info[proximity_itr->first.coast_token].adjacent_coasts);
 
             previous_province = -1;
 
-            for (coast_iterator = adjacent_coasts->begin();
-                 coast_iterator != adjacent_coasts->end();
-                 coast_iterator++) {
+            for (coast_itr = adjacent_coasts->begin();
+                 coast_itr != adjacent_coasts->end();
+                 coast_itr++) {
                 // If it is the same province again (e.g. This is Spa/sc after Spa/nc, for MAO
-                if (coast_iterator->province_index == previous_province) {
+                if (coast_itr->province_index == previous_province) {
                     // Replace the previous weight with the new one, if the new one is higher
-                    if ((m_proximity_map[proximity_counter - 1])[*coast_iterator] > previous_weight) {
-                        proximity_iterator->second = proximity_iterator->second - previous_weight;
+                    if ((m_proximity_map[proximity_counter - 1])[*coast_itr] > previous_weight) {
+                        proximity_itr->second = proximity_itr->second - previous_weight;
 
-                        previous_weight = (m_proximity_map[proximity_counter - 1])[*coast_iterator];
+                        previous_weight = (m_proximity_map[proximity_counter - 1])[*coast_itr];
 
-                        proximity_iterator->second = proximity_iterator->second + previous_weight;
+                        proximity_itr->second = proximity_itr->second + previous_weight;
                     }
                 } else {
                     // Add to the weight
-                    previous_weight = (m_proximity_map[proximity_counter - 1])[*coast_iterator];
+                    previous_weight = (m_proximity_map[proximity_counter - 1])[*coast_itr];
 
-                    proximity_iterator->second = proximity_iterator->second + previous_weight;
+                    proximity_itr->second = proximity_itr->second + previous_weight;
                 }
 
-                previous_province = coast_iterator->province_index;
+                previous_province = coast_itr->province_index;
             }
 
             // Add this province in, then divide the answer by 5
-            proximity_iterator->second =
-                    proximity_iterator->second + (m_proximity_map[proximity_counter - 1])[proximity_iterator->first];
+            proximity_itr->second =
+                    proximity_itr->second + (m_proximity_map[proximity_counter - 1])[proximity_itr->first];
 
-            proximity_iterator->second = proximity_iterator->second / 5;
+            proximity_itr->second = proximity_itr->second / 5;
         }
     }
 
@@ -434,18 +434,18 @@ void DumbBot::calculate_factors(WEIGHTING proximity_attack_weight, WEIGHTING pro
         m_competition_value[province_counter] = 0;
     }
 
-    for (unit_iterator = m_map_and_units->units.begin();
-         unit_iterator != m_map_and_units->units.end();
-         unit_iterator++) {
-        adjacent_coasts = &(m_map_and_units->game_map[unit_iterator->second.coast_id.province_index].coast_info[unit_iterator->second.coast_id.coast_token].adjacent_coasts);
+    for (unit_itr = m_map_and_units->units.begin();
+         unit_itr != m_map_and_units->units.end();
+         unit_itr++) {
+        adjacent_coasts = &(m_map_and_units->game_map[unit_itr->second.coast_id.province_index].coast_info[unit_itr->second.coast_id.coast_token].adjacent_coasts);
 
-        for (coast_iterator = adjacent_coasts->begin();
-             coast_iterator != adjacent_coasts->end();
-             coast_iterator++) {
-            adjacent_unit_count[coast_iterator->province_index][unit_iterator->second.nationality]++;
+        for (coast_itr = adjacent_coasts->begin();
+             coast_itr != adjacent_coasts->end();
+             coast_itr++) {
+            adjacent_unit_count[coast_itr->province_index][unit_itr->second.nationality]++;
         }
 
-        adjacent_unit_count[unit_iterator->second.coast_id.province_index][unit_iterator->second.nationality]++;
+        adjacent_unit_count[unit_itr->second.coast_id.province_index][unit_itr->second.nationality]++;
     }
 
     for (province_counter = 0; province_counter < m_map_and_units->number_of_provinces; province_counter++) {
@@ -464,15 +464,15 @@ void DumbBot::calculate_factors(WEIGHTING proximity_attack_weight, WEIGHTING pro
 
 void DumbBot::calculate_destination_value(WEIGHTING *proximity_weight, WEIGHTING strength_weight,
                                           WEIGHTING competition_weight) {
-    PROXIMITY_MAP::iterator proximity_iterator;
+    PROXIMITY_MAP::iterator proximity_itr;
     MapAndUnits::COAST_ID coast_id;
     int proximity_counter;
     WEIGHTING destination_weight;
 
-    for (proximity_iterator = m_proximity_map[0].begin();
-         proximity_iterator != m_proximity_map[0].end();
-         proximity_iterator++) {
-        coast_id = proximity_iterator->first;
+    for (proximity_itr = m_proximity_map[0].begin();
+         proximity_itr != m_proximity_map[0].end();
+         proximity_itr++) {
+        coast_id = proximity_itr->first;
 
         destination_weight = 0;
 
@@ -491,15 +491,15 @@ void DumbBot::calculate_destination_value(WEIGHTING *proximity_weight, WEIGHTING
 // the value of each coast for winter builds and removals.
 
 void DumbBot::calculate_winter_destination_value(WEIGHTING *proximity_weight, WEIGHTING defence_weight) {
-    PROXIMITY_MAP::iterator proximity_iterator;
+    PROXIMITY_MAP::iterator proximity_itr;
     MapAndUnits::COAST_ID coast_id;
     int proximity_counter;
     WEIGHTING destination_weight;
 
-    for (proximity_iterator = m_proximity_map[0].begin();
-         proximity_iterator != m_proximity_map[0].end();
-         proximity_iterator++) {
-        coast_id = proximity_iterator->first;
+    for (proximity_itr = m_proximity_map[0].begin();
+         proximity_itr != m_proximity_map[0].end();
+         proximity_itr++) {
+        coast_id = proximity_itr->first;
 
         destination_weight = 0;
 
@@ -519,7 +519,7 @@ void DumbBot::calculate_winter_destination_value(WEIGHTING *proximity_weight, WE
 
 void DumbBot::generate_debug() {
     FILE *fp;
-    PROXIMITY_MAP::iterator coast_iterator;
+    PROXIMITY_MAP::iterator coast_itr;
     MapAndUnits::COAST_ID coast_id;
     String filename;
     int proximity_counter;
@@ -534,10 +534,10 @@ void DumbBot::generate_debug() {
     } else {
         fprintf(fp, "Province,Coast,Attack,Defence,Strength,Competition,Proximities,,,,,,,,,,Value\n");
 
-        for (coast_iterator = m_proximity_map[0].begin();
-             coast_iterator != m_proximity_map[0].end();
-             coast_iterator++) {
-            coast_id = coast_iterator->first;
+        for (coast_itr = m_proximity_map[0].begin();
+             coast_itr != m_proximity_map[0].end();
+             coast_itr++) {
+            coast_id = coast_itr->first;
 
             if (m_strength_value[coast_id.province_index] > 0) {
                 fprintf(fp, "%s,%s,",
@@ -567,52 +567,52 @@ void DumbBot::generate_debug() {
 // Generate the actual orders for a movement turn
 
 void DumbBot::generate_movement_orders() {
-    RANDOM_UNIT_MAP::iterator unit_iterator;
+    RANDOM_UNIT_MAP::iterator unit_itr;
     DESTINATION_MAP destination_map;
     MapAndUnits::UNIT_AND_ORDER *unit;
     MapAndUnits::COAST_SET *adjacent_coasts;
-    MapAndUnits::COAST_SET::iterator coast_iterator;
-    DESTINATION_MAP::iterator destination_iterator;
-    DESTINATION_MAP::iterator next_destination_iterator;
+    MapAndUnits::COAST_SET::iterator coast_itr;
+    DESTINATION_MAP::iterator destination_itr;
+    DESTINATION_MAP::iterator next_destination_itr;
     bool try_next_province;
     WEIGHTING next_province_chance;
     bool selection_is_ok;
     bool order_unit_to_move;
-    MapAndUnits::UNITS::iterator current_unit_iterator;
-    RANDOM_UNIT_MAP::iterator random_unit_iterator;
+    MapAndUnits::UNITS::iterator current_unit_itr;
+    RANDOM_UNIT_MAP::iterator random_unit_itr;
     int occupying_unit_order;
     MOVING_UNIT_MAP moving_unit_map;
-    MOVING_UNIT_MAP::iterator moving_unit_iterator;
+    MOVING_UNIT_MAP::iterator moving_unit_itr;
 
     // Put our units into a random order. This is one of the ways in which
     // DumbBot is made non-deterministic - the order the units are considered
     // in can affect the orders selected
     generate_random_unit_list(m_map_and_units->our_units);
 
-    unit_iterator = m_random_unit_map.begin();
+    unit_itr = m_random_unit_map.begin();
 
     log("%s %d",
         TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->current_season].c_str(),
         m_map_and_units->current_year);
 
-    while (unit_iterator != m_random_unit_map.end()) {
+    while (unit_itr != m_random_unit_map.end()) {
         // Build the list of possible destinations for this unit, indexed by the
         // weight for the destination
         destination_map.clear();
 
-        unit = &(m_map_and_units->units[unit_iterator->second]);
+        unit = &(m_map_and_units->units[unit_itr->second]);
 
         log("Selecting destination for %s",
             TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[unit->coast_id.province_index].province_token].c_str());
 
 
         // Put all the adjacent coasts into the destination map
-        adjacent_coasts = &(m_map_and_units->game_map[unit_iterator->second].coast_info[unit->coast_id.coast_token].adjacent_coasts);
+        adjacent_coasts = &(m_map_and_units->game_map[unit_itr->second].coast_info[unit->coast_id.coast_token].adjacent_coasts);
 
-        for (coast_iterator = adjacent_coasts->begin();
-             coast_iterator != adjacent_coasts->end();
-             coast_iterator++) {
-            destination_map.insert(DESTINATION_MAP::value_type(m_destination_value[*coast_iterator], *coast_iterator));
+        for (coast_itr = adjacent_coasts->begin();
+             coast_itr != adjacent_coasts->end();
+             coast_itr++) {
+            destination_map.insert(DESTINATION_MAP::value_type(m_destination_value[*coast_itr], *coast_itr));
         }
 
         // Put the current location in (we can hold rather than move)
@@ -620,43 +620,43 @@ void DumbBot::generate_movement_orders() {
 
         do {
             // Pick a destination
-            destination_iterator = destination_map.begin();
+            destination_itr = destination_map.begin();
 
             log("Destination selected : %s %s",
-                TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_iterator->second.province_index].province_token].c_str(),
-                TokenTextMap::instance()->m_token_to_text_map[destination_iterator->second.coast_token].c_str());
+                TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_itr->second.province_index].province_token].c_str(),
+                TokenTextMap::instance()->m_token_to_text_map[destination_itr->second.coast_token].c_str());
 
             try_next_province = true;
 
             while (try_next_province == true) {
                 // Consider the next destination in the map
-                next_destination_iterator = destination_iterator;
-                next_destination_iterator++;
+                next_destination_itr = destination_itr;
+                next_destination_itr++;
 
                 // If there is no next destination, give up.
-                if (next_destination_iterator == destination_map.end()) {
+                if (next_destination_itr == destination_map.end()) {
                     try_next_province = false;
                 } else {
                     // Randomly determine whether to use the current or next destination,
                     // based on their relative weights (the higher the difference, the
                     // more chance of picking the better one).
-                    if (destination_iterator->first == 0) {
+                    if (destination_itr->first == 0) {
                         next_province_chance = 0;
                     } else {
-                        next_province_chance = ((destination_iterator->first - next_destination_iterator->first) *
+                        next_province_chance = ((destination_itr->first - next_destination_itr->first) *
                                                 m_alternative_difference_modifier)
-                                               / destination_iterator->first;
+                                               / destination_itr->first;
                     }
 
                     if ((rand_no(100) < m_play_alternative)
                         && (rand_no(100) >= next_province_chance)) {
                         // Pick the next one (and go around the loop again to keep considering
                         // more options
-                        destination_iterator = next_destination_iterator;
+                        destination_itr = next_destination_itr;
 
                         log("New destination selected : %s %s (%d%% chance)",
-                            TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_iterator->second.province_index].province_token].c_str(),
-                            TokenTextMap::instance()->m_token_to_text_map[destination_iterator->second.coast_token].c_str(),
+                            TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_itr->second.province_index].province_token].c_str(),
+                            TokenTextMap::instance()->m_token_to_text_map[destination_itr->second.coast_token].c_str(),
                             m_play_alternative - (next_province_chance * m_play_alternative / 100));
                     } else {
                         // Use this one
@@ -670,28 +670,28 @@ void DumbBot::generate_movement_orders() {
             order_unit_to_move = true;
 
             // If this is a hold order
-            if (destination_iterator->second.province_index == unit->coast_id.province_index) {
+            if (destination_itr->second.province_index == unit->coast_id.province_index) {
                 log("Ordered to hold");
 
                 // Hold order
-                m_map_and_units->set_hold_order(unit_iterator->second);
+                m_map_and_units->set_hold_order(unit_itr->second);
             } else {
                 // If there is a unit in this province already
-                current_unit_iterator = m_map_and_units->units.find(destination_iterator->second.province_index);
-                if (m_map_and_units->our_units.find(destination_iterator->second.province_index) !=
+                current_unit_itr = m_map_and_units->units.find(destination_itr->second.province_index);
+                if (m_map_and_units->our_units.find(destination_itr->second.province_index) !=
                     m_map_and_units->our_units.end()) {
                     log("Province occupied");
 
                     // If it is not yet ordered
-                    if (current_unit_iterator->second.order_type == MapAndUnits::NO_ORDER) {
+                    if (current_unit_itr->second.order_type == MapAndUnits::NO_ORDER) {
                         log("Occupying unit unordered");
 
                         // Find this unit in the random unit map
-                        for (random_unit_iterator = m_random_unit_map.begin();
-                             random_unit_iterator != m_random_unit_map.end();
-                             random_unit_iterator++) {
-                            if (random_unit_iterator->second == destination_iterator->second.province_index) {
-                                occupying_unit_order = random_unit_iterator->first;
+                        for (random_unit_itr = m_random_unit_map.begin();
+                             random_unit_itr != m_random_unit_map.end();
+                             random_unit_itr++) {
+                            if (random_unit_itr->second == destination_itr->second.province_index) {
+                                occupying_unit_order = random_unit_itr->first;
                             }
                         }
 
@@ -699,24 +699,24 @@ void DumbBot::generate_movement_orders() {
                         // whether to move there or not, so give up on this unit for now
                         if (occupying_unit_order >= 0) {
                             m_random_unit_map.insert(
-                                    RANDOM_UNIT_MAP::value_type(occupying_unit_order - 1, unit_iterator->second));
+                                    RANDOM_UNIT_MAP::value_type(occupying_unit_order - 1, unit_itr->second));
 
                             order_unit_to_move = false;
                         }
                     }
 
                         // If it is not moving
-                    else if ((current_unit_iterator->second.order_type != MapAndUnits::MOVE_ORDER)
-                             && (current_unit_iterator->second.order_type != MapAndUnits::MOVE_BY_CONVOY_ORDER)) {
+                    else if ((current_unit_itr->second.order_type != MapAndUnits::MOVE_ORDER)
+                             && (current_unit_itr->second.order_type != MapAndUnits::MOVE_BY_CONVOY_ORDER)) {
                         log("Occupying unit not moving");
 
                         // If it needs supporting
-                        if (m_competition_value[destination_iterator->second.province_index] > 1) {
+                        if (m_competition_value[destination_itr->second.province_index] > 1) {
                             log("Supporting occupying unit");
 
                             // Support it
-                            m_map_and_units->set_support_to_hold_order(unit_iterator->second,
-                                                                       destination_iterator->second.province_index);
+                            m_map_and_units->set_support_to_hold_order(unit_itr->second,
+                                                                       destination_itr->second.province_index);
 
                             order_unit_to_move = false;
                         } else {
@@ -726,23 +726,23 @@ void DumbBot::generate_movement_orders() {
                             selection_is_ok = false;
 
                             // Make sure it isn't selected again
-                            destination_map.erase(destination_iterator);
+                            destination_map.erase(destination_itr);
                         }
                     }
                 }
 
                 // If there is a unit already moving to this province
-                moving_unit_iterator = moving_unit_map.find(destination_iterator->second.province_index);
-                if (moving_unit_iterator != moving_unit_map.end()) {
+                moving_unit_itr = moving_unit_map.find(destination_itr->second.province_index);
+                if (moving_unit_itr != moving_unit_map.end()) {
                     log("Unit already moving here");
 
                     // If it may need support
-                    if (m_competition_value[destination_iterator->second.province_index] > 0) {
+                    if (m_competition_value[destination_itr->second.province_index] > 0) {
                         log("Supporting moving unit");
 
                         // Support it
-                        m_map_and_units->set_support_to_move_order(unit_iterator->second, moving_unit_iterator->second,
-                                                                   moving_unit_iterator->first);
+                        m_map_and_units->set_support_to_move_order(unit_itr->second, moving_unit_itr->second,
+                                                                   moving_unit_itr->first);
 
                         order_unit_to_move = false;
                     } else {
@@ -752,45 +752,45 @@ void DumbBot::generate_movement_orders() {
                         selection_is_ok = false;
 
                         // Make sure it isn't selected again
-                        destination_map.erase(destination_iterator);
+                        destination_map.erase(destination_itr);
                     }
                 }
 
                 if ((selection_is_ok) && (order_unit_to_move)) {
                     log("Ordered to move");
 
-                    m_map_and_units->set_move_order(unit_iterator->second, destination_iterator->second);
+                    m_map_and_units->set_move_order(unit_itr->second, destination_itr->second);
 
-                    moving_unit_map[destination_iterator->second.province_index] = unit_iterator->second;
+                    moving_unit_map[destination_itr->second.province_index] = unit_itr->second;
                 }
             }
         } while (!selection_is_ok);
 
         // Unit is now ordered, so delete it from the random unit map
-        m_random_unit_map.erase(unit_iterator);
+        m_random_unit_map.erase(unit_itr);
 
         // Move onto the next one
-        unit_iterator = m_random_unit_map.begin();
+        unit_itr = m_random_unit_map.begin();
     }
 
     check_for_wasted_holds(moving_unit_map);
 }
 
 void DumbBot::check_for_wasted_holds(MOVING_UNIT_MAP &moving_unit_map) {
-    MapAndUnits::UNIT_SET::iterator our_unit_iterator;
+    MapAndUnits::UNIT_SET::iterator our_unit_itr;
     MapAndUnits::UNIT_AND_ORDER *unit;
     MapAndUnits::COAST_SET *adjacent_coasts;
-    MapAndUnits::COAST_SET::iterator adjacent_coast_iterator;
-    MapAndUnits::UNITS::iterator adjacent_unit_iterator;
+    MapAndUnits::COAST_SET::iterator adjacent_coast_itr;
+    MapAndUnits::UNITS::iterator adjacent_unit_itr;
     WEIGHTING max_destination_value;
     MapAndUnits::PROVINCE_INDEX destination;
     MapAndUnits::PROVINCE_INDEX source;
 
     // For each unit, if it is ordered to hold
-    for (our_unit_iterator = m_map_and_units->our_units.begin();
-         our_unit_iterator != m_map_and_units->our_units.end();
-         our_unit_iterator++) {
-        unit = &(m_map_and_units->units[*our_unit_iterator]);
+    for (our_unit_itr = m_map_and_units->our_units.begin();
+         our_unit_itr != m_map_and_units->our_units.end();
+         our_unit_itr++) {
+        unit = &(m_map_and_units->units[*our_unit_itr]);
 
         if (unit->order_type == MapAndUnits::HOLD_ORDER) {
             // Consider every province we can move to
@@ -798,36 +798,36 @@ void DumbBot::check_for_wasted_holds(MOVING_UNIT_MAP &moving_unit_map) {
 
             max_destination_value = 0;
 
-            for (adjacent_coast_iterator = adjacent_coasts->begin();
-                 adjacent_coast_iterator != adjacent_coasts->end();
-                 adjacent_coast_iterator++) {
+            for (adjacent_coast_itr = adjacent_coasts->begin();
+                 adjacent_coast_itr != adjacent_coasts->end();
+                 adjacent_coast_itr++) {
                 // Check if there is a unit moving there
-                if (moving_unit_map.find(adjacent_coast_iterator->province_index) != moving_unit_map.end()) {
+                if (moving_unit_map.find(adjacent_coast_itr->province_index) != moving_unit_map.end()) {
                     // Unit is moving there
-                    if (m_competition_value[adjacent_coast_iterator->province_index] > 0) {
+                    if (m_competition_value[adjacent_coast_itr->province_index] > 0) {
                         // Unit needs support
-                        if (m_destination_value[*adjacent_coast_iterator] > max_destination_value) {
+                        if (m_destination_value[*adjacent_coast_itr] > max_destination_value) {
                             // Best so far
-                            max_destination_value = m_destination_value[*adjacent_coast_iterator];
-                            destination = adjacent_coast_iterator->province_index;
-                            source = moving_unit_map[adjacent_coast_iterator->province_index];
+                            max_destination_value = m_destination_value[*adjacent_coast_itr];
+                            destination = adjacent_coast_itr->province_index;
+                            source = moving_unit_map[adjacent_coast_itr->province_index];
                         }
                     }
                 } else {
                     // Check if there is a unit holding there
-                    adjacent_unit_iterator = m_map_and_units->units.find(adjacent_coast_iterator->province_index);
+                    adjacent_unit_itr = m_map_and_units->units.find(adjacent_coast_itr->province_index);
 
-                    if ((adjacent_unit_iterator != m_map_and_units->units.end())
-                        && (adjacent_unit_iterator->second.nationality == m_map_and_units->power_played.get_subtoken())
-                        && (adjacent_unit_iterator->second.order_type != MapAndUnits::MOVE_ORDER)
-                        && (adjacent_unit_iterator->second.order_type != MapAndUnits::MOVE_BY_CONVOY_ORDER)) {
+                    if ((adjacent_unit_itr != m_map_and_units->units.end())
+                        && (adjacent_unit_itr->second.nationality == m_map_and_units->power_played.get_subtoken())
+                        && (adjacent_unit_itr->second.order_type != MapAndUnits::MOVE_ORDER)
+                        && (adjacent_unit_itr->second.order_type != MapAndUnits::MOVE_BY_CONVOY_ORDER)) {
                         // Unit is holding there
-                        if (m_competition_value[adjacent_coast_iterator->province_index] > 1) {
+                        if (m_competition_value[adjacent_coast_itr->province_index] > 1) {
                             // Unit needs support
-                            if (m_destination_value[*adjacent_coast_iterator] > max_destination_value) {
+                            if (m_destination_value[*adjacent_coast_itr] > max_destination_value) {
                                 // Best so far
-                                max_destination_value = m_destination_value[*adjacent_coast_iterator];
-                                destination = adjacent_coast_iterator->province_index;
+                                max_destination_value = m_destination_value[*adjacent_coast_itr];
+                                destination = adjacent_coast_itr->province_index;
                                 source = destination;
                             }
                         }
@@ -856,86 +856,86 @@ void DumbBot::check_for_wasted_holds(MOVING_UNIT_MAP &moving_unit_map) {
 // Generate Retreat orders
 
 void DumbBot::generate_retreat_orders() {
-    RANDOM_UNIT_MAP::iterator unit_iterator;
+    RANDOM_UNIT_MAP::iterator unit_itr;
     DESTINATION_MAP destination_map;
     MapAndUnits::UNIT_AND_ORDER *unit;
-    MapAndUnits::COAST_SET::iterator coast_iterator;
-    DESTINATION_MAP::iterator destination_iterator;
-    DESTINATION_MAP::iterator next_destination_iterator;
+    MapAndUnits::COAST_SET::iterator coast_itr;
+    DESTINATION_MAP::iterator destination_itr;
+    DESTINATION_MAP::iterator next_destination_itr;
     bool try_next_province;
     WEIGHTING next_province_chance;
     bool selection_is_ok;
     MOVING_UNIT_MAP moving_unit_map;
-    MOVING_UNIT_MAP::iterator moving_unit_iterator;
+    MOVING_UNIT_MAP::iterator moving_unit_itr;
 
     // Put the units into a list in random order
     generate_random_unit_list(m_map_and_units->our_dislodged_units);
 
-    unit_iterator = m_random_unit_map.begin();
+    unit_itr = m_random_unit_map.begin();
 
     log("%s %d",
         TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->current_season].c_str(),
         m_map_and_units->current_year);
 
-    while (unit_iterator != m_random_unit_map.end()) {
+    while (unit_itr != m_random_unit_map.end()) {
         destination_map.clear();
 
-        unit = &(m_map_and_units->dislodged_units[unit_iterator->second]);
+        unit = &(m_map_and_units->dislodged_units[unit_itr->second]);
 
         log("Selecting destination for %s",
             TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[unit->coast_id.province_index].province_token].c_str());
 
         // Put all the adjacent coasts into the destination map
-        for (coast_iterator = unit->retreat_options.begin();
-             coast_iterator != unit->retreat_options.end();
-             coast_iterator++) {
-            destination_map.insert(DESTINATION_MAP::value_type(m_destination_value[*coast_iterator], *coast_iterator));
+        for (coast_itr = unit->retreat_options.begin();
+             coast_itr != unit->retreat_options.end();
+             coast_itr++) {
+            destination_map.insert(DESTINATION_MAP::value_type(m_destination_value[*coast_itr], *coast_itr));
         }
 
         do {
             // Pick a destination
-            destination_iterator = destination_map.begin();
+            destination_itr = destination_map.begin();
 
-            if (destination_iterator == destination_map.end()) {
+            if (destination_itr == destination_map.end()) {
                 // No retreat possible. Disband unit
-                m_map_and_units->set_disband_order(unit_iterator->second);
+                m_map_and_units->set_disband_order(unit_itr->second);
 
                 selection_is_ok = true;
 
                 log("Disbanding unit");
             } else {
                 log("Destination selected : %s %s",
-                    TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_iterator->second.province_index].province_token].c_str(),
-                    TokenTextMap::instance()->m_token_to_text_map[destination_iterator->second.coast_token].c_str());
+                    TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_itr->second.province_index].province_token].c_str(),
+                    TokenTextMap::instance()->m_token_to_text_map[destination_itr->second.coast_token].c_str());
 
                 // Determine whether to try the next option instead
                 try_next_province = true;
 
                 while (try_next_province == true) {
-                    next_destination_iterator = destination_iterator;
-                    next_destination_iterator++;
+                    next_destination_itr = destination_itr;
+                    next_destination_itr++;
 
                     // If there is no next option, don't try it...
-                    if (next_destination_iterator == destination_map.end()) {
+                    if (next_destination_itr == destination_map.end()) {
                         try_next_province = false;
                     } else {
                         // Randomly decide whether to move on
-                        if (destination_iterator->first == 0) {
+                        if (destination_itr->first == 0) {
                             next_province_chance = 0;
                         } else {
-                            next_province_chance = ((destination_iterator->first - next_destination_iterator->first) *
+                            next_province_chance = ((destination_itr->first - next_destination_itr->first) *
                                                     m_alternative_difference_modifier)
-                                                   / destination_iterator->first;
+                                                   / destination_itr->first;
                         }
 
                         if ((rand_no(100) < m_play_alternative)
                             && (rand_no(100) >= next_province_chance)) {
                             // Move on
-                            destination_iterator = next_destination_iterator;
+                            destination_itr = next_destination_itr;
 
                             log("New destination selected : %s %s (%d%% chance)",
-                                TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_iterator->second.province_index].province_token].c_str(),
-                                TokenTextMap::instance()->m_token_to_text_map[destination_iterator->second.coast_token].c_str(),
+                                TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[destination_itr->second.province_index].province_token].c_str(),
+                                TokenTextMap::instance()->m_token_to_text_map[destination_itr->second.coast_token].c_str(),
                                 m_play_alternative - (next_province_chance * m_play_alternative / 100));
                         } else {
                             // Stick with this province
@@ -948,54 +948,54 @@ void DumbBot::generate_retreat_orders() {
                 selection_is_ok = true;
 
                 // If there is a unit already moving to this province
-                moving_unit_iterator = moving_unit_map.find(destination_iterator->second.province_index);
-                if (moving_unit_iterator != moving_unit_map.end()) {
+                moving_unit_itr = moving_unit_map.find(destination_itr->second.province_index);
+                if (moving_unit_itr != moving_unit_map.end()) {
                     log("Unit already moving here");
 
                     // This is not an acceptable selection
                     selection_is_ok = false;
 
                     // Make sure it isn't selected again
-                    destination_map.erase(destination_iterator);
+                    destination_map.erase(destination_itr);
                 }
 
                 if (selection_is_ok) {
                     log("Ordered to RETREAT");
 
                     // Order the retreat
-                    m_map_and_units->set_retreat_order(unit_iterator->second, destination_iterator->second);
+                    m_map_and_units->set_retreat_order(unit_itr->second, destination_itr->second);
 
-                    moving_unit_map[destination_iterator->second.province_index] = unit_iterator->second;
+                    moving_unit_map[destination_itr->second.province_index] = unit_itr->second;
                 }
             }
         } while (!selection_is_ok);
 
         // Unit is now ordered, so delete it from the random unit map
-        m_random_unit_map.erase(unit_iterator);
+        m_random_unit_map.erase(unit_itr);
 
         // Move onto the next one
-        unit_iterator = m_random_unit_map.begin();
+        unit_itr = m_random_unit_map.begin();
     }
 }
 
 // Generate the actual remove orders for an adjustment phase
 
 void DumbBot::generate_remove_orders(int remove_count) {
-    MapAndUnits::UNIT_SET::iterator unit_iterator;
+    MapAndUnits::UNIT_SET::iterator unit_itr;
     DESTINATION_MAP remove_map;
     MapAndUnits::UNIT_AND_ORDER *unit;
     int remove_counter;
-    DESTINATION_MAP::reverse_iterator remove_iterator;
-    DESTINATION_MAP::iterator remove_forward_iterator;
-    DESTINATION_MAP::reverse_iterator next_remove_iterator;
+    DESTINATION_MAP::reverse_iterator remove_itr;
+    DESTINATION_MAP::iterator remove_forward_itr;
+    DESTINATION_MAP::reverse_iterator next_remove_itr;
     bool try_next_remove;
     WEIGHTING next_remove_chance;
 
     // Put all the units into a removal map, ordered by value of their location
-    for (unit_iterator = m_map_and_units->our_units.begin();
-         unit_iterator != m_map_and_units->our_units.end();
-         unit_iterator++) {
-        unit = &(m_map_and_units->units[*unit_iterator]);
+    for (unit_itr = m_map_and_units->our_units.begin();
+         unit_itr != m_map_and_units->our_units.end();
+         unit_itr++) {
+        unit = &(m_map_and_units->units[*unit_itr]);
 
         remove_map[m_destination_value[unit->coast_id]] = unit->coast_id;
     }
@@ -1003,40 +1003,40 @@ void DumbBot::generate_remove_orders(int remove_count) {
     // For each required removal
     for (remove_counter = 0; remove_counter < remove_count; remove_counter++) {
         // Start with the best option (which is the end of the list)
-        remove_iterator = remove_map.rbegin();
+        remove_itr = remove_map.rbegin();
 
         log("Removal selected : %s %s",
-            TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[remove_iterator->second.province_index].province_token].c_str(),
-            TokenTextMap::instance()->m_token_to_text_map[remove_iterator->second.coast_token].c_str());
+            TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[remove_itr->second.province_index].province_token].c_str(),
+            TokenTextMap::instance()->m_token_to_text_map[remove_itr->second.coast_token].c_str());
 
         try_next_remove = true;
 
         // Determine whether to try the next option
         while (try_next_remove) {
-            next_remove_iterator = remove_iterator;
-            next_remove_iterator++;
+            next_remove_itr = remove_itr;
+            next_remove_itr++;
 
             // No next option - so don't try it.
-            if (next_remove_iterator == remove_map.rend()) {
+            if (next_remove_itr == remove_map.rend()) {
                 try_next_remove = false;
             } else {
                 // Decide randomly
-                if (remove_iterator->first == 0) {
+                if (remove_itr->first == 0) {
                     next_remove_chance = 0;
                 } else {
                     next_remove_chance =
-                            ((remove_iterator->first - next_remove_iterator->first) * m_alternative_difference_modifier)
-                            / remove_iterator->first;
+                            ((remove_itr->first - next_remove_itr->first) * m_alternative_difference_modifier)
+                            / remove_itr->first;
                 }
 
                 if ((rand_no(100) < m_play_alternative)
                     && (rand_no(100) >= next_remove_chance)) {
                     // Try the next one
-                    remove_iterator = next_remove_iterator;
+                    remove_itr = next_remove_itr;
 
                     log("New removal selected : %s %s (%d%% chance)",
-                        TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[remove_iterator->second.province_index].province_token].c_str(),
-                        TokenTextMap::instance()->m_token_to_text_map[remove_iterator->second.coast_token].c_str(),
+                        TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[remove_itr->second.province_index].province_token].c_str(),
+                        TokenTextMap::instance()->m_token_to_text_map[remove_itr->second.coast_token].c_str(),
                         m_play_alternative - (next_remove_chance * m_play_alternative / 100));
                 } else {
                     // Stick with this one
@@ -1046,11 +1046,11 @@ void DumbBot::generate_remove_orders(int remove_count) {
         }
 
         // Order the removal
-        m_map_and_units->set_remove_order(remove_iterator->second.province_index);
+        m_map_and_units->set_remove_order(remove_itr->second.province_index);
 
-        remove_forward_iterator = remove_iterator.base();
-        remove_forward_iterator--;
-        remove_map.erase(remove_forward_iterator);
+        remove_forward_itr = remove_itr.base();
+        remove_forward_itr--;
+        remove_map.erase(remove_forward_itr);
     }
 }
 
@@ -1058,13 +1058,13 @@ void DumbBot::generate_remove_orders(int remove_count) {
 
 void DumbBot::generate_build_orders(int build_count) {
     DESTINATION_MAP build_map;
-    MapAndUnits::PROVINCE_SET::iterator home_centre_iterator;
+    MapAndUnits::PROVINCE_SET::iterator home_centre_itr;
     MapAndUnits::PROVINCE_COASTS *province_coasts;
-    MapAndUnits::PROVINCE_COASTS::iterator build_coast_iterator;
+    MapAndUnits::PROVINCE_COASTS::iterator build_coast_itr;
     MapAndUnits::COAST_ID coast_id;
     int builds_remaining = build_count;
-    DESTINATION_MAP::iterator build_iterator;
-    DESTINATION_MAP::iterator next_build_iterator;
+    DESTINATION_MAP::iterator build_itr;
+    DESTINATION_MAP::iterator next_build_itr;
     bool try_next_build;
     WEIGHTING next_build_chance;
     int build_province;
@@ -1074,16 +1074,16 @@ void DumbBot::generate_build_orders(int build_count) {
         m_map_and_units->current_year);
 
     // Put all the coasts of all the home centres into a map
-    for (home_centre_iterator = m_map_and_units->open_home_centres.begin();
-         home_centre_iterator != m_map_and_units->open_home_centres.end();
-         home_centre_iterator++) {
-        province_coasts = &(m_map_and_units->game_map[*home_centre_iterator].coast_info);
+    for (home_centre_itr = m_map_and_units->open_home_centres.begin();
+         home_centre_itr != m_map_and_units->open_home_centres.end();
+         home_centre_itr++) {
+        province_coasts = &(m_map_and_units->game_map[*home_centre_itr].coast_info);
 
-        for (build_coast_iterator = province_coasts->begin();
-             build_coast_iterator != province_coasts->end();
-             build_coast_iterator++) {
-            coast_id.province_index = *home_centre_iterator;
-            coast_id.coast_token = build_coast_iterator->first;
+        for (build_coast_itr = province_coasts->begin();
+             build_coast_itr != province_coasts->end();
+             build_coast_itr++) {
+            coast_id.province_index = *home_centre_itr;
+            coast_id.coast_token = build_coast_itr->first;
 
             build_map.insert(DESTINATION_MAP::value_type(m_destination_value[coast_id], coast_id));
         }
@@ -1092,40 +1092,40 @@ void DumbBot::generate_build_orders(int build_count) {
     // For each build, while we have a vacant home centre
     while (!build_map.empty() && (builds_remaining > 0)) {
         // Select the best location
-        build_iterator = build_map.begin();
+        build_itr = build_map.begin();
 
         log("Build selected : %s %s",
-            TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[build_iterator->second.province_index].province_token].c_str(),
-            TokenTextMap::instance()->m_token_to_text_map[build_iterator->second.coast_token].c_str());
+            TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[build_itr->second.province_index].province_token].c_str(),
+            TokenTextMap::instance()->m_token_to_text_map[build_itr->second.coast_token].c_str());
 
         try_next_build = true;
 
         // Consider the next location
         while (try_next_build) {
-            next_build_iterator = build_iterator;
-            next_build_iterator++;
+            next_build_itr = build_itr;
+            next_build_itr++;
 
-            if (next_build_iterator == build_map.end()) {
+            if (next_build_itr == build_map.end()) {
                 // There isn't one, so stick with this one
                 try_next_build = false;
             } else {
                 // Determine randomly
-                if (build_iterator->first == 0) {
+                if (build_itr->first == 0) {
                     next_build_chance = 0;
                 } else {
                     next_build_chance =
-                            ((build_iterator->first - next_build_iterator->first) * m_alternative_difference_modifier)
-                            / build_iterator->first;
+                            ((build_itr->first - next_build_itr->first) * m_alternative_difference_modifier)
+                            / build_itr->first;
                 }
 
                 if ((rand_no(100) < m_play_alternative)
                     && (rand_no(100) >= next_build_chance)) {
                     // Try the next one
-                    build_iterator = next_build_iterator;
+                    build_itr = next_build_itr;
 
                     log("New build selected : %s %s (%d%% chance)",
-                        TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[build_iterator->second.province_index].province_token].c_str(),
-                        TokenTextMap::instance()->m_token_to_text_map[build_iterator->second.coast_token].c_str(),
+                        TokenTextMap::instance()->m_token_to_text_map[m_map_and_units->game_map[build_itr->second.province_index].province_token].c_str(),
+                        TokenTextMap::instance()->m_token_to_text_map[build_itr->second.coast_token].c_str(),
                         m_play_alternative - (next_build_chance * m_play_alternative / 100));
                 } else {
                     // Stick with this one
@@ -1135,18 +1135,18 @@ void DumbBot::generate_build_orders(int build_count) {
         }
 
         // Order the build
-        m_map_and_units->set_build_order(build_iterator->second);
+        m_map_and_units->set_build_order(build_itr->second);
 
-        build_province = build_iterator->second.province_index;
+        build_province = build_itr->second.province_index;
 
-        build_iterator = build_map.begin();
+        build_itr = build_map.begin();
 
         // Remove all other build options for this province
-        while (build_iterator != build_map.end()) {
-            if (build_iterator->second.province_index == build_province) {
-                build_iterator = build_map.erase(build_iterator);
+        while (build_itr != build_map.end()) {
+            if (build_itr->second.province_index == build_province) {
+                build_itr = build_map.erase(build_itr);
             } else {
-                build_iterator++;
+                build_itr++;
             }
         }
 
@@ -1164,17 +1164,17 @@ void DumbBot::generate_build_orders(int build_count) {
 // Generate a random unit map from a set of units
 
 void DumbBot::generate_random_unit_list(MapAndUnits::UNIT_SET &units) {
-    MapAndUnits::UNIT_SET::iterator unit_iterator;
+    MapAndUnits::UNIT_SET::iterator unit_itr;
     int unit_index;
 
     m_random_unit_map.clear();
 
-    for (unit_iterator = units.begin();
-         unit_iterator != units.end();
-         unit_iterator++) {
+    for (unit_itr = units.begin();
+         unit_itr != units.end();
+         unit_itr++) {
         unit_index = rand_no(RAND_MAX);
 
-        m_random_unit_map.insert(RANDOM_UNIT_MAP::value_type(unit_index, *unit_iterator));
+        m_random_unit_map.insert(RANDOM_UNIT_MAP::value_type(unit_index, *unit_itr));
     }
 }
 

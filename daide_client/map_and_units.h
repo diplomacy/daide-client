@@ -444,7 +444,7 @@ private:
 
     TokenMessage describe_build_result(POWER_INDEX power_counter,
                                        WINTER_ORDERS_FOR_POWER *orders,
-                                       BUILDS_OR_DISBANDS::iterator order_iterator);
+                                       BUILDS_OR_DISBANDS::iterator order_itr);
 
     TokenMessage describe_waive(POWER_INDEX power_counter);
 

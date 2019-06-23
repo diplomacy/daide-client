@@ -966,28 +966,28 @@ void BaseBot::process_out(TokenMessage &incoming_message) {
 }
 
 void BaseBot::check_sent_press_for_missing_power(Token &missing_power) {
-    SentPressList::iterator sent_press_iterator;
+    SentPressList::iterator sent_press_itr;
     TokenMessage receiving_powers;
     bool missing_power_found;
     int power_counter;
 
-    for (sent_press_iterator = m_sent_press.begin();
-         sent_press_iterator != m_sent_press.end();
-         sent_press_iterator++) {
-        receiving_powers = sent_press_iterator->receiving_powers;
+    for (sent_press_itr = m_sent_press.begin();
+         sent_press_itr != m_sent_press.end();
+         sent_press_itr++) {
+        receiving_powers = sent_press_itr->receiving_powers;
 
         for ((power_counter = 0, missing_power_found = false);
              (power_counter < receiving_powers.get_message_length() && !missing_power_found);
              power_counter++) {
             if (receiving_powers.get_token(power_counter) == missing_power) {
-                if (sent_press_iterator->resend_partial) {
-                    send_to_reduced_powers(sent_press_iterator, missing_power);
+                if (sent_press_itr->resend_partial) {
+                    send_to_reduced_powers(sent_press_itr, missing_power);
 
                     missing_power_found = true;
                 } else {
-                    report_failed_press(sent_press_iterator->is_broadcast,
-                                        sent_press_iterator->original_receiving_powers,
-                                        sent_press_iterator->press_message);
+                    report_failed_press(sent_press_itr->is_broadcast,
+                                        sent_press_itr->original_receiving_powers,
+                                        sent_press_itr->press_message);
 
                     missing_power_found = true;
                 }
@@ -996,12 +996,12 @@ void BaseBot::check_sent_press_for_missing_power(Token &missing_power) {
     }
 }
 
-void BaseBot::send_to_reduced_powers(SentPressList::iterator &sent_press_iterator, Token &cd_power) {
+void BaseBot::send_to_reduced_powers(SentPressList::iterator &sent_press_itr, Token &cd_power) {
     TokenMessage receiving_powers;
     TokenMessage reduced_powers;
     int power_counter;
 
-    receiving_powers = sent_press_iterator->receiving_powers;
+    receiving_powers = sent_press_itr->receiving_powers;
 
     for (power_counter = 0; power_counter < receiving_powers.get_message_length(); power_counter++) {
         if (receiving_powers.get_token(power_counter) != cd_power) {
@@ -1009,9 +1009,9 @@ void BaseBot::send_to_reduced_powers(SentPressList::iterator &sent_press_iterato
         }
     }
 
-    sent_press_iterator->receiving_powers = reduced_powers;
+    sent_press_itr->receiving_powers = reduced_powers;
 
-    send_message_to_server(TOKEN_COMMAND_SND & reduced_powers & sent_press_iterator->press_message);
+    send_message_to_server(TOKEN_COMMAND_SND & reduced_powers & sent_press_itr->press_message);
 }
 
 void BaseBot::report_failed_press(bool is_broadcast, TokenMessage &receiving_powers, TokenMessage &press_message) {
@@ -1038,8 +1038,8 @@ void BaseBot::process_rej_snd(TokenMessage &incoming_message, TokenMessage &mess
 }
 
 void BaseBot::remove_sent_press(TokenMessage &send_message) {
-    SentPressList::iterator sent_press_iterator;
-    SentPressList::iterator sent_press_iterator_copy;
+    SentPressList::iterator sent_press_itr;
+    SentPressList::iterator sent_press_itr_copy;
     TokenMessage to_powers;
     TokenMessage press_message;
 
@@ -1047,16 +1047,16 @@ void BaseBot::remove_sent_press(TokenMessage &send_message) {
     press_message = send_message.get_submessage(2);
 
     // Remove the message from the sent press
-    sent_press_iterator = m_sent_press.begin();
+    sent_press_itr = m_sent_press.begin();
 
-    while (sent_press_iterator != m_sent_press.end()) {
-        sent_press_iterator_copy = sent_press_iterator;
+    while (sent_press_itr != m_sent_press.end()) {
+        sent_press_itr_copy = sent_press_itr;
 
-        sent_press_iterator++;
+        sent_press_itr++;
 
-        if ((sent_press_iterator_copy->receiving_powers == to_powers)
-            && (sent_press_iterator_copy->press_message == press_message)) {
-            m_sent_press.erase(sent_press_iterator_copy);
+        if ((sent_press_itr_copy->receiving_powers == to_powers)
+            && (sent_press_itr_copy->press_message == press_message)) {
+            m_sent_press.erase(sent_press_itr_copy);
         }
     }
 }

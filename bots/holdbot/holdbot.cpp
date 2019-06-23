@@ -24,23 +24,23 @@ void HoldBot::send_nme_or_obs() {
 }
 
 void HoldBot::process_now_message(TokenMessage &incoming_message) {
-    MapAndUnits::UNIT_SET::iterator unit_iterator;
+    MapAndUnits::UNIT_SET::iterator unit_itr;
 
     if ((m_map_and_units->current_season == TOKEN_SEASON_SPR)
         || (m_map_and_units->current_season == TOKEN_SEASON_FAL)) {
         // Order all units to hold.
-        for (unit_iterator = m_map_and_units->our_units.begin();
-             unit_iterator != m_map_and_units->our_units.end();
-             unit_iterator++) {
-            m_map_and_units->set_hold_order(*unit_iterator);
+        for (unit_itr = m_map_and_units->our_units.begin();
+             unit_itr != m_map_and_units->our_units.end();
+             unit_itr++) {
+            m_map_and_units->set_hold_order(*unit_itr);
         }
     } else if ((m_map_and_units->current_season == TOKEN_SEASON_SUM)
                || (m_map_and_units->current_season == TOKEN_SEASON_AUT)) {
         // Order all dislodged units to disband.
-        for (unit_iterator = m_map_and_units->our_dislodged_units.begin();
-             unit_iterator != m_map_and_units->our_dislodged_units.end();
-             unit_iterator++) {
-            m_map_and_units->set_disband_order(*unit_iterator);
+        for (unit_itr = m_map_and_units->our_dislodged_units.begin();
+             unit_itr != m_map_and_units->our_dislodged_units.end();
+             unit_itr++) {
+            m_map_and_units->set_disband_order(*unit_itr);
         }
     } else {
         if (m_map_and_units->our_units.size() > m_map_and_units->our_centres.size()) {

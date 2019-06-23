@@ -324,7 +324,7 @@ private:
     // Remove the quotes from a string
     void remove_quotes(std::string &message_string);
 
-    void send_to_reduced_powers(SentPressList::iterator &sent_press_iterator, Token &cd_power);
+    void send_to_reduced_powers(SentPressList::iterator &sent_press_itr, Token &cd_power);
 
     void check_sent_press_for_missing_power(Token &missing_power);
 

@@ -368,7 +368,7 @@ int TokenMessage::set_message_from_text(string text) {
     string token_string;
     Token *token_message;
     TEXT_TO_TOKEN_MAP *text_to_token_map = &(TokenTextMap::instance()->m_text_to_token_map);
-    TEXT_TO_TOKEN_MAP::iterator token_iterator;
+    TEXT_TO_TOKEN_MAP::iterator token_itr;
     bool is_negative;
     int token_value;
     char token_text[5];
@@ -429,13 +429,13 @@ int TokenMessage::set_message_from_text(string text) {
 
             token_string = token_text;
 
-            token_iterator = text_to_token_map->find(token_string);
+            token_itr = text_to_token_map->find(token_string);
 
-            if (token_iterator == text_to_token_map->end()) {
+            if (token_itr == text_to_token_map->end()) {
                 // Undefined token
                 error_location = char_counter;
             } else {
-                token_message[token_counter] = token_iterator->second;
+                token_message[token_counter] = token_itr->second;
                 token_counter++;
                 char_counter = char_counter + 3;
             }
@@ -502,7 +502,7 @@ string TokenMessage::get_message_as_text() const {
     int token_counter;
     bool is_ascii_text = false;
     TOKEN_TO_TEXT_MAP *token_to_text_map = &(TokenTextMap::instance()->m_token_to_text_map);
-    TOKEN_TO_TEXT_MAP::iterator token_iterator;
+    TOKEN_TO_TEXT_MAP::iterator token_itr;
 
     for (token_counter = 0; token_counter < m_message_length; token_counter++) {
         if ((is_ascii_text)
@@ -522,12 +522,12 @@ string TokenMessage::get_message_as_text() const {
         } else if (m_message[token_counter].is_number()) {
             message_as_text << m_message[token_counter].get_number() << " ";
         } else {
-            token_iterator = token_to_text_map->find(m_message[token_counter].get_token());
+            token_itr = token_to_text_map->find(m_message[token_counter].get_token());
 
-            if (token_iterator == token_to_text_map->end()) {
+            if (token_itr == token_to_text_map->end()) {
                 message_as_text << "??? ";
             } else {
-                message_as_text << token_iterator->second + " ";
+                message_as_text << token_itr->second + " ";
             }
         }
     }
