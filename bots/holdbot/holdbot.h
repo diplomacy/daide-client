@@ -21,13 +21,13 @@
 
 class HoldBot : public BaseBot {
 public:
-    HoldBot() {};
+    HoldBot() = default;
 
-    ~HoldBot() {};
+    ~HoldBot() override = default;
 
-    virtual void send_nme_or_obs();
+    void send_nme_or_obs() override;
 
-    virtual void process_now_message(TokenMessage &incoming_message);
+    void process_now_message(TokenMessage &incoming_message) override;
 };
 
 #endif

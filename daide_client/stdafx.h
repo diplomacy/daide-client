@@ -15,11 +15,11 @@
 // set the _WIN32_WINNT macro to the platform you wish to support before including SDKDDKVer.h.
 
 #include <windows.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
-#include <time.h>
+#include <ctime>
 #include <queue>
 #include "crtdbg.h"
 #include <winsock2.h>

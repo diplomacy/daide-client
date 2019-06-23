@@ -50,7 +50,7 @@ class Socket {
 
     void InsertSocket();
 
-    void RemoveSocket();
+    static void RemoveSocket();
 
     void SendData();
 
@@ -69,7 +69,7 @@ class Socket {
     virtual void OnSend(int error);
 
 public:
-    Socket() : Connected(false), IncomingMessage(0), OutgoingMessage(0) {}
+    Socket() : Connected(false), IncomingMessage(nullptr), OutgoingMessage(nullptr) {}
 
     ~Socket();
 

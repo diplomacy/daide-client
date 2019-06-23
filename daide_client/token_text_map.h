@@ -31,7 +31,7 @@ public:
 
     void clear_power_and_province_categories();
 
-    bool add_token(const Token &token, const string token_string);
+    bool add_token(const Token &token, string token_string);
 
 private:
     TokenTextMap();

@@ -44,7 +44,7 @@ public:
         m_token = 0;
     }
 
-    inline Token(LANGUAGE_TOKEN token) {
+    inline explicit Token(LANGUAGE_TOKEN token) {
         m_token = token;
     }
 
@@ -57,8 +57,7 @@ public:
     }
 
     // Destructor
-    inline ~Token() {
-    }
+    inline ~Token() = default;
 
     // Category and Token
     BYTE get_category() const {

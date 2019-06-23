@@ -19,13 +19,13 @@ using namespace std;
 
 class String : public std::string {
 public:
-    String() {}
+    String() = default;
 
-    String(Str s) : string(s) {}
+    explicit String(Str s) : string(s) {}
 
-    String(const String &s) : string(s) {}
+    String(const String &s) = default;
 
-    String(const std::string &s) : string(s) {}
+    explicit String(const std::string &s) : string(s) {}
 
     explicit String(int n);
 

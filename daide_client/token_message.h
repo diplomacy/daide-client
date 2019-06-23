@@ -24,13 +24,13 @@ public:
     TokenMessage();
 
     // Construct with a message as specified. Message must be terminated
-    TokenMessage(const Token *message);
+    explicit TokenMessage(const Token *message);
 
     // Construct with a message as specified.
     TokenMessage(const Token *message, int message_length);
 
     // Construct to contain a single token
-    TokenMessage(const Token &token);
+    explicit TokenMessage(const Token &token);
 
     // Copy another token message
     TokenMessage(const TokenMessage &message_to_copy);
@@ -78,10 +78,10 @@ public:
     int set_message(const Token *message, int message_length);
 
     // Set the message from a string. Returns location of error or ADJUDICATOR_NO_ERROR
-    int set_message_from_text(const string text);
+    int set_message_from_text(string text);
 
     // Set the message as a string of ASCII category tokens
-    void set_message_as_ascii(const string text);
+    void set_message_as_ascii(string text);
 
     // Get the message as a string
     string get_message_as_text() const;

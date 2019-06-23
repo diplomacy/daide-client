@@ -321,7 +321,7 @@ public:
 
     string describe_adjustment_result(WINTER_ORDERS_FOR_POWER &orders, int order_index);
 
-    int get_number_of_results(WINTER_ORDERS_FOR_POWER &orders);
+    static int get_number_of_results(WINTER_ORDERS_FOR_POWER &orders);
 
     COAST_ID find_result_unit_initial_location(PROVINCE_INDEX province_index,
                                                bool &is_new_build, bool &retreated_to_province, bool &moved_to_province,
@@ -395,14 +395,14 @@ private:
 
     int process_province_adjacency(TokenMessage &province_adjacency);
 
-    int process_adjacency_list(PROVINCE_DETAILS *province_details, TokenMessage &adjacency_list);
+    static int process_adjacency_list(PROVINCE_DETAILS *province_details, TokenMessage &adjacency_list);
 
     int process_sco_for_power(TokenMessage &sco_for_power);
 
     // From the client side
     int process_now_unit(TokenMessage unit);
 
-    COAST_ID get_coast_id(TokenMessage &coast, Token unit_type);
+    static COAST_ID get_coast_id(TokenMessage &coast, Token unit_type);
 
     TokenMessage describe_movement_order(UNIT_AND_ORDER *unit);
 
@@ -416,7 +416,7 @@ private:
 
     void decode_order(UNIT_AND_ORDER &unit, TokenMessage order);
 
-    void decode_result(UNIT_AND_ORDER &unit, TokenMessage result);
+    static void decode_result(UNIT_AND_ORDER &unit, TokenMessage result);
 
     // From the server side
     int process_now_unit(TokenMessage unit_message, PROVINCE_SET &no_bounce_list,

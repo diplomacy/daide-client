@@ -52,10 +52,10 @@ protected:
     // Useful utility functions
 
     // Send initial message to the server
-    void send_initial_message_to_server();
+    static void send_initial_message_to_server();
 
     // Send a message to the server
-    void send_message_to_server(TokenMessage &message);
+    static void send_message_to_server(TokenMessage &message);
 
     // Send the set orders to the server (see set_..._order() in MapAndUnits)
     void send_orders_to_server();
@@ -281,7 +281,7 @@ private:
     void process_message(char *&message);
 
     // Process an incoming rm message
-    void process_rm_message(char *message, int message_length);
+    static void process_rm_message(char *message, int message_length);
 
     // Process an incoming diplomacy message
     void process_diplomacy_message(char *message, int message_length);
@@ -322,7 +322,7 @@ private:
     void process_rej_snd(TokenMessage &incoming_message, TokenMessage &message_parameters);
 
     // Remove the quotes from a string
-    void remove_quotes(std::string &message_string);
+    static void remove_quotes(std::string &message_string);
 
     void send_to_reduced_powers(SentPressList::iterator &sent_press_itr, Token &cd_power);
 

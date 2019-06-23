@@ -21,13 +21,13 @@
 
 class RandBot : public BaseBot {
 public:
-    RandBot() {};
+    RandBot() = default;
 
-    ~RandBot() {};
+    ~RandBot() override = default;
 
-    virtual void send_nme_or_obs();
+    void send_nme_or_obs() override;
 
-    virtual void process_now_message(TokenMessage &incoming_message);
+    void process_now_message(TokenMessage &incoming_message) override;
 };
 
 #endif

@@ -24,29 +24,29 @@ class DumbBot : public BaseBot {
 public:
     DumbBot();
 
-    ~DumbBot();
+    ~DumbBot() override;
 
-    virtual void send_nme_or_obs();
+    void send_nme_or_obs() override;
 
-    virtual void process_mdf_message(TokenMessage &incoming_message);
+    void process_mdf_message(TokenMessage &incoming_message) override;
 
-    virtual void process_sco_message(TokenMessage &incoming_message);
+    void process_sco_message(TokenMessage &incoming_message) override;
 
-    virtual void process_now_message(TokenMessage &incoming_message);
+    void process_now_message(TokenMessage &incoming_message) override;
 
 private:
     typedef _int64 WEIGHTING;
     typedef set<MapAndUnits::PROVINCE_INDEX> ADJACENT_PROVINCE_SET;
     typedef map<MapAndUnits::COAST_ID, WEIGHTING> PROXIMITY_MAP;
-    typedef multimap<int, MapAndUnits::PROVINCE_INDEX, greater<int> > RANDOM_UNIT_MAP;
-    typedef map<WEIGHTING, MapAndUnits::COAST_ID, greater<int> > DESTINATION_MAP;
+    typedef multimap<int, MapAndUnits::PROVINCE_INDEX, greater<> > RANDOM_UNIT_MAP;
+    typedef map<WEIGHTING, MapAndUnits::COAST_ID, greater<> > DESTINATION_MAP;
     typedef map<MapAndUnits::PROVINCE_INDEX, MapAndUnits::PROVINCE_INDEX> MOVING_UNIT_MAP;
 
     enum {
         PROXIMITY_DEPTH = 10
     };
 
-    int get_power_index(Token power_token);
+    static int get_power_index(Token power_token);
 
     WEIGHTING calculate_defence_value(int province_index);
 
@@ -71,7 +71,7 @@ private:
 
     void generate_random_unit_list(MapAndUnits::UNIT_SET &units);
 
-    int rand_no(int max_value);
+    static int rand_no(int max_value);
 
     virtual bool extract_parameters(COMMAND_LINE_PARAMETERS &parameters);
 

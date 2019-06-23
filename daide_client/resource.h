@@ -14,7 +14,7 @@
 #define IDI_SMALL                       108
 #define IDC_AICLIENT                    109
 #define IDC_MYICON                        2
-#define IDC_STATIC                       -1
+#define IDC_STATIC                      (-1)
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
@@ -27,5 +27,5 @@
 #endif
 #endif
 
-#define WM_SOCKET_STATE                 WM_APP+0
-#define WM_SOCKET_MESSAGE               WM_APP+1
+#define WM_SOCKET_STATE                 (WM_APP+0)
+#define WM_SOCKET_MESSAGE               (WM_APP+1)

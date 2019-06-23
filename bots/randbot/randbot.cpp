@@ -36,7 +36,7 @@ typename SetType::value_type get_random_set_member(SetType my_set) {
         set_itr++;
     }
 
-    return (*set_itr);
+    return *set_itr;
 }
 
 void RandBot::process_now_message(TokenMessage &incoming_message) {

@@ -1402,7 +1402,7 @@ typename SetType::value_type get_from_set(SetType my_set, int item_index) {
         set_itr++;
     }
 
-    return (*set_itr);
+    return *set_itr;
 }
 
 string MapAndUnits::describe_adjustment_result(WINTER_ORDERS_FOR_POWER &orders, int order_index) {
