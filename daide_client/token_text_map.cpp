@@ -15,7 +15,7 @@
 #include "stdafx.h"
 #include "token_text_map.h"
 
-TokenTextMap *TokenTextMap::instance(void) {
+TokenTextMap *TokenTextMap::instance() {
     static TokenTextMap the_instance;
 
     return &the_instance;
@@ -44,7 +44,7 @@ void TokenTextMap::clear_category(BYTE category) {
     }
 }
 
-void TokenTextMap::clear_power_and_province_categories(void) {
+void TokenTextMap::clear_power_and_province_categories() {
     BYTE category_counter;
 
     clear_category(CATEGORY_POWER);

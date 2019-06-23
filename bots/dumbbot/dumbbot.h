@@ -22,11 +22,11 @@
 
 class DumbBot : public BaseBot {
 public:
-    DumbBot(void);
+    DumbBot();
 
     ~DumbBot();
 
-    virtual void send_nme_or_obs(void);
+    virtual void send_nme_or_obs();
 
     virtual void process_mdf_message(TokenMessage &incoming_message);
 
@@ -57,13 +57,13 @@ private:
 
     void calculate_winter_destination_value(WEIGHTING *proximity_weight, WEIGHTING defence_weight);
 
-    void generate_debug(void);
+    void generate_debug();
 
-    void generate_movement_orders(void);
+    void generate_movement_orders();
 
     void check_for_wasted_holds(MOVING_UNIT_MAP &moving_unit_map);
 
-    void generate_retreat_orders(void);
+    void generate_retreat_orders();
 
     void generate_remove_orders(int disband_count);
 

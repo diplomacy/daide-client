@@ -67,7 +67,7 @@ const int NEUTRAL_POWER_INDEX = MapAndUnits::MAX_POWERS;
  * disband the unit in the lowest value location.
  **/
 
-DumbBot::DumbBot(void) {
+DumbBot::DumbBot() {
     // Initialise all the settings. These are just values that seemed
     // right at the time - there has been no attempt to optimise them
     // for best play.
@@ -164,7 +164,7 @@ DumbBot::DumbBot(void) {
 DumbBot::~DumbBot() {
 }
 
-void DumbBot::send_nme_or_obs(void) {
+void DumbBot::send_nme_or_obs() {
     send_name_and_version_to_server(BOT_FAMILY, BOT_GENERATION);
 }
 
@@ -517,7 +517,7 @@ void DumbBot::calculate_winter_destination_value(WEIGHTING *proximity_weight, WE
 // data used to calculate the moves for this turn. Lists all the calculated information
 // for every province we have a unit in or adjacent to.
 
-void DumbBot::generate_debug(void) {
+void DumbBot::generate_debug() {
     FILE *fp;
     PROXIMITY_MAP::iterator coast_iterator;
     MapAndUnits::COAST_ID coast_id;
@@ -566,7 +566,7 @@ void DumbBot::generate_debug(void) {
 
 // Generate the actual orders for a movement turn
 
-void DumbBot::generate_movement_orders(void) {
+void DumbBot::generate_movement_orders() {
     RANDOM_UNIT_MAP::iterator unit_iterator;
     DESTINATION_MAP destination_map;
     MapAndUnits::UNIT_AND_ORDER *unit;
@@ -855,7 +855,7 @@ void DumbBot::check_for_wasted_holds(MOVING_UNIT_MAP &moving_unit_map) {
 
 // Generate Retreat orders
 
-void DumbBot::generate_retreat_orders(void) {
+void DumbBot::generate_retreat_orders() {
     RANDOM_UNIT_MAP::iterator unit_iterator;
     DESTINATION_MAP destination_map;
     MapAndUnits::UNIT_AND_ORDER *unit;

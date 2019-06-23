@@ -21,11 +21,11 @@
 
 class HoldBot : public BaseBot {
 public:
-    HoldBot(void) {};
+    HoldBot() {};
 
     ~HoldBot() {};
 
-    virtual void send_nme_or_obs(void);
+    virtual void send_nme_or_obs();
 
     virtual void process_now_message(TokenMessage &incoming_message);
 };

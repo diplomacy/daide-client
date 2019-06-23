@@ -15,8 +15,6 @@
 #ifndef _DAIDE_TYPES_H
 #define _DAIDE_TYPES_H
 
-#pragma warning( disable : 4786 )
-
 #include <set>
 #include <list>
 #include <map>

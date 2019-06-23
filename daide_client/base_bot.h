@@ -40,7 +40,7 @@ class BaseBot {
 public:
     Socket m_socket;
 
-    BaseBot(void);
+    BaseBot();
 
     virtual ~BaseBot();
 
@@ -58,29 +58,29 @@ protected:
     void send_message_to_server(TokenMessage &message);
 
     // Send the set orders to the server (see set_..._order() in MapAndUnits)
-    void send_orders_to_server(void);
+    void send_orders_to_server();
 
     // Send a name and version to the server
     void BaseBot::send_name_and_version_to_server(const char *name, const char *version);
 
     // Disconnect from the server
-    void disconnect_from_server(void);
+    void disconnect_from_server();
 
     // Request a copy of the map. Gets a MAP and MDF, but doesn't YES(MAP()) in response
     // Done automatically if joining a game via HLO or OBS, but not if via IAM (since you
     // may just be rejoining following connection loss).
-    void request_map(void);
+    void request_map();
 
     // Determine if an MAP or MDF was by request.
     // Only valid in process_map_message and process_mdf_message
-    bool is_map_requested(void);
+    bool is_map_requested();
 
     // Overrideables
 
     // The following virtual functions have a default implementation, but you may completely override them.
 
     // Send the NME or OBS message to server. Default sends OBS.
-    virtual void send_nme_or_obs(void);
+    virtual void send_nme_or_obs();
 
     // Handle an incoming CCD message.
     virtual void process_ccd_message(TokenMessage &incoming_message, bool is_new_disconnection);
@@ -343,9 +343,9 @@ private:
     bool extract_parameters(COMMAND_LINE_PARAMETERS &parameters);
 
 public:
-    void BaseBot::OnSocketMessage(void);
+    void BaseBot::OnSocketMessage();
 
-    void end_dialog(void);
+    void end_dialog();
 };
 
 #endif // _DAN_BASEBOT_H

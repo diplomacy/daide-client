@@ -17,7 +17,7 @@
 #include "token_message.h"
 
 // Function to get the instance of the MapAndUnits object
-MapAndUnits *MapAndUnits::get_instance(void) {
+MapAndUnits *MapAndUnits::get_instance() {
     static MapAndUnits object_instance;
 
     return &object_instance;
@@ -25,7 +25,7 @@ MapAndUnits *MapAndUnits::get_instance(void) {
 
 // Get a duplicate copy of the MapAndUnits class. Recommended for messing around with
 // without affecting the master copy
-MapAndUnits *MapAndUnits::get_duplicate_instance(void) {
+MapAndUnits *MapAndUnits::get_duplicate_instance() {
     MapAndUnits *original;
     MapAndUnits *duplicate;
 
@@ -44,7 +44,7 @@ void MapAndUnits::delete_duplicate_instance(MapAndUnits *duplicate) {
 }
 
 // Private constructor. Use get_instance to get the object
-MapAndUnits::MapAndUnits(void) {
+MapAndUnits::MapAndUnits() {
     game_over = false;
     game_started = false;
     power_played = Token(0);
@@ -912,7 +912,7 @@ bool MapAndUnits::set_remove_order(PROVINCE_INDEX unit) {
     return unit_ordered;
 }
 
-void MapAndUnits::set_waive_order(void) {
+void MapAndUnits::set_waive_order() {
     our_winter_orders.number_of_waives++;
 }
 
@@ -952,7 +952,7 @@ bool MapAndUnits::cancel_remove_order(PROVINCE_INDEX location) {
     return cancel_build_order(location);
 }
 
-bool MapAndUnits::any_orders_entered(void) {
+bool MapAndUnits::any_orders_entered() {
     UNITS::iterator unit_iterator;            // The unit we are working on
     bool order_entered = false;                // Whether any orders have been entered
 
@@ -978,7 +978,7 @@ bool MapAndUnits::any_orders_entered(void) {
     return order_entered;
 }
 
-TokenMessage MapAndUnits::build_sub_command(void) {
+TokenMessage MapAndUnits::build_sub_command() {
     TokenMessage sub_message;                // The sub message
     UNITS::iterator unit_iterator;            // The unit we are working on
     TokenMessage unit_order;                // The order for one unit
@@ -1041,7 +1041,7 @@ TokenMessage MapAndUnits::build_sub_command(void) {
     return sub_message;
 }
 
-void MapAndUnits::clear_all_orders(void) {
+void MapAndUnits::clear_all_orders() {
     UNITS::iterator unit_iterator;
 
     for (unit_iterator = units.begin(); unit_iterator != units.end(); unit_iterator++) {
@@ -2271,7 +2271,7 @@ TokenMessage MapAndUnits::describe_movement_result(UNIT_AND_ORDER *unit) {
     return movement_result;
 }
 
-TokenMessage MapAndUnits::describe_turn(void) {
+TokenMessage MapAndUnits::describe_turn() {
     TokenMessage current_turn;
     Token current_year_token;
 

@@ -21,7 +21,7 @@
 class TokenMessage {
 public:
     // Construct as a blank message
-    TokenMessage(void);
+    TokenMessage();
 
     // Construct with a message as specified. Message must be terminated
     TokenMessage(const Token *message);
@@ -45,22 +45,22 @@ public:
     bool get_message(Token message[], int buffer_length) const;
 
     // Get the length of the message
-    int get_message_length(void) const;
+    int get_message_length() const;
 
     // Find out if the message is a single token
-    bool is_single_token(void) const;
+    bool is_single_token() const;
 
     // Find out if the message contains submessages or just individual tokens
-    bool contains_submessages(void) const;
+    bool contains_submessages() const;
 
     // Get the first token (if a single token, it is the only one
-    Token get_token(void) const;
+    Token get_token() const;
 
     // Get a token by index
     Token get_token(int index) const;
 
     // Get the number of submessages (a submessage is one token, or ( ... ) )
-    int get_submessage_count(void) const;
+    int get_submessage_count() const;
 
     // Get a submessage
     TokenMessage get_submessage(int submessage_index);
@@ -84,13 +84,13 @@ public:
     void set_message_as_ascii(const string text);
 
     // Get the message as a string
-    string get_message_as_text(void) const;
+    string get_message_as_text() const;
 
     // Enclose the message in brackets and return
-    TokenMessage enclose(void) const;
+    TokenMessage enclose() const;
 
     // Enclose the message in brackets and update this message
-    void enclose_this(void);
+    void enclose_this();
 
     // Concatenate two messages together. Treat the second as a submessage
     TokenMessage operator&(const TokenMessage &other_message);
@@ -116,7 +116,7 @@ public:
     };
 
 private:
-    void find_submessages(void);
+    void find_submessages();
 
     Token *m_message;                    // The message
     int m_message_length;                // Number of tokens in the message

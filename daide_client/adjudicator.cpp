@@ -15,7 +15,7 @@
 #include "stdafx.h"
 #include "map_and_units.h"
 
-void MapAndUnits::adjudicate(void) {
+void MapAndUnits::adjudicate() {
     if ((current_season == TOKEN_SEASON_SPR)
         || (current_season == TOKEN_SEASON_FAL)) {
         adjudicate_moves();
@@ -27,7 +27,7 @@ void MapAndUnits::adjudicate(void) {
     }
 }
 
-void MapAndUnits::adjudicate_moves(void) {
+void MapAndUnits::adjudicate_moves() {
     bool changes_made = true;
     bool futile_convoys_checked = false;
     bool futile_and_indomtiable_convoys_checked = false;
@@ -74,7 +74,7 @@ void MapAndUnits::adjudicate_moves(void) {
     fight_ordinary_battles();
 }
 
-void MapAndUnits::initialise_move_adjudication(void) {
+void MapAndUnits::initialise_move_adjudication() {
     UNITS::iterator unit_iterator;
     UNIT_AND_ORDER *unit;
 
@@ -142,7 +142,7 @@ void MapAndUnits::initialise_move_adjudication(void) {
     }
 }
 
-void MapAndUnits::check_for_illegal_move_orders(void) {
+void MapAndUnits::check_for_illegal_move_orders() {
     UNITS::iterator unit_iterator;                // Iterator through the units on the board
     UNIT_AND_ORDER *unit_record;                // The record for the unit being ordered
     UNIT_AND_ORDER *supported_unit;                // The record for the unit being supported
@@ -291,7 +291,7 @@ void MapAndUnits::check_for_illegal_move_orders(void) {
     }
 }
 
-void MapAndUnits::cancel_inconsistent_convoys(void) {
+void MapAndUnits::cancel_inconsistent_convoys() {
     UNIT_SET::iterator convoyed_unit_iterator;
     UNIT_SET::iterator convoying_unit_iterator;
     UNIT_LIST::iterator convoying_step_iterator;
@@ -376,7 +376,7 @@ void MapAndUnits::cancel_inconsistent_convoys(void) {
     // No need to keep it up to date for the rest of the adjudicator
 }
 
-void MapAndUnits::cancel_inconsistent_supports(void) {
+void MapAndUnits::cancel_inconsistent_supports() {
     bool order_ok;
     UNIT_SET::iterator supporting_unit_iterator;
     UNITS::iterator supported_unit_iterator;
@@ -431,7 +431,7 @@ void MapAndUnits::cancel_inconsistent_supports(void) {
     }
 }
 
-void MapAndUnits::direct_attacks_cut_support(void) {
+void MapAndUnits::direct_attacks_cut_support() {
     ATTACKER_MAP::iterator moving_unit_iterator;
     UNIT_AND_ORDER *moving_unit;
     UNITS::iterator attacked_unit_iterator;
@@ -463,7 +463,7 @@ void MapAndUnits::direct_attacks_cut_support(void) {
     }
 }
 
-void MapAndUnits::build_support_lists(void) {
+void MapAndUnits::build_support_lists() {
     UNIT_SET::iterator supporting_unit_iterator;
     UNIT_AND_ORDER *supporting_unit;
     UNIT_AND_ORDER *supported_unit;
@@ -504,7 +504,7 @@ void MapAndUnits::build_support_lists(void) {
     // No need to keep it up to date for the rest of the adjudicator
 }
 
-void MapAndUnits::build_convoy_subversion_list(void) {
+void MapAndUnits::build_convoy_subversion_list() {
     UNIT_SET::iterator convoyed_moves_iterator;
     CONVOY_SUBVERSION convoy_subversion;
     UNIT_AND_ORDER *convoyed_unit;
@@ -577,7 +577,7 @@ void MapAndUnits::build_convoy_subversion_list(void) {
     // No need to keep it up to date for the rest of the adjudicator
 }
 
-bool MapAndUnits::resolve_attacks_on_non_subverted_convoys(void) {
+bool MapAndUnits::resolve_attacks_on_non_subverted_convoys() {
     bool changes_made = false;
     CONVOY_SUBVERSION_MAP::iterator convoy_subversion_iterator;
     UNIT_AND_ORDER *convoyed_army;
@@ -656,7 +656,7 @@ bool MapAndUnits::resolve_attacks_on_non_subverted_convoys(void) {
     return changes_made;
 }
 
-bool MapAndUnits::check_for_futile_convoys(void) {
+bool MapAndUnits::check_for_futile_convoys() {
     bool changes_made = false;
     CONVOY_SUBVERSION_MAP::iterator convoy_subversion_iterator;
     PROVINCE_INDEX convoyed_army_province;
@@ -751,7 +751,7 @@ bool MapAndUnits::check_for_futile_convoys(void) {
     return changes_made;
 }
 
-bool MapAndUnits::check_for_indomitable_and_futile_convoys(void) {
+bool MapAndUnits::check_for_indomitable_and_futile_convoys() {
     bool changes_made = false;
     CONVOY_SUBVERSION_MAP::iterator convoy_subversion_iterator;
     PROVINCE_INDEX convoyed_army_province;
@@ -891,7 +891,7 @@ bool MapAndUnits::check_for_indomitable_and_futile_convoys(void) {
     return changes_made;
 }
 
-void MapAndUnits::resolve_circles_of_subversion(void) {
+void MapAndUnits::resolve_circles_of_subversion() {
     CONVOY_SUBVERSION_MAP::iterator convoy_subversion_iterator;
     PROVINCE_INDEX convoyed_army_province;
     bool convoy_is_confused;
@@ -991,7 +991,7 @@ void MapAndUnits::resolve_circles_of_subversion(void) {
     }
 }
 
-void MapAndUnits::identify_rings_of_attack_and_head_to_head_battles(void) {
+void MapAndUnits::identify_rings_of_attack_and_head_to_head_battles() {
     int move_counter = 0;
     ATTACKER_MAP::iterator moving_unit_iterator;
     UNIT_AND_ORDER *moving_unit;
@@ -1070,7 +1070,7 @@ void MapAndUnits::identify_rings_of_attack_and_head_to_head_battles(void) {
     }
 }
 
-void MapAndUnits::advance_rings_of_attack(void) {
+void MapAndUnits::advance_rings_of_attack() {
     UNIT_SET::iterator ring_set_iterator;
     int first_province;
     UNIT_AND_ORDER *ring_unit;
@@ -1284,7 +1284,7 @@ void MapAndUnits::bounce_attack(UNIT_AND_ORDER *unit) {
     }
 }
 
-void MapAndUnits::resolve_unbalanced_head_to_head_battles(void) {
+void MapAndUnits::resolve_unbalanced_head_to_head_battles() {
     UNIT_SET::iterator head_to_head_iterator;
     UNIT_AND_ORDER *stronger_unit;
     UNIT_AND_ORDER *weaker_unit;
@@ -1343,7 +1343,7 @@ void MapAndUnits::resolve_unbalanced_head_to_head_battles(void) {
     }
 }
 
-void MapAndUnits::resolve_balanced_head_to_head_battles(void) {
+void MapAndUnits::resolve_balanced_head_to_head_battles() {
     UNIT_SET::iterator head_to_head_iterator;
     UNIT_AND_ORDER *first_unit;
     UNIT_AND_ORDER *second_unit;
@@ -1390,7 +1390,7 @@ void MapAndUnits::resolve_balanced_head_to_head_battles(void) {
     }
 }
 
-void MapAndUnits::fight_ordinary_battles(void) {
+void MapAndUnits::fight_ordinary_battles() {
     ATTACKER_MAP::iterator attacker_iterator;
 
     // Just run through the attacker map, resolving each entry (each entry is removed
@@ -1582,7 +1582,7 @@ MapAndUnits::PROVINCE_INDEX MapAndUnits::find_successful_attack_on_empty_provinc
     return most_supported_unit;
 }
 
-void MapAndUnits::adjudicate_retreats(void) {
+void MapAndUnits::adjudicate_retreats() {
     UNITS::iterator unit_iterator;
     UNIT_AND_ORDER *unit;
     ATTACKER_MAP retreat_map;
@@ -1634,7 +1634,7 @@ void MapAndUnits::adjudicate_retreats(void) {
     }
 }
 
-void MapAndUnits::check_for_illegal_retreat_orders(void) {
+void MapAndUnits::check_for_illegal_retreat_orders() {
     UNITS::iterator unit_iterator;                // Iterator through the units on the board
     UNIT_AND_ORDER *unit_record;                // The record for the unit being ordered
 
@@ -1657,7 +1657,7 @@ void MapAndUnits::check_for_illegal_retreat_orders(void) {
     }
 }
 
-void MapAndUnits::adjudicate_builds(void) {
+void MapAndUnits::adjudicate_builds() {
     POWER_INDEX power_index;
     BUILDS_OR_DISBANDS::iterator adjustment_iterator;
     WINTER_ORDERS_FOR_POWER *orders;
@@ -1783,7 +1783,7 @@ int MapAndUnits::get_distance_from_home(UNIT_AND_ORDER &unit) {
     return current_distance;
 }
 
-bool MapAndUnits::apply_adjudication(void) {
+bool MapAndUnits::apply_adjudication() {
     if ((current_season == TOKEN_SEASON_SPR)
         || (current_season == TOKEN_SEASON_FAL)) {
         apply_moves();
@@ -1797,7 +1797,7 @@ bool MapAndUnits::apply_adjudication(void) {
     return move_to_next_turn();
 }
 
-void MapAndUnits::apply_moves(void) {
+void MapAndUnits::apply_moves() {
     UNITS moved_units;
     UNITS::iterator unit_iterator;
     UNIT_AND_ORDER *unit;
@@ -1861,7 +1861,7 @@ void MapAndUnits::apply_moves(void) {
     }
 }
 
-void MapAndUnits::apply_retreats(void) {
+void MapAndUnits::apply_retreats() {
     UNITS::iterator unit_iterator;
     UNIT_AND_ORDER *unit;
 
@@ -1883,7 +1883,7 @@ void MapAndUnits::apply_retreats(void) {
     dislodged_units.clear();
 }
 
-void MapAndUnits::apply_builds(void) {
+void MapAndUnits::apply_builds() {
     UNIT_AND_ORDER new_unit;
     POWER_INDEX power_counter;
     WINTER_ORDERS_FOR_POWER *orders;
@@ -1920,7 +1920,7 @@ void MapAndUnits::apply_builds(void) {
     }
 }
 
-bool MapAndUnits::move_to_next_turn(void) {
+bool MapAndUnits::move_to_next_turn() {
     bool new_turn_found = false;
     bool send_sco = false;            // Whether SCO should be sent if server.
 
@@ -1957,7 +1957,7 @@ bool MapAndUnits::move_to_next_turn(void) {
     return send_sco;
 }
 
-bool MapAndUnits::update_sc_ownership(void) {
+bool MapAndUnits::update_sc_ownership() {
     int unit_count[MAX_POWERS];
     int sc_count[MAX_POWERS];
     int power_counter;

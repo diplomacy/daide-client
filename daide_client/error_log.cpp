@@ -28,13 +28,9 @@ void enable_logging(bool enable) {
     logging_enabled = enable;
 }
 
-#pragma warning( disable: 4996 )
-
 FILE *open(const char *filename, const char *mode) {
     return fopen(filename, mode);
 }
-
-#pragma warning( default: 4996 )
 
 void log(char *format, ...) {
     va_list arg_list;
@@ -115,7 +111,7 @@ void log_daide_message(bool is_incoming, TokenMessage &message) {
     }
 }
 
-void close_logs(void) {
+void close_logs() {
     if (bad_log != NULL) {
         fclose(bad_log);
     }

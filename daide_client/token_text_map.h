@@ -22,14 +22,14 @@ typedef map<string, Token> TEXT_TO_TOKEN_MAP;
 
 class TokenTextMap {
 public:
-    static TokenTextMap *instance(void);
+    static TokenTextMap *instance();
 
     TOKEN_TO_TEXT_MAP m_token_to_text_map;
     TEXT_TO_TOKEN_MAP m_text_to_token_map;
 
     void clear_category(BYTE category);
 
-    void clear_power_and_province_categories(void);
+    void clear_power_and_province_categories();
 
     bool add_token(const Token &token, const string token_string);
 

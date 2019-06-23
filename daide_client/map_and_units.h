@@ -15,8 +15,6 @@
 #ifndef _DAIDE_MAP_AND_UNITS
 #define _DAIDE_MAP_AND_UNITS
 
-#pragma warning( disable : 4786 )
-
 #include "types.h"
 #include "tokens.h"
 #include "token_message.h"
@@ -243,11 +241,11 @@ public:
     // Public Functions
 
     // Get the instance of the MapAndUnits class
-    static MapAndUnits *get_instance(void);
+    static MapAndUnits *get_instance();
 
     // Get a duplicate copy of the MapAndUnits class. Recommended for messing around with
     // without affecting the master copy
-    static MapAndUnits *get_duplicate_instance(void);
+    static MapAndUnits *get_duplicate_instance();
 
     // Delete a duplicate
     static void delete_duplicate_instance(MapAndUnits *duplicate);
@@ -287,7 +285,7 @@ public:
 
     bool set_remove_order(PROVINCE_INDEX unit);
 
-    void set_waive_order(void);
+    void set_waive_order();
 
     void set_multiple_waive_orders(int waives);
 
@@ -304,13 +302,13 @@ public:
     bool unorder_adjustment(TokenMessage &not_sub_message, int power_index);
 
     // Whether any units have had orders submitted
-    bool any_orders_entered(void);
+    bool any_orders_entered();
 
     // Convert all the set orders into a sub command to send to the server
-    TokenMessage build_sub_command(void);
+    TokenMessage build_sub_command();
 
     // Clear all orders
-    void clear_all_orders(void);
+    void clear_all_orders();
 
     // Describe a result as a string. Used if results are to be displayed to the user.
     string describe_movement_result(UNIT_AND_ORDER &unit);
@@ -354,13 +352,13 @@ public:
     void set_order_checking(bool check_on_submit, bool check_on_adjudicate);
 
     // Perform the adjudication
-    void adjudicate(void);
+    void adjudicate();
 
     // Get the results as a set of ORD messages
     int get_adjudication_results(TokenMessage ord_messages[]);
 
     // Apply the adjudication. This moves all the units to their new positions.
-    bool apply_adjudication(void);
+    bool apply_adjudication();
 
     // Get the current game status
     void get_unit_positions(TokenMessage *now_message);
@@ -381,7 +379,7 @@ public:
 
 private:
     // Private constructor - use the get_instance() function
-    MapAndUnits(void);
+    MapAndUnits();
 
     int process_power_list(TokenMessage &power_list);
 
@@ -408,7 +406,7 @@ private:
 
     TokenMessage describe_movement_order(UNIT_AND_ORDER *unit);
 
-    TokenMessage describe_turn(void);
+    TokenMessage describe_turn();
 
     TokenMessage describe_coast(COAST_ID coast);
 
@@ -451,39 +449,39 @@ private:
     TokenMessage describe_waive(POWER_INDEX power_counter);
 
     // Functions used to adjudicate
-    void adjudicate_moves(void);
+    void adjudicate_moves();
 
-    void adjudicate_retreats(void);
+    void adjudicate_retreats();
 
-    void adjudicate_builds(void);
+    void adjudicate_builds();
 
-    void initialise_move_adjudication(void);
+    void initialise_move_adjudication();
 
-    void check_for_illegal_move_orders(void);
+    void check_for_illegal_move_orders();
 
-    void cancel_inconsistent_convoys(void);
+    void cancel_inconsistent_convoys();
 
-    void cancel_inconsistent_supports(void);
+    void cancel_inconsistent_supports();
 
-    void direct_attacks_cut_support(void);
+    void direct_attacks_cut_support();
 
-    void build_support_lists(void);
+    void build_support_lists();
 
-    void build_convoy_subversion_list(void);
+    void build_convoy_subversion_list();
 
-    bool resolve_attacks_on_non_subverted_convoys(void);
+    bool resolve_attacks_on_non_subverted_convoys();
 
-    bool check_for_futile_convoys(void);
+    bool check_for_futile_convoys();
 
-    bool check_for_indomitable_and_futile_convoys(void);
+    bool check_for_indomitable_and_futile_convoys();
 
-    void resolve_circles_of_subversion(void);
+    void resolve_circles_of_subversion();
 
     bool resolve_attacks_on_occupied_province(PROVINCE_INDEX attacked_province);
 
-    void identify_rings_of_attack_and_head_to_head_battles(void);
+    void identify_rings_of_attack_and_head_to_head_battles();
 
-    void advance_rings_of_attack(void);
+    void advance_rings_of_attack();
 
     RING_UNIT_STATUS determine_ring_status(PROVINCE_INDEX province, PROVINCE_INDEX ring_unit_source);
 
@@ -493,11 +491,11 @@ private:
 
     void bounce_attack(UNIT_AND_ORDER *unit);
 
-    void resolve_unbalanced_head_to_head_battles(void);
+    void resolve_unbalanced_head_to_head_battles();
 
-    void resolve_balanced_head_to_head_battles(void);
+    void resolve_balanced_head_to_head_battles();
 
-    void fight_ordinary_battles(void);
+    void fight_ordinary_battles();
 
     void resolve_attacks_on_province(PROVINCE_INDEX province);
 
@@ -507,21 +505,21 @@ private:
 
     PROVINCE_INDEX find_successful_attack_on_empty_province(PROVINCE_INDEX attacked_province);
 
-    void check_for_illegal_retreat_orders(void);
+    void check_for_illegal_retreat_orders();
 
     void generate_cd_disbands(POWER_INDEX power_index, WINTER_ORDERS_FOR_POWER *orders);
 
     int get_distance_from_home(UNIT_AND_ORDER &unit);
 
-    void apply_moves(void);
+    void apply_moves();
 
-    void apply_retreats(void);
+    void apply_retreats();
 
-    void apply_builds(void);
+    void apply_builds();
 
-    bool move_to_next_turn(void);
+    bool move_to_next_turn();
 
-    bool update_sc_ownership(void);
+    bool update_sc_ownership();
 
     // Constants used by the adjudicator
     enum {

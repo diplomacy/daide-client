@@ -316,7 +316,7 @@ void Socket::PushOutgoingMessage(char *message) {
     if (!OutgoingMessage && Connected) SendData();
 }
 
-char *Socket::PullIncomingMessage(void) {
+char *Socket::PullIncomingMessage() {
     // Pull next message from front of IncomingMessageQueue. Post a new message event if more messages remain on queue.
 
     ASSERT(!IncomingMessageQueue.empty());

@@ -18,7 +18,7 @@
 #include "token_message.h"
 #include "token_text_map.h"
 
-TokenMessage::TokenMessage(void) {
+TokenMessage::TokenMessage() {
     // Set the message to blank
     m_message = NULL;
     m_message_length = NO_MESSAGE;
@@ -126,19 +126,19 @@ const {
     return message_copied;
 }
 
-int TokenMessage::get_message_length(void) const {
+int TokenMessage::get_message_length() const {
     return m_message_length;
 }
 
-bool TokenMessage::is_single_token(void) const {
+bool TokenMessage::is_single_token() const {
     return (m_message_length == 1);
 }
 
-bool TokenMessage::contains_submessages(void) const {
+bool TokenMessage::contains_submessages() const {
     return (m_message_length != m_submessage_count);
 }
 
-Token TokenMessage::get_token(void) const {
+Token TokenMessage::get_token() const {
     return m_message[0];
 }
 
@@ -155,7 +155,7 @@ const {
     return token;
 }
 
-int TokenMessage::get_submessage_count(void) const {
+int TokenMessage::get_submessage_count() const {
     int submessage_count;
 
     if (m_submessage_count == NO_MESSAGE) {
@@ -497,7 +497,7 @@ void TokenMessage::set_message_as_ascii(const string text) {
     delete[] token_message;
 }
 
-string TokenMessage::get_message_as_text(void) const {
+string TokenMessage::get_message_as_text() const {
     ostringstream message_as_text;
     int token_counter;
     bool is_ascii_text = false;
@@ -539,7 +539,7 @@ string TokenMessage::get_message_as_text(void) const {
     return message_as_text.str();
 }
 
-TokenMessage TokenMessage::enclose(void) const {
+TokenMessage TokenMessage::enclose() const {
     TokenMessage new_message;
 
     if (m_message == NULL) {
@@ -578,7 +578,7 @@ TokenMessage TokenMessage::enclose(void) const {
     return new_message;
 }
 
-void TokenMessage::enclose_this(void) {
+void TokenMessage::enclose_this() {
     Token *new_message;                    // The enclosed message
 
     if (m_message == NULL) {
@@ -714,7 +714,7 @@ TokenMessage TokenMessage::operator+(const Token &token) {
     return operator+(token_message);
 }
 
-void TokenMessage::find_submessages(void) {
+void TokenMessage::find_submessages() {
     int bracket_count = 0;
     int token_counter;
     int submessage_count = 0;

@@ -40,7 +40,7 @@ class TokenMessage;
 class Token {
 public:
     // Constructor
-    inline Token(void) {
+    inline Token() {
         m_token = 0;
     }
 
@@ -61,20 +61,20 @@ public:
     }
 
     // Category and Token
-    BYTE get_category(void) const {
+    BYTE get_category() const {
         return m_token >> 8;
     }
 
-    BYTE get_subtoken(void) const {
+    BYTE get_subtoken() const {
         return m_token & 0xFF;
     }
 
     // Numbers
-    inline bool is_number(void) const {
+    inline bool is_number() const {
         return ((m_token & NUMBER_MASK) == NUMBER_MASK_CHECK);
     }
 
-    inline int get_number(void) const {
+    inline int get_number() const {
         return ((m_token & NEGATIVE_MASK) == NEGATIVE_MASK_CHECK)
                ? m_token | MAKE_NEGATIVE_MASK
                : m_token;
@@ -85,11 +85,11 @@ public:
     }
 
     // Provinces
-    inline bool is_province(void) const {
+    inline bool is_province() const {
         return ((m_token & PROVINCE_MASK) == PROVINCE_MASK_CHECK);
     }
 
-    inline LANGUAGE_TOKEN get_token(void) const {
+    inline LANGUAGE_TOKEN get_token() const {
         return m_token;
     }
 

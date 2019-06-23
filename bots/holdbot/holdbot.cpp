@@ -19,7 +19,7 @@
 #include "bot_type.h"
 #include "holdbot.h"
 
-void HoldBot::send_nme_or_obs(void) {
+void HoldBot::send_nme_or_obs() {
     send_name_and_version_to_server(BOT_FAMILY, BOT_GENERATION);
 }
 

@@ -27,7 +27,7 @@ void log_error(char *error, ...);
 
 void log_daide_message(bool is_incoming, TokenMessage &message);
 
-void close_logs(void);
+void close_logs();
 
 int display(const char *message, const char *caption = 0, int type = MB_OK);
 

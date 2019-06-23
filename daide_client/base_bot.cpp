@@ -23,7 +23,7 @@
 #include "ai_client.h"
 #include "base_bot.h"
 
-BaseBot::BaseBot(void) {
+BaseBot::BaseBot() {
     log_error("Started"); // not an error, but indicates start of logging; also writes to normal log
     m_tcpip_client_started = false;
     m_map_and_units = MapAndUnits::get_instance();
@@ -82,7 +82,7 @@ bool BaseBot::initialise() {
     }
 }
 
-void BaseBot::send_nme_or_obs(void) {
+void BaseBot::send_nme_or_obs() {
     TokenMessage obs_message(TOKEN_COMMAND_OBS);
 
     send_message_to_server(obs_message);
@@ -126,7 +126,7 @@ void BaseBot::send_message_to_server(TokenMessage &message) {
     m_socket.PushOutgoingMessage(tcpip_message);
 }
 
-void BaseBot::send_orders_to_server(void) {
+void BaseBot::send_orders_to_server() {
     TokenMessage sub_command;
 
     sub_command = m_map_and_units->build_sub_command();
@@ -153,17 +153,17 @@ void BaseBot::send_name_and_version_to_server(const char *name, const char *vers
     send_message_to_server(name_message);
 }
 
-void BaseBot::disconnect_from_server(void) {
+void BaseBot::disconnect_from_server() {
     m_tcpip_client_started = false;
 }
 
-void BaseBot::request_map(void) {
+void BaseBot::request_map() {
     m_map_requested = true;
 
     send_message_to_server(TokenMessage(TOKEN_COMMAND_MAP));
 }
 
-bool BaseBot::is_map_requested(void) {
+bool BaseBot::is_map_requested() {
     return m_map_requested;
 }
 
@@ -1172,7 +1172,7 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
     return extracted_ok;
 }
 
-void BaseBot::OnSocketMessage(void) {
+void BaseBot::OnSocketMessage() {
     // Process a DAIDE event: there are 1 or more unprocessed incoming DAIDE messages, in order of arrival.
     // Ensure all are processed, in order.
     // Assumes messages were queued in the same thread.
@@ -1187,10 +1187,6 @@ void BaseBot::OnSocketMessage(void) {
     delete[] incomingMessage;
 }
 
-void BaseBot::end_dialog(void) {
+void BaseBot::end_dialog() {
     PostMessage(main_wnd, WM_CLOSE, 0, 0);
 }
-
-
-
- 
