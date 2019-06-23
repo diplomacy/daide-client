@@ -48,13 +48,13 @@ void MapAndUnits::adjudicate_moves() {
     while (changes_made) {
         changes_made = resolve_attacks_on_non_subverted_convoys();
 
-        if ((changes_made == false) && (futile_convoys_checked == false)) {
+        if (!changes_made && !futile_convoys_checked) {
             changes_made = check_for_futile_convoys();
 
             futile_convoys_checked = true;
         }
 
-        if ((changes_made == false) && (futile_and_indomtiable_convoys_checked == false)) {
+        if (!changes_made && !futile_and_indomtiable_convoys_checked) {
             changes_made = check_for_indomitable_and_futile_convoys();
 
             futile_and_indomtiable_convoys_checked = true;
@@ -165,7 +165,7 @@ void MapAndUnits::check_for_illegal_move_orders() {
             }
 
             case MOVE_ORDER: {
-                if (can_move_to(unit_record, unit_record->move_dest) == false) {
+                if (!can_move_to(unit_record, unit_record->move_dest)) {
                     unit_record->order_type_copy = HOLD_ORDER;
                     unit_record->illegal_order = true;
                     unit_record->illegal_reason = TOKEN_ORDER_NOTE_FAR;
@@ -177,7 +177,7 @@ void MapAndUnits::check_for_illegal_move_orders() {
             case SUPPORT_TO_HOLD_ORDER: {
                 supported_unit = &(units[unit_record->other_source_province]);
 
-                if (can_move_to_province(unit_record, supported_unit->coast_id.province_index) == false) {
+                if (!can_move_to_province(unit_record, supported_unit->coast_id.province_index)) {
                     unit_record->order_type_copy = HOLD_ORDER;
                     unit_record->illegal_order = true;
                     unit_record->illegal_reason = TOKEN_ORDER_NOTE_FAR;
@@ -194,7 +194,7 @@ void MapAndUnits::check_for_illegal_move_orders() {
 
             case SUPPORT_TO_MOVE_ORDER: {
                 // Support to move
-                if (can_move_to_province(unit_record, unit_record->other_dest_province) == false) {
+                if (!can_move_to_province(unit_record, unit_record->other_dest_province)) {
                     unit_record->order_type_copy = HOLD_ORDER;
                     unit_record->illegal_order = true;
                     unit_record->illegal_reason = TOKEN_ORDER_NOTE_FAR;
@@ -256,7 +256,7 @@ void MapAndUnits::check_for_illegal_move_orders() {
                             unit_record->order_type_copy = HOLD_ORDER;
                             unit_record->illegal_order = true;
                             unit_record->illegal_reason = TOKEN_ORDER_NOTE_NAS;
-                        } else if (can_move_to_province(convoying_unit, previous_province) == false) {
+                        } else if (!can_move_to_province(convoying_unit, previous_province)) {
                             unit_record->order_type_copy = HOLD_ORDER;
                             unit_record->illegal_order = true;
                             unit_record->illegal_reason = TOKEN_ORDER_NOTE_FAR;
@@ -264,15 +264,15 @@ void MapAndUnits::check_for_illegal_move_orders() {
                     }
                 }
 
-                if (unit_record->illegal_order == false) {
-                    if (can_move_to_province(convoying_unit, unit_record->other_dest_province) == false) {
+                if (!unit_record->illegal_order) {
+                    if (!can_move_to_province(convoying_unit, unit_record->other_dest_province)) {
                         unit_record->order_type_copy = HOLD_ORDER;
                         unit_record->illegal_order = true;
                         unit_record->illegal_reason = TOKEN_ORDER_NOTE_FAR;
                     }
                 }
 
-                if (unit_record->illegal_order == false) {
+                if (!unit_record->illegal_order) {
                     if (unit_record->move_dest.province_index == unit_record->coast_id.province_index) {
                         unit_record->order_type_copy = HOLD_ORDER;
                         unit_record->illegal_order = true;
@@ -326,7 +326,7 @@ void MapAndUnits::cancel_inconsistent_convoys() {
             }
         }
 
-        if (order_ok == false) {
+        if (!order_ok) {
             convoyed_unit->order_type_copy = HOLD_NO_SUPPORT_ORDER;
             convoyed_unit->no_convoy = true;
             convoyed_unit_iterator = convoyed_units.erase(convoyed_unit_iterator);
@@ -362,7 +362,7 @@ void MapAndUnits::cancel_inconsistent_convoys() {
             }
         }
 
-        if (order_ok == false) {
+        if (!order_ok) {
             convoying_unit->no_army_to_convoy = true;
             convoying_unit->order_type_copy = HOLD_ORDER;
             convoying_unit_iterator = convoying_units.erase(convoying_unit_iterator);
@@ -422,7 +422,7 @@ void MapAndUnits::cancel_inconsistent_supports() {
             }
         }
 
-        if (order_ok == false) {
+        if (!order_ok) {
             supporting_unit->order_type_copy = HOLD_ORDER;
             supporting_unit_iterator = supporting_units.erase(supporting_unit_iterator);
         } else {
@@ -1013,7 +1013,7 @@ void MapAndUnits::identify_rings_of_attack_and_head_to_head_battles() {
         loop_found = false;
 
         // Follow the chain of unit attacking another unit
-        while (chain_end_found == false) {
+        while (!chain_end_found) {
             // If we find a unit with a number, we've branched into a chain we've already considered
             if (moving_unit->move_number != NO_MOVE_NUMBER) {
                 chain_end_found = true;
@@ -1396,7 +1396,7 @@ void MapAndUnits::fight_ordinary_battles() {
     // Just run through the attacker map, resolving each entry (each entry is removed
     // from the map once resolved, so we just keep resolving the first entry until
     // there are none left)
-    while (attacker_map.empty() == false) {
+    while (!attacker_map.empty()) {
         attacker_iterator = attacker_map.begin();
         resolve_attacks_on_province(attacker_iterator->first);
     }
@@ -1416,7 +1416,7 @@ void MapAndUnits::resolve_attacks_on_province(PROVINCE_INDEX province) {
 
         if (((occupying_unit->order_type_copy == MOVE_ORDER)
              || (occupying_unit->order_type_copy == MOVE_BY_CONVOY_ORDER))
-            && (occupying_unit->unit_moves == false)) {
+            && !occupying_unit->unit_moves) {
             resolve_attacks_on_province(occupying_unit->move_dest.province_index);
         }
 
@@ -1534,7 +1534,7 @@ MapAndUnits::find_dislodging_unit(PROVINCE_INDEX attacked_province, bool ignore_
     }
 
     // If we have to consider the occupying unit, then consider it from second strongest
-    if (ignore_occupying_unit == false) {
+    if (!ignore_occupying_unit) {
         occupying_unit = &(units[attacked_province]);
 
         if (((int) (occupying_unit->supports.size())) > second_most_supports) {
@@ -1643,7 +1643,7 @@ void MapAndUnits::check_for_illegal_retreat_orders() {
          unit_iterator++) {
         unit_record = &(unit_iterator->second);
 
-        if (can_move_to(unit_record, unit_record->move_dest) == false) {
+        if (!can_move_to(unit_record, unit_record->move_dest)) {
             unit_record->order_type_copy = HOLD_ORDER;
             unit_record->illegal_order = true;
             unit_record->illegal_reason = TOKEN_ORDER_NOTE_FAR;
@@ -1740,7 +1740,7 @@ int MapAndUnits::get_distance_from_home(UNIT_AND_ORDER &unit) {
         current_distances.insert(DISTANCE_MAP::value_type(unit.coast_id.province_index, 0));
 
         // While a home centre is not found
-        while (home_centre_found == false) {
+        while (!home_centre_found) {
             current_distance++;
 
             for (distance_iterator = current_distances.begin();
@@ -1925,7 +1925,7 @@ bool MapAndUnits::move_to_next_turn() {
     bool send_sco = false;            // Whether SCO should be sent if server.
 
     // Step through the turns until we find one which has something to do
-    while (new_turn_found == false) {
+    while (!new_turn_found) {
         if (current_season == TOKEN_SEASON_WIN) {
             current_season = TOKEN_SEASON_SPR;
             current_year++;
@@ -1940,7 +1940,7 @@ bool MapAndUnits::move_to_next_turn() {
         } else if ((current_season == TOKEN_SEASON_SUM)
                    || (current_season == TOKEN_SEASON_AUT)) {
             // Retreat turns happen if there are any dislodged units
-            if (dislodged_units.empty() == false) {
+            if (!dislodged_units.empty()) {
                 new_turn_found = true;
             }
         } else {

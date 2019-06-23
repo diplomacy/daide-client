@@ -71,8 +71,8 @@ int MapAndUnits::set_map(TokenMessage &mdf_message) {
         adjacencies = mdf_message.get_submessage(3);
 
         // Check the mdf command
-        if ((mdf_command.is_single_token() == false)
-            || (mdf_command.get_token() != TOKEN_COMMAND_MDF)) {
+        if (!mdf_command.is_single_token()
+            || mdf_command.get_token() != TOKEN_COMMAND_MDF) {
             error_location = 0;
         }
     }
@@ -165,7 +165,7 @@ int MapAndUnits::process_provinces(TokenMessage &provinces) {
         number_of_provinces = -1;
 
         for (province_counter = 0; province_counter < MAX_PROVINCES; province_counter++) {
-            if (game_map[province_counter].province_in_use == false) {
+            if (!game_map[province_counter].province_in_use) {
                 if (number_of_provinces == -1) {
                     number_of_provinces = province_counter;
                 }
@@ -225,7 +225,7 @@ int MapAndUnits::process_supply_centres_for_power(TokenMessage &supply_centres) 
             } else if (token.is_province()) {
                 province_index = token.get_subtoken();
 
-                if (game_map[province_index].province_in_use == false) {
+                if (!game_map[province_index].province_in_use) {
                     game_map[province_index].province_token = token;
                     game_map[province_index].province_in_use = true;
                     game_map[province_index].home_centre_set = home_centre_set;
@@ -274,7 +274,7 @@ int MapAndUnits::process_non_supply_centres(TokenMessage &non_supply_centres) {
         if (token.is_province()) {
             province_index = token.get_subtoken();
 
-            if (game_map[province_index].province_in_use == false) {
+            if (!game_map[province_index].province_in_use) {
                 game_map[province_index].province_token = token;
                 game_map[province_index].province_in_use = true;
                 game_map[province_index].owner = TOKEN_PARAMETER_UNO;
@@ -320,8 +320,8 @@ int MapAndUnits::process_province_adjacency(TokenMessage &province_adjacency) {
 
     province_details = &(game_map[province_token.get_subtoken()]);
 
-    if ((province_details->province_in_use == false)
-        || (province_details->coast_info.empty() == false)) {
+    if (!province_details->province_in_use
+        || !province_details->coast_info.empty()) {
         error_location = 0;
     } else {
         for (adjacency_counter = 1;
@@ -366,7 +366,7 @@ int MapAndUnits::process_adjacency_list(PROVINCE_DETAILS *province_details, Toke
 
     coast_details = &(province_details->coast_info[coast_token]);
 
-    if (coast_details->adjacent_coasts.empty() == false) {
+    if (!coast_details->adjacent_coasts.empty()) {
         error_location = 0;
     } else {
         for (adjacency_counter = 1;
@@ -429,7 +429,7 @@ int MapAndUnits::set_ownership(TokenMessage &sco_message) {
     if (number_of_provinces != NO_MAP) {
         sco_command = sco_message.get_submessage(0);
 
-        if ((sco_command.is_single_token() == false)
+        if (!sco_command.is_single_token()
             || (sco_command.get_token() != TOKEN_COMMAND_SCO)) {
             error_location = 0;
         } else {
@@ -491,7 +491,7 @@ int MapAndUnits::set_units(TokenMessage &now_message) {
     if (number_of_provinces != NO_MAP) {
         now_command = now_message.get_submessage(0);
 
-        if ((now_command.is_single_token() == false)
+        if (!now_command.is_single_token()
             || (now_command.get_token() != TOKEN_COMMAND_NOW)) {
             error_location = 0;
         } else {
@@ -655,7 +655,7 @@ int MapAndUnits::store_result(TokenMessage &ord_message) {
         // No map set up yet, so can't process
     } else if (ord_message.get_submessage_count() != 4) {
         error_location = 0;
-    } else if ((ord_message.get_submessage(0).is_single_token() == false)
+    } else if (!ord_message.get_submessage(0).is_single_token()
                || (ord_message.get_submessage(0).get_token() != TOKEN_COMMAND_ORD)) {
         error_location = 0;
     } else {
@@ -969,7 +969,7 @@ bool MapAndUnits::any_orders_entered() {
             }
         }
     } else {
-        if ((our_winter_orders.builds_or_disbands.empty() == false)
+        if (!our_winter_orders.builds_or_disbands.empty()
             || (our_winter_orders.number_of_waives != 0)) {
             order_entered = true;
         }
@@ -1528,7 +1528,7 @@ MapAndUnits::COAST_ID MapAndUnits::find_result_unit_initial_location(
         }
     }
 
-    if (unit_found == false) {
+    if (!unit_found) {
         for (unit_iterator = last_retreat_results.begin();
              unit_iterator != last_retreat_results.end();
              unit_iterator++) {
@@ -1541,7 +1541,7 @@ MapAndUnits::COAST_ID MapAndUnits::find_result_unit_initial_location(
         }
     }
 
-    if (unit_found == false) {
+    if (!unit_found) {
         for (unit_iterator = last_movement_results.begin();
              unit_iterator != last_movement_results.end();
              unit_iterator++) {
@@ -1551,8 +1551,8 @@ MapAndUnits::COAST_ID MapAndUnits::find_result_unit_initial_location(
                 moved_to_province = true;
                 unit_found = true;
             } else if ((unit_iterator->second.coast_id.province_index == province_index)
-                       && (unit_iterator->second.unit_moves == false)
-                       && (unit_iterator->second.dislodged == false)) {
+                       && !unit_iterator->second.unit_moves
+                       && !unit_iterator->second.dislodged) {
                 initial_location = unit_iterator->second.coast_id;
                 unit_found = true;
             }
@@ -1634,7 +1634,7 @@ int MapAndUnits::process_orders(TokenMessage &sub_message, POWER_INDEX power_ind
 
     sub_command = sub_message.get_submessage(0);
 
-    if ((sub_command.is_single_token() == false)
+    if (!sub_command.is_single_token()
         || (sub_command.get_token() != TOKEN_COMMAND_SUB)) {
         error_location = 0;
     } else {
@@ -1717,7 +1717,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
             destination = get_coast_id(order.get_submessage(2), unit_record->unit_type);
 
             if ((check_orders_on_submission)
-                && (can_move_to(unit_record, destination) == false)) {
+                && !can_move_to(unit_record, destination)) {
                 order_result = TOKEN_ORDER_NOTE_FAR;
             } else {
                 unit_record->order_type = MOVE_ORDER;
@@ -1731,7 +1731,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                 if (supported_unit == NULL) {
                     order_result = TOKEN_ORDER_NOTE_NSU;
                 } else if ((check_orders_on_submission)
-                           && (can_move_to_province(unit_record, supported_unit->coast_id.province_index) == false)) {
+                           && !can_move_to_province(unit_record, supported_unit->coast_id.province_index)) {
                     order_result = TOKEN_ORDER_NOTE_FAR;
                 }
                     // Check it isn't trying to support itself
@@ -1750,11 +1750,11 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                 if (supported_unit == NULL) {
                     order_result = TOKEN_ORDER_NOTE_NSU;
                 } else if ((check_orders_on_submission)
-                           && (has_route_to_province(supported_unit, support_destination.get_subtoken(),
-                                                     unit_record->coast_id.province_index) == false)) {
+                           && !has_route_to_province(supported_unit, support_destination.get_subtoken(),
+                                                     unit_record->coast_id.province_index)) {
                     order_result = TOKEN_ORDER_NOTE_FAR;
                 } else if ((check_orders_on_submission)
-                           && (can_move_to_province(unit_record, support_destination.get_subtoken()) == false)) {
+                           && !can_move_to_province(unit_record, support_destination.get_subtoken())) {
                     order_result = TOKEN_ORDER_NOTE_FAR;
                 }
                     // Check it isn't trying to support itself
@@ -1783,7 +1783,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                        && (convoyed_unit->unit_type != TOKEN_UNIT_AMY)) {
                 order_result = TOKEN_ORDER_NOTE_NSA;
             } else if ((check_orders_on_submission)
-                       && (has_route_to_province(convoyed_unit, convoy_destination.get_subtoken(), -1) == false)) {
+                       && !has_route_to_province(convoyed_unit, convoy_destination.get_subtoken(), -1)) {
                 order_result = TOKEN_ORDER_NOTE_FAR;
             } else {
                 unit_record->order_type = CONVOY_ORDER;
@@ -1818,7 +1818,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                             order_result = TOKEN_ORDER_NOTE_NSF;
                         } else if (game_map[convoying_unit->coast_id.province_index].is_land) {
                             order_result = TOKEN_ORDER_NOTE_NAS;
-                        } else if (can_move_to_province(convoying_unit, previous_province) == false) {
+                        } else if (!can_move_to_province(convoying_unit, previous_province)) {
                             order_result = TOKEN_ORDER_NOTE_FAR;
                         } else {
                             previous_province = convoying_unit->coast_id.province_index;
@@ -1832,7 +1832,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
             }
 
             if ((check_orders_on_submission) && (order_result == TOKEN_ORDER_NOTE_MBV)) {
-                if (can_move_to_province(convoying_unit, convoy_destination.get_subtoken()) == false) {
+                if (!can_move_to_province(convoying_unit, convoy_destination.get_subtoken())) {
                     order_result = TOKEN_ORDER_NOTE_FAR;
                 }
             }
@@ -1854,7 +1854,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
             destination = get_coast_id(order.get_submessage(2), unit_record->unit_type);
 
             if ((check_orders_on_submission)
-                && (can_move_to(unit_record, destination) == false)) {
+                && !can_move_to(unit_record, destination)) {
                 order_result = TOKEN_ORDER_NOTE_FAR;
             } else if ((check_orders_on_submission)
                        && (unit_record->retreat_options.find(destination) == unit_record->retreat_options.end())) {
@@ -1866,7 +1866,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
         } else if (order_token == TOKEN_ORDER_DSB) {
             unit_record->order_type = DISBAND_ORDER;
         } else if (order_token == TOKEN_ORDER_BLD) {
-            if ((winter_record->is_building == false)
+            if (!winter_record->is_building
                 || ((int) winter_record->builds_or_disbands.size() + winter_record->number_of_waives
                     >= winter_record->number_of_orders_required)) {
                 order_result = TOKEN_ORDER_NOTE_NMB;
@@ -1883,7 +1883,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
 
                 if (winter_order_unit.get_token(0).get_subtoken() != power_index) {
                     order_result = TOKEN_ORDER_NOTE_NYU;
-                } else if (game_map[build_location.province_index].is_supply_centre == false) {
+                } else if (!game_map[build_location.province_index].is_supply_centre) {
                     order_result = TOKEN_ORDER_NOTE_NSC;
                 } else if (game_map[build_location.province_index].home_centre_set.find(power_index)
                            == game_map[build_location.province_index].home_centre_set.end()) {
@@ -1930,7 +1930,7 @@ Token MapAndUnits::process_order(TokenMessage &order, POWER_INDEX power_index) {
                 }
             }
         } else if (order_token == TOKEN_ORDER_WVE) {
-            if ((winter_record->is_building == false)
+            if (!winter_record->is_building
                 || ((int) winter_record->builds_or_disbands.size() + winter_record->number_of_waives
                     >= winter_record->number_of_orders_required)) {
                 order_result = TOKEN_ORDER_NOTE_NMB;
@@ -1962,8 +1962,8 @@ MapAndUnits::UNIT_AND_ORDER *MapAndUnits::find_unit(TokenMessage &unit_to_find, 
         unit_type = unit_to_find.get_submessage(1);
         location = unit_to_find.get_submessage(2);
 
-        if ((nationality.is_single_token() == false)
-            || (unit_type.is_single_token() == false)) {
+        if (!nationality.is_single_token()
+            || !unit_type.is_single_token()) {
             error = true;
         } else {
             if (location.is_single_token()) {
@@ -2052,7 +2052,7 @@ bool MapAndUnits::has_route_to_province(UNIT_AND_ORDER *unit, PROVINCE_INDEX pro
     has_route = can_move_to_province(unit, province_index);
 
     // If not, check for convoy routes
-    if ((has_route == false)
+    if (!has_route
         && (unit->unit_type == TOKEN_UNIT_AMY)
         && (game_map[province_index].is_land)) {
         // Mark the source province as checked
@@ -2077,8 +2077,8 @@ bool MapAndUnits::has_route_to_province(UNIT_AND_ORDER *unit, PROVINCE_INDEX pro
         }
 
         // While there are provinces to check
-        while ((provinces_to_check.empty() == false)
-               && (has_route == false)) {
+        while (!provinces_to_check.empty()
+               && !has_route) {
             // Get the first
             province_being_checked = *(provinces_to_check.begin());
             provinces_to_check.erase(provinces_to_check.begin());
@@ -2163,7 +2163,7 @@ TokenMessage MapAndUnits::describe_movement_result(UNIT_AND_ORDER *unit) {
         case HOLD_ORDER: {
             order = describe_unit(unit) + TOKEN_ORDER_HLD;
 
-            if (unit->dislodged == false) {
+            if (!unit->dislodged) {
                 result = TOKEN_RESULT_SUC;
             }
 
@@ -2228,7 +2228,7 @@ TokenMessage MapAndUnits::describe_movement_result(UNIT_AND_ORDER *unit) {
                 result = TOKEN_RESULT_NSO;
             } else if (unit->illegal_order) {
                 result = unit->illegal_reason;
-            } else if (unit->dislodged == false) {
+            } else if (!unit->dislodged) {
                 result = TOKEN_RESULT_SUC;
             }
 
@@ -2631,7 +2631,7 @@ bool MapAndUnits::unorder_adjustment(TokenMessage &not_sub_message, int power_in
                 }
             }
         } else if (order_token == TOKEN_ORDER_WVE) {
-            if ((winter_record->is_building == false)
+            if (!winter_record->is_building
                 || (winter_record->number_of_waives == 0)) {
                 order_valid = false;
             } else if (order.get_token(0).get_subtoken() != power_index) {

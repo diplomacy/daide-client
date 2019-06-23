@@ -51,7 +51,7 @@ bool BaseBot::initialise() {
     m_parameters = parameters;
 
     // Get the log level
-    if (parameters.log_level_specified == false) {
+    if (!parameters.log_level_specified) {
 #ifdef _DEBUG
         parameters.log_level = 1;
 #else
@@ -62,16 +62,16 @@ bool BaseBot::initialise() {
     enable_logging(parameters.log_level > 0);
 
     // Start the TCP/IP
-    if (parameters.name_specified == false) {
+    if (!parameters.name_specified) {
         parameters.server_name = "localhost";
     }
-    if (parameters.port_specified == false) {
+    if (!parameters.port_specified) {
         parameters.port_number = DEFAULT_PORT_NUMBER;
     }
 
     SetWindowText(main_wnd, BOT_FAMILY " " BOT_GENERATION);
 
-    if (m_socket.Connect(parameters.server_name, parameters.port_number) == false) {
+    if (!m_socket.Connect(parameters.server_name, parameters.port_number)) {
         log_error("Failed to connect to server");
         return false;
     } else {
@@ -397,7 +397,7 @@ void BaseBot::process_mdf(TokenMessage &incoming_message) {
     process_mdf_message(incoming_message);
 
     // If the map wasn't sent by request, then reply to accept the map
-    if (m_map_requested == false) {
+    if (!m_map_requested) {
         send_message_to_server(TOKEN_COMMAND_YES & m_map_message);
     } else {
         // The map was requested following an IAM, so also request a HLO, SCO and NOW.
@@ -977,7 +977,7 @@ void BaseBot::check_sent_press_for_missing_power(Token &missing_power) {
         receiving_powers = sent_press_iterator->receiving_powers;
 
         for ((power_counter = 0, missing_power_found = false);
-             (power_counter < receiving_powers.get_message_length() && missing_power_found == false);
+             (power_counter < receiving_powers.get_message_length() && !missing_power_found);
              power_counter++) {
             if (receiving_powers.get_token(power_counter) == missing_power) {
                 if (sent_press_iterator->resend_partial) {

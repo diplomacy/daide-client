@@ -511,7 +511,7 @@ string TokenMessage::get_message_as_text() const {
             is_ascii_text = false;
         }
 
-        if ((is_ascii_text == false)
+        if (!is_ascii_text
             && (m_message[token_counter].get_category() == CATEGORY_ASCII)) {
             message_as_text << "'";
             is_ascii_text = true;
@@ -754,7 +754,7 @@ bool TokenMessage::operator<(const TokenMessage &other) const {
         difference_found = true;
     }
 
-    while ((difference_found == false)
+    while (!difference_found
            && (token_counter < tokens_to_compare)) {
         if (m_message[token_counter] < other.m_message[token_counter]) {
             is_less_than = true;
@@ -767,7 +767,7 @@ bool TokenMessage::operator<(const TokenMessage &other) const {
         token_counter++;
     }
 
-    if (difference_found == false) {
+    if (!difference_found) {
         if (tokens_to_compare < other.m_message_length) {
             is_less_than = true;
         } else {
@@ -788,7 +788,7 @@ bool TokenMessage::operator==(const TokenMessage &other) const {
         difference_found = true;
     }
 
-    while ((difference_found == false)
+    while (!difference_found
            && (token_counter < m_message_length)) {
         if (m_message[token_counter] != other.m_message[token_counter]) {
             difference_found = true;

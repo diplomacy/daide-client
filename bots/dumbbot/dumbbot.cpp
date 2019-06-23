@@ -764,7 +764,7 @@ void DumbBot::generate_movement_orders() {
                     moving_unit_map[destination_iterator->second.province_index] = unit_iterator->second;
                 }
             }
-        } while (selection_is_ok == false);
+        } while (!selection_is_ok);
 
         // Unit is now ordered, so delete it from the random unit map
         m_random_unit_map.erase(unit_iterator);
@@ -968,7 +968,7 @@ void DumbBot::generate_retreat_orders() {
                     moving_unit_map[destination_iterator->second.province_index] = unit_iterator->second;
                 }
             }
-        } while (selection_is_ok == false);
+        } while (!selection_is_ok);
 
         // Unit is now ordered, so delete it from the random unit map
         m_random_unit_map.erase(unit_iterator);
@@ -1090,7 +1090,7 @@ void DumbBot::generate_build_orders(int build_count) {
     }
 
     // For each build, while we have a vacant home centre
-    while ((build_map.empty() == false) && (builds_remaining > 0)) {
+    while (!build_map.empty() && (builds_remaining > 0)) {
         // Select the best location
         build_iterator = build_map.begin();
 

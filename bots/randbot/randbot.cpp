@@ -48,7 +48,7 @@ void RandBot::process_now_message(TokenMessage &incoming_message) {
     MapAndUnits::PROVINCE_COASTS *build_coast_info;
     MapAndUnits::COAST_ID build_location;
 
-    if (m_map_and_units->game_over == false) {
+    if (!m_map_and_units->game_over) {
         if ((m_map_and_units->current_season == TOKEN_SEASON_SPR)
             || (m_map_and_units->current_season == TOKEN_SEASON_FAL)) {
             // Order all units to hold.
@@ -79,7 +79,7 @@ void RandBot::process_now_message(TokenMessage &incoming_message) {
             } else if (m_map_and_units->our_units.size() < m_map_and_units->our_centres.size()) {
                 number_of_builds = m_map_and_units->our_centres.size() - m_map_and_units->our_units.size();
 
-                while ((number_of_builds > 0) && (m_map_and_units->open_home_centres.empty() == false)) {
+                while ((number_of_builds > 0) && !m_map_and_units->open_home_centres.empty()) {
                     build_location.province_index = get_random_set_member<MapAndUnits::PROVINCE_SET>(
                             m_map_and_units->open_home_centres);
                     build_coast_info = &(m_map_and_units->game_map[build_location.province_index].coast_info);
