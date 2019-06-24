@@ -14,20 +14,24 @@
  * Release 8~2~b
  **/
 
-#ifndef _DIPAI_RANDBOT_H
-#define _DIPAI_RANDBOT_H
+#ifndef _DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
+#define _DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
 
 #include "daide_client/base_bot.h"
 
-class RandBot : public BaseBot {
+class RandBot : public DAIDE::BaseBot {
 public:
     RandBot() = default;
-
+    RandBot(const RandBot &other) = default;                // Copy constructor
+    RandBot(RandBot &&rhs) = default;                       // Move constructor
     ~RandBot() override = default;
+
+    RandBot& operator=(const RandBot &other) = default;     // Copy Assignment
+    RandBot& operator=(RandBot &&rhs) = default;            // Move Assignment
 
     void send_nme_or_obs() override;
 
-    void process_now_message(TokenMessage &incoming_message) override;
+    void process_now_message(const DAIDE::TokenMessage &incoming_msg) override;
 };
 
-#endif
+#endif // _DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H

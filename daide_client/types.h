@@ -12,18 +12,20 @@
  * Release 8~2
  **/
 
-#ifndef _DAIDE_TYPES_H
-#define _DAIDE_TYPES_H
+#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H
+#define _DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H
 
 #include <set>
 #include <list>
 #include <map>
 #include <string>
 
-using namespace std;
+namespace DAIDE {
 
-typedef unsigned char BYTE;
+using BYTE = unsigned char;
 
 const int ADJUDICATOR_NO_ERROR = -1;
 
-#endif // _DAIDE_TYPES_H
+} // namespace DAIDE
+
+#endif // _DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H

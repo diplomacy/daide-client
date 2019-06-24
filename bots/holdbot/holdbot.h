@@ -14,20 +14,24 @@
  * Release 8~2~b
  **/
 
-#ifndef _DIPAI_HOLDBOT_H
-#define _DIPAI_HOLDBOT_H
+#ifndef _DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
+#define _DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
 
 #include "daide_client/base_bot.h"
 
-class HoldBot : public BaseBot {
+class HoldBot : public DAIDE::BaseBot {
 public:
     HoldBot() = default;
-
+    HoldBot(const HoldBot &other) = default;                // Copy constructor
+    HoldBot(HoldBot &&rhs) = default;                       // Move constructor
     ~HoldBot() override = default;
+
+    HoldBot& operator=(const HoldBot &other) = default;     // Copy Assignment
+    HoldBot& operator=(HoldBot &&rhs) = default;            // Move Assignment
 
     void send_nme_or_obs() override;
 
-    void process_now_message(TokenMessage &incoming_message) override;
+    void process_now_message(const DAIDE::TokenMessage &incoming_msg) override;
 };
 
-#endif
+#endif // _DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H

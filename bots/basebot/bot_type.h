@@ -21,14 +21,14 @@
  * Change the #define BOT_GENERATION to specify the generation (base version) of your Bot. *
  *******************************************************************************************/
 
-#ifndef _DIPAI_BOT_TYPE_H
-#define _DIPAI_BOT_TYPE_H
+#ifndef _DAIDE_CLIENT_BOTS_BASEBOT_BOT_TYPE_H
+#define _DAIDE_CLIENT_BOTS_BASEBOT_BOT_TYPE_H
 
 #include "daide_client/base_bot.h"
 
-typedef BaseBot BOT_TYPE;
+using BOT_TYPE = DAIDE::BaseBot;
 
 #define BOT_FAMILY "BaseBot"
 #define BOT_GENERATION "8~2~b"
 
-#endif
+#endif // _DAIDE_CLIENT_BOTS_BASEBOT_BOT_TYPE_H

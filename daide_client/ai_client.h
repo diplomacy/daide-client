@@ -4,13 +4,15 @@
 
 // Release 8~2~b
 
-#if !defined(AFX_AICLIENT_H__D5AB8927_58D3_4E57_AB2E_BE53B39E7085__INCLUDED_)
-#define AFX_AICLIENT_H__D5AB8927_58D3_4E57_AB2E_BE53B39E7085__INCLUDED_
+#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
+#define _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
 
 #include "bot_type.h"
-#include "resource.h"
+
+namespace DAIDE {
 
 extern BOT_TYPE the_bot;
-extern HWND main_wnd;
 
-#endif // !defined(AFX_AICLIENT_H__D5AB8927_58D3_4E57_AB2E_BE53B39E7085__INCLUDED_)
+} // namespace DAIDE
+
+#endif // _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H

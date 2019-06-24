@@ -16,19 +16,23 @@
 
 /*******************************************************************************************
  * Change the #include to specify the header for the main class of your Bot.               *
- * Change the typedef to make BOT_TYPE specify the main class of your Bot.                 *
+ * Change the using to make BOT_TYPE specify the main class of your Bot.                 *
  * Change the #define BOT_FAMILY to specify the family (generic name) of your bot.         *
  * Change the #define BOT_GENERATION to specify the generation (base version) of your Bot. *
  *******************************************************************************************/
 
-#ifndef _DIPAI_BOT_TYPE_H
-#define _DIPAI_BOT_TYPE_H
+#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_BOT_TYPE_H
+#define _DAIDE_CLIENT_DAIDE_CLIENT_BOT_TYPE_H
 
 #include "base_bot.h"
 
-typedef BaseBot BOT_TYPE;
+namespace DAIDE {
+
+using BOT_TYPE = BaseBot;
 
 #define BOT_FAMILY "BaseBot"
 #define BOT_GENERATION "8~2~b"
 
-#endif
+} // namespace DAIDE
+
+#endif // _DAIDE_CLIENT_DAIDE_CLIENT_BOT_TYPE_H

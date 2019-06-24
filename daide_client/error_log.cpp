@@ -14,8 +14,12 @@
  * Release 8~2
  **/
 
-#include "stdafx.h"
+#include <cstdarg>
 #include "error_log.h"
+
+// TODO - REWRITE completely
+// Avoid using variadic functions
+// Also log to file
 
 FILE *bad_log = nullptr;
 FILE *big_log = nullptr;
@@ -24,15 +28,11 @@ bool logging_enabled = true;
 const char BAD_LOG_FILENAME[] = "badlog.txt";
 const char BIG_LOG_FILENAME[] = "biglog.txt";
 
-void enable_logging(bool enable) {
-    logging_enabled = enable;
-}
+void enable_logging(bool enable) { logging_enabled = enable; }
 
-FILE *open(const char *filename, const char *mode) {
-    return fopen(filename, mode);
-}
+FILE *open(const char *filename, const char *mode) { return fopen(filename, mode); }
 
-void log(char *format, ...) {
+void log(const std::string &format, ...) {
     va_list arg_list;
     va_start(arg_list, format);
 
@@ -60,8 +60,12 @@ void log(char *format, ...) {
     va_end(arg_list);
 }
 
+void log_error(const std::string &message) {
+    // Fix me
+}
+
 void log_error(char *format, ...) {
-    va_list arg_list;
+    /** va_list arg_list;
 
     va_start(arg_list, format);
 
@@ -89,9 +93,10 @@ void log_error(char *format, ...) {
     log(buffer);
 
     va_end(arg_list);
+    */
 }
 
-void log_daide_message(bool is_incoming, TokenMessage &message) {
+void log_daide_message(bool is_incoming, const DAIDE::TokenMessage &message) {
     if (logging_enabled) {
         if (big_log == nullptr) {
             big_log = open(BIG_LOG_FILENAME, "w");
@@ -104,8 +109,7 @@ void log_daide_message(bool is_incoming, TokenMessage &message) {
                 fprintf(big_log, "<< ");
             }
 
-            fprintf(big_log, "%s\n", message.get_message_as_text().c_str());
-
+            fprintf(big_log, "%s\n", message.get_message_as_text());
             fflush(big_log);
         }
     }
@@ -119,9 +123,4 @@ void close_logs() {
     if (big_log != nullptr) {
         fclose(big_log);
     }
-}
-
-int display(const char *message, const char *caption, int type) {
-    MessageBox(0, message, caption, type);
-    return 0;
 }

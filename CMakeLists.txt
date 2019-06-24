@@ -27,11 +27,8 @@ add_executable(daide_client
         daide_client/error_log.h
         daide_client/map_and_units.cpp
         daide_client/map_and_units.h
-        daide_client/resource.h
         daide_client/socket.cpp
         daide_client/socket.h
-        daide_client/stdafx.cpp
-        daide_client/stdafx.h
         daide_client/token_message.cpp
         daide_client/token_message.h
         daide_client/token_text_map.cpp

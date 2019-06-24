@@ -14,22 +14,25 @@
  * Release 8~2
  **/
 
-#ifndef _DIPAI_ERROR_LOG_H
-#define _DIPAI_ERROR_LOG_H
+#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
+#define _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
 
 #include "token_message.h"
 
+namespace DAIDE {
+
 void enable_logging(bool enable);
 
-void log(char *format, ...);
+template<typename... Args>
+void log(const std::string &format, Args... args);
 
-void log_error(char *error, ...);
+template<typename... Args>
+void log_error(const std::string &format, Args... args);
 
-void log_daide_message(bool is_incoming, TokenMessage &message);
+void log_daide_message(bool is_incoming, const TokenMessage &message);
 
 void close_logs();
 
-int display(const char *message, const char *caption = nullptr, int type = MB_OK);
+} // namespace DAIDE
 
-#endif
-
+#endif // _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H

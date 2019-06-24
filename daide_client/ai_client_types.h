@@ -14,20 +14,26 @@
  * Release 8~2~b
  **/
 
-#ifndef _DAN_TYPES_H
-#define _DAN_TYPES_H
+#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
+#define _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
 
-typedef struct {
-    bool ip_specified;            // Whether the IP address was specified
-    bool name_specified;        // Whether the server name was specified
-    string server_name;            // The name of the server machine
-    bool port_specified;        // Whether the port number was specified
-    unsigned short port_number;    // The port number of the server (in host order)
-    bool log_level_specified;    // Whether the log level was specified
-    int log_level;                // The level to log at
-    bool reconnection_specified;// Whether the reconnection parameters have been provided
-    string reconnect_power;        // Power to reconnect as
-    int reconnect_passcode;        // Passcode to reconnect as
-} COMMAND_LINE_PARAMETERS;
+#include <string>
 
-#endif // _DAN_TYPES_H
+namespace DAIDE {
+
+using COMMAND_LINE_PARAMETERS = struct {
+    bool ip_specified;              // Whether the IP address was specified
+    bool name_specified;            // Whether the server name was specified
+    std::string server_name;        // The name of the server machine
+    bool port_specified;            // Whether the port number was specified
+    uint16_t port_number;           // The port number of the server (in host order)
+    bool log_level_specified;       // Whether the log level was specified
+    int log_level;                  // The level to log at
+    bool reconnection_specified;    // Whether the reconnection parameters have been provided
+    std::string reconnect_power;    // Power to reconnect as
+    int reconnect_passcode;         // Passcode to reconnect as
+};
+
+} // namespace DAIDE
+
+#endif // _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H

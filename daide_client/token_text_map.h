@@ -12,13 +12,15 @@
  * Release 8~2
  **/
 
-#ifndef _DAIDE_TOKEN_TEXT_MAP
-#define _DAIDE_TOKEN_TEXT_MAP
+#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
+#define _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
 
 #include "tokens.h"
 
-typedef map<Token, string> TOKEN_TO_TEXT_MAP;
-typedef map<string, Token> TEXT_TO_TOKEN_MAP;
+namespace DAIDE {
+
+using TOKEN_TO_TEXT_MAP = std::map<Token, std::string>;
+using TEXT_TO_TOKEN_MAP = std::map<std::string, Token>;
 
 class TokenTextMap {
 public:
@@ -31,10 +33,12 @@ public:
 
     void clear_power_and_province_categories();
 
-    bool add_token(const Token &token, string token_string);
+    bool add_token(const Token &token, const std::string &token_string);
 
 private:
     TokenTextMap();
 };
 
-#endif // _DAIDE_TOKEN_TEXT_MAP
+} // namespace DAIDE
+
+#endif // _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H

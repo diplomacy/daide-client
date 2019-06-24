@@ -21,14 +21,14 @@
  * Change the #define BOT_GENERATION to specify the generation (base version) of your Bot. *
  *******************************************************************************************/
 
-#ifndef _DIPAI_BOT_TYPE_H
-#define _DIPAI_BOT_TYPE_H
+#ifndef _DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H
+#define _DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H
 
 #include "holdbot.h"
 
-typedef HoldBot BOT_TYPE;
+using BOT_TYPE = HoldBot;
 
 #define BOT_FAMILY "HoldBot"
 #define BOT_GENERATION "8~2~b"
 
-#endif
+#endif // _DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H

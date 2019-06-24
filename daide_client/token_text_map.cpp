@@ -12,12 +12,12 @@
  * Release 8~2
  **/
 
-#include "stdafx.h"
 #include "token_text_map.h"
+
+using DAIDE::TokenTextMap;
 
 TokenTextMap *TokenTextMap::instance() {
     static TokenTextMap the_instance;
-
     return &the_instance;
 }
 
@@ -25,14 +25,14 @@ void TokenTextMap::clear_category(BYTE category) {
     TOKEN_TO_TEXT_MAP::iterator token_to_text_itr;
     LANGUAGE_TOKEN category_value = (LANGUAGE_TOKEN) (category) << 8;
     LANGUAGE_TOKEN next_category_value = (LANGUAGE_TOKEN) (category + 1) << 8;
-    string token_string;
+    std::string token_string;
 
     // Find the first element in the specified category
     token_to_text_itr = m_token_to_text_map.lower_bound(category_value);
 
     // While the end of the category is not found
-    while ((token_to_text_itr != m_token_to_text_map.end())
-           && (token_to_text_itr->first < next_category_value)) {
+    while ((token_to_text_itr != m_token_to_text_map.end()) && (token_to_text_itr->first < next_category_value)) {
+
         // Get the string for the current token
         token_string = token_to_text_itr->second;
 
@@ -45,28 +45,26 @@ void TokenTextMap::clear_category(BYTE category) {
 }
 
 void TokenTextMap::clear_power_and_province_categories() {
-    BYTE category_counter;
-
     clear_category(CATEGORY_POWER);
-
-    for (category_counter = CATEGORY_PROVINCE_MIN;
-         category_counter <= CATEGORY_PROVINCE_MAX;
-         category_counter++) {
-        clear_category(category_counter);
+    for (BYTE category_ctr = CATEGORY_PROVINCE_MIN; category_ctr <= CATEGORY_PROVINCE_MAX; category_ctr++) {
+        clear_category(category_ctr);
     }
 }
 
-bool TokenTextMap::add_token(const Token &token, const string token_string) {
-    bool added_ok = true;
+bool TokenTextMap::add_token(const Token &token, const std::string &token_string) {
+    bool added_ok {true};
 
+    // Already added, not readding
     if ((m_token_to_text_map.find(token) != m_token_to_text_map.end())
-        || (m_text_to_token_map.find(token_string) != m_text_to_token_map.end())) {
+            || (m_text_to_token_map.find(token_string) != m_text_to_token_map.end())) {
+
         added_ok = false;
+
+    // Storing in map
     } else {
         m_token_to_text_map[token] = token_string;
         m_text_to_token_map[token_string] = token;
     }
-
     return added_ok;
 }
 

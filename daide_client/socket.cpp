@@ -6,25 +6,20 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "socket.h"
-#include "resource.h"
-#include "error_log.h"
+#include <iostream>
 #include "ai_client.h"
+#include "error_log.h"
+#include "socket.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
-namespace JPN {
+DAIDE::Socket *DAIDE::Socket::SocketTab[FD_SETSIZE];
 
-/////////////////////////////////////////////////////////////////////////////
+int DAIDE::Socket::SocketCnt;
 
-Socket *Socket::SocketTab[FD_SETSIZE];
-
-int Socket::SocketCnt;
-
-Socket::~Socket() {
+DAIDE::Socket::~Socket() {
     // Destructor.
-
+    // FIXME - Avoid using C-casts and delete
     RemoveSocket();
     delete[] OutgoingMessage;
     if (IncomingMessage != (char *) &Header) delete[] IncomingMessage;
@@ -38,26 +33,21 @@ Socket::~Socket() {
     }
 }
 
-void Socket::InsertSocket() {
+void DAIDE::Socket::InsertSocket() {
     // Insert `this` into SocketTab. Must not already be present; should be full, else system socket table would already be full.
-
     ASSERT(!FindSocket(MySocket) && SocketCnt < FD_SETSIZE);
-
     SocketTab[SocketCnt++] = this;
 }
 
-void Socket::RemoveSocket() {
+void DAIDE::Socket::RemoveSocket() {
     // Remove `this` from SocketTab iff present.
-
     Socket **s = FindSocket(MySocket);
     if (s) *s = SocketTab[--SocketCnt]; // found; replace by last elem
 }
 
-void Socket::SendData() {
+void DAIDE::Socket::SendData() {
     // Send all available data to socket, while space is available.
-
     ASSERT(Connected);
-
     for (;;) { // while data available to send and space avalable
         if (!OutgoingMessage) { // no outgoing message in progress
             if (OutgoingMessageQueue.empty()) return; // nothing more to send
@@ -69,8 +59,8 @@ void Socket::SendData() {
             OutgoingLength = sizeof(MessageHeader) + length;
         }
 
-        int sent = send(MySocket, OutgoingMessage + OutgoingNext, OutgoingLength - OutgoingNext,
-                        0); // # bytes sent, or SOCKET_ERROR
+        // # bytes sent, or SOCKET_ERROR
+        int sent = send(MySocket, OutgoingMessage + OutgoingNext, OutgoingLength - OutgoingNext, 0);
 
         if (sent == SOCKET_ERROR) {
             int error = WSAGetLastError();
@@ -87,15 +77,13 @@ void Socket::SendData() {
     }
 }
 
-void Socket::ReceiveData() {
+void DAIDE::Socket::ReceiveData() {
     // Receive all data available from socket.
-
     ASSERT(Connected);
 
     const int bufferLength = 1024; // arbitrary
     char buffer[bufferLength];
     int bufferNext = 0; // index of next byte in `buffer`
-
     int received = recv(MySocket, buffer, bufferLength, 0);
 
     if (!received) {
@@ -112,16 +100,17 @@ void Socket::ReceiveData() {
         return;
     }
     for (;;) { // while incoming data available
-        int count = min(IncomingLength - IncomingNext,
-                        received - bufferNext); // max # bytes that may be read into current message
+        // max # bytes that may be read into current message
+        int count = min(IncomingLength - IncomingNext, received - bufferNext);
         if (!count) return; // no more data available
 
+        // copy `count` bytes from `buffer` to IncomingMessage
         ASSERT(count > 0);
+        memcpy(IncomingMessage + IncomingNext, buffer + bufferNext, count);
 
-        memcpy(IncomingMessage + IncomingNext, buffer + bufferNext,
-               count); // copy `count` bytes from `buffer` to IncomingMessage
         IncomingNext += count;
         bufferNext += count;
+
         if (IncomingNext == sizeof(MessageHeader)) { // just completed reading Header; length now known
             short length = ((MessageHeader *) (IncomingMessage))->length; // length of body
             AdjustOrdering(length);
@@ -135,6 +124,7 @@ void Socket::ReceiveData() {
 
             IncomingNext = sizeof(MessageHeader);
         }
+
         if (IncomingNext >= IncomingLength) { // current incoming message is complete
             AdjustOrdering(IncomingMessage, IncomingLength - sizeof(MessageHeader));
             PushIncomingMessage(IncomingMessage);
@@ -147,36 +137,31 @@ void Socket::ReceiveData() {
     }
 }
 
-void Socket::Start() {
+void DAIDE::Socket::Start() {
     // Start using the socket.
-
     Connected = true;
     log("connected");
-
     SendData();
 }
 
-void Socket::OnConnect(int error) {
+void DAIDE::Socket::OnConnect(int error) {
     // Handle socket Connect event; NZ `error` indicates failure.
-
     if (!error) Start();
     else {
         log_error("Failure %d during OnConnect", error);
-        display("Failed to connect");
+        std::cerr << "Failed to connect" << std::endl;
         the_bot.end_dialog();
     }
 }
 
-void Socket::OnClose(int error) {
+void DAIDE::Socket::OnClose(int error) {
     // Handle socket Close event; NZ `error` indicates failure.
-
     if (error) log_error("Failure %d during OnClose", error);
     the_bot.end_dialog();
 }
 
-void Socket::OnReceive(int error) {
+void DAIDE::Socket::OnReceive(int error) {
     // Handle socket Receive event; NZ `error` indicates failure.
-
     if (!error) ReceiveData();
     else {
         log_error("Failure %d during OnReceive", error);
@@ -184,9 +169,8 @@ void Socket::OnReceive(int error) {
     }
 }
 
-void Socket::OnSend(int error) {
+void DAIDE::Socket::OnSend(int error) {
     // Handle socket Send event; NZ `error` indicates failure.
-
     if (!error) SendData();
     else {
         log_error("Failure %d during OnSend", error);
@@ -196,7 +180,6 @@ void Socket::OnSend(int error) {
 
 bool Socket::Connect(const char *address, int port) {
     // Initiate asynchronous connection of socket to `address` and `port`; return true iff OK.
-
     WORD wVersionRequested;
     WSADATA wsaData;
     int err;
@@ -301,21 +284,21 @@ bool Socket::Connect(const char *address, int port) {
     return true;
 }
 
-void Socket::PushIncomingMessage(char *message) {
+void DAIDE::Socket::PushIncomingMessage(char *message) {
     // Push incoming `message` on end of IncomingMessageQueue.
 
     if (IncomingMessageQueue.empty()) PostMessage(main_wnd, WM_SOCKET_MESSAGE, 0, 0);
     IncomingMessageQueue.push(message); // safe to follow the post as we are in the Main thread
 }
 
-void Socket::PushOutgoingMessage(char *message) {
+void DAIDE::Socket::PushOutgoingMessage(char *message) {
     // Push outgoing `message` on end of OutgoingMessageQueue.
 
     OutgoingMessageQueue.push(message);
     if (!OutgoingMessage && Connected) SendData();
 }
 
-char *Socket::PullIncomingMessage() {
+char *DAIDE::Socket::PullIncomingMessage() {
     // Pull next message from front of IncomingMessageQueue. Post a new message event if more messages remain on queue.
 
     ASSERT(!IncomingMessageQueue.empty());
@@ -329,9 +312,8 @@ char *Socket::PullIncomingMessage() {
     return incomingMessage;
 }
 
-void Socket::OnSocketState(LPARAM lParam) {
+void DAIDE::Socket::OnSocketState(LPARAM lParam) {
     // Process a change of socket state, specified by `lParam`.
-
     int event = WSAGETSELECTEVENT(lParam);
     int error = WSAGETSELECTERROR(lParam);
 
@@ -351,19 +333,17 @@ void Socket::OnSocketState(LPARAM lParam) {
     }
 }
 
-Socket **Socket::FindSocket(SOCKET socket) {
+DAIDE::Socket **DAIDE::Socket::FindSocket(SOCKET socket) {
     // Return the Socket** in SocketTab that owns `socket`; 0 iff not found.
-
     Socket **s;
-    int i;
-    for (i = 0; i < SocketCnt; ++i) {
+    for (int i = 0; i < SocketCnt; ++i) {
         s = &SocketTab[i];
         if ((*s)->MySocket == socket) return s;
     }
     return 0;
 }
 
-void Socket::OnSocketState(WPARAM wParam, LPARAM lParam) {
+void DAIDE::Socket::OnSocketState(WPARAM wParam, LPARAM lParam) {
     // Process change of socket state, specified by `lParam` for socket specifed by `wParam`.
 
     Socket **s = FindSocket((SOCKET) wParam);
@@ -373,7 +353,7 @@ void Socket::OnSocketState(WPARAM wParam, LPARAM lParam) {
     (*s)->OnSocketState(lParam);
 }
 
-void Socket::AdjustOrdering(short &x) {
+void DAIDE::Socket::AdjustOrdering(short &x) {
     // Adjust the byte ordering of `x`, to or from network ordering of a `short`.
 
 #if LITTLE_ENDIAN
@@ -385,7 +365,7 @@ void Socket::AdjustOrdering(short &x) {
 #endif
 }
 
-void Socket::AdjustOrdering(char *message, short length) {
+void DAIDE::Socket::AdjustOrdering(char *message, short length) {
     // Adjust 16-bit aligned `message`, having body `length`, to or from network ordering of its components.
     // 'length` must be specified, as that in the header may or may not be in internal order.
     // Header `type` and `pad` are single byte, so need no reordering; the rest are byte-pair `short`, so may need reordering.
@@ -397,7 +377,3 @@ void Socket::AdjustOrdering(char *message, short length) {
     for (; message < end; message += sizeof(short)) AdjustOrdering(*(short *) message);
 #endif
 }
-
-/////////////////////////////////////////////////////////////////////////////
-
-} // namespace JPN

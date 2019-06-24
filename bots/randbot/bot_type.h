@@ -21,14 +21,14 @@
  * Change the #define BOT_GENERATION to specify the generation (base version) of your Bot. *
  *******************************************************************************************/
 
-#ifndef _DIPAI_BOT_TYPE_H
-#define _DIPAI_BOT_TYPE_H
+#ifndef _DAIDE_CLIENT_BOTS_RANDBOT_BOT_TYPE_H
+#define _DAIDE_CLIENT_BOTS_RANDBOT_BOT_TYPE_H
 
 #include "randbot.h"
 
-typedef RandBot BOT_TYPE;
+using BOT_TYPE = RandBot;
 
 #define BOT_FAMILY "RandBot"
 #define BOT_GENERATION "8~2~b"
 
-#endif
+#endif // _DAIDE_CLIENT_BOTS_RANDBOT_BOT_TYPE_H

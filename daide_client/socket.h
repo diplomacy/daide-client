@@ -6,47 +6,42 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _JPN_SOCKET
-#define _JPN_SOCKET
+#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
+#define _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
 
-namespace JPN {
+#include <queue>
 
-/////////////////////////////////////////////////////////////////////////////
+namespace DAIDE {
 
-#define LITTLE_ENDIAN 1 // NZ for platforms that use little endian ordering
-
-/////////////////////////////////////////////////////////////////////////////
-
-class MessageHeader {
-    // Message header, common to all types.
+class MessageHeader {           // Message header, common to all types.
 public:
-    char type; // type of message
-    char pad; // unused; maintains 16-bit alignment
-    short length; // length of body in bytes, which follows the header
+    char type;                  // type of message
+    char pad;                   // unused; maintains 16-bit alignment
+    int16_t length;             // length of body in bytes, which follows the header
 };
-
-/////////////////////////////////////////////////////////////////////////////
 
 class Socket {
     // Message-oriented socket.
 
-    typedef std::queue<char *> MessageQueue;
+    using MessageQueue = std::queue<char *>;
 
     SOCKET MySocket;
 
-    static Socket *SocketTab[FD_SETSIZE]; // table of active Socket*
-    static int SocketCnt; /// # active Socket
+    static Socket *SocketTab[FD_SETSIZE];               // table of active Socket*
+    static int SocketCnt;                               // # active Socket
 
-    MessageQueue IncomingMessageQueue; // queue of incoming messages
-    MessageQueue OutgoingMessageQueue; // queue of outgoing messages
-    char *IncomingMessage; // current incoming message; points to Header until length read; else a full, but incomplete, message
-    char *OutgoingMessage; // current outgoing message, when partially sent; else 0
-    int IncomingNext; // index of start of next incoming message in buffer
-    int OutgoingNext; // index of start of next outgoingmessage in buffer
-    int IncomingLength; // whole length of current incoming message, including header
-    int OutgoingLength; // whole length of current outgoing message, including header
-    MessageHeader Header; // buffer for header of current incoming message, pending new IncomingMessage, when length is known
-    bool Connected; // true iff connected
+    MessageQueue IncomingMessageQueue;                  // queue of incoming messages
+    MessageQueue OutgoingMessageQueue;                  // queue of outgoing messages
+    char *IncomingMessage {nullptr};                    // current incoming message; points to Header until length read;
+                                                        // else a full, but incomplete, message
+    char *OutgoingMessage {nullptr};                    // current outgoing message, when partially sent; else 0
+    int IncomingNext;                                   // index of start of next incoming message in buffer
+    int OutgoingNext;                                   // index of start of next outgoingmessage in buffer
+    int IncomingLength;                                 // whole length of current incoming message, including header
+    int OutgoingLength;                                 // whole length of current outgoing message, including header
+    MessageHeader Header;                               // buffer for header of current incoming message
+                                                        // pending new IncomingMessage, when length is known
+    bool Connected {false};                             // true iff connected
 
     void InsertSocket();
 
@@ -69,7 +64,7 @@ class Socket {
     virtual void OnSend(int error);
 
 public:
-    Socket() : Connected(false), IncomingMessage(nullptr), OutgoingMessage(nullptr) {}
+    Socket() : IncomingMessage(nullptr), OutgoingMessage(nullptr) {}
 
     ~Socket();
 
@@ -85,13 +80,13 @@ public:
 
     static void OnSocketState(WPARAM wParam, LPARAM lParam);
 
-    static void AdjustOrdering(short &x);
+    static void AdjustOrdering(int16_t &x);
 
-    static void AdjustOrdering(char *message, short length);
+    static void AdjustOrdering(char *message, int16_t length);
 };
 
 /////////////////////////////////////////////////////////////////////////////
 
-} // namespace JPN
+} // namespace DAIDE
 
-#endif
+#endif // _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H

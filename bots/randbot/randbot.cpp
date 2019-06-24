@@ -15,9 +15,11 @@
  **/
 
 #include "daide_client/map_and_units.h"
-#include "daide_client/stdafx.h"
 #include "bot_type.h"
 #include "randbot.h"
+
+using DAIDE::MapAndUnits;
+using DAIDE::TokenMessage;
 
 void RandBot::send_nme_or_obs() {
     send_name_and_version_to_server(BOT_FAMILY, BOT_GENERATION);
@@ -27,55 +29,53 @@ template<class SetType>
 typename SetType::value_type get_random_set_member(SetType my_set) {
     int set_size = my_set.size();
     int rand_selection = rand() / 37 % set_size;
-    int item_counter;
-    SetType::iterator set_itr;
 
-    set_itr = my_set.begin();
-
-    for (item_counter = 0; item_counter < rand_selection; item_counter++) {
-        set_itr++;
-    }
-
+    auto set_itr = my_set.begin();
+    for (int item_ctr = 0; item_ctr < rand_selection; item_ctr++, set_itr++) {}
     return *set_itr;
 }
 
-void RandBot::process_now_message(TokenMessage &incoming_message) {
-    MapAndUnits::UNIT_SET::iterator unit_itr;
-    MapAndUnits::UNIT_AND_ORDER *unit_info;
-    MapAndUnits::COAST_DETAILS *province_coast_info;
-    MapAndUnits::COAST_ID move_destination;
-    int number_of_builds;
-    MapAndUnits::PROVINCE_COASTS *build_coast_info;
-    MapAndUnits::COAST_ID build_location;
+void RandBot::process_now_message(const TokenMessage & /*incoming_message*/) {
+    int number_of_builds {0};
+    MapAndUnits::COAST_ID move_destination {-1};
+    MapAndUnits::COAST_ID build_location {-1};
+    MapAndUnits::UNIT_AND_ORDER *unit_info {nullptr};
+    MapAndUnits::COAST_DETAILS *province_coast_info {nullptr};
+    MapAndUnits::PROVINCE_COASTS *build_coast_info {nullptr};
 
     if (!m_map_and_units->game_over) {
-        if ((m_map_and_units->current_season == TOKEN_SEASON_SPR)
-            || (m_map_and_units->current_season == TOKEN_SEASON_FAL)) {
-            // Order all units to hold.
-            for (unit_itr = m_map_and_units->our_units.begin();
-                 unit_itr != m_map_and_units->our_units.end();
-                 unit_itr++) {
-                unit_info = &(m_map_and_units->units[*unit_itr]);
+
+        // Movement - Order units to move randomly.
+        if ((m_map_and_units->current_season == DAIDE::TOKEN_SEASON_SPR)
+            || (m_map_and_units->current_season == DAIDE::TOKEN_SEASON_FAL)) {
+
+            for (int our_unit : m_map_and_units->our_units) {
+                unit_info = &(m_map_and_units->units[our_unit]);
                 province_coast_info = &(m_map_and_units->game_map[unit_info->coast_id.province_index]
-                        .coast_info[unit_info->coast_id.coast_token]);
+                                        .coast_info[unit_info->coast_id.coast_token]);
                 move_destination = get_random_set_member<MapAndUnits::COAST_SET>(province_coast_info->adjacent_coasts);
-                m_map_and_units->set_move_order(*unit_itr, move_destination);
+                m_map_and_units->set_move_order(our_unit, move_destination);
             }
-        } else if ((m_map_and_units->current_season == TOKEN_SEASON_SUM)
-                   || (m_map_and_units->current_season == TOKEN_SEASON_AUT)) {
-            // Order all dislodged units to disband.
-            for (unit_itr = m_map_and_units->our_dislodged_units.begin();
-                 unit_itr != m_map_and_units->our_dislodged_units.end();
-                 unit_itr++) {
-                m_map_and_units->set_disband_order(*unit_itr);
+
+        // Retreats - Order all dislodged units to disband.
+        } else if ((m_map_and_units->current_season == DAIDE::TOKEN_SEASON_SUM)
+                   || (m_map_and_units->current_season == DAIDE::TOKEN_SEASON_AUT)) {
+
+            for (int our_dislodged_unit : m_map_and_units->our_dislodged_units) {
+                m_map_and_units->set_disband_order(our_dislodged_unit);
             }
+
+        // Adjustment
         } else {
+
+            // Too many units. Disband.
             if (m_map_and_units->our_units.size() > m_map_and_units->our_centres.size()) {
-                // Too many units. Disband.
                 while (m_map_and_units->our_units.size() > m_map_and_units->our_centres.size()) {
                     m_map_and_units->set_remove_order(*(m_map_and_units->our_units.begin()));
                     m_map_and_units->our_units.erase(m_map_and_units->our_units.begin());
                 }
+
+            // Building units randomly
             } else if (m_map_and_units->our_units.size() < m_map_and_units->our_centres.size()) {
                 number_of_builds = m_map_and_units->our_centres.size() - m_map_and_units->our_units.size();
 
@@ -96,7 +96,7 @@ void RandBot::process_now_message(TokenMessage &incoming_message) {
             }
         }
 
+        // Submitting orders
         send_orders_to_server();
     }
 }
-

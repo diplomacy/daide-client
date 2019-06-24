@@ -4,22 +4,20 @@
 
 // Release 8~2~b
 
-#include "stdafx.h"
-#include "socket.h"
-#include "error_log.h"
-#include "ai_client.h"
-
-#define MAX_LOADSTRING 100
-
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include "ai_client.h"
+#include "error_log.h"
+#include "socket.h"
+
+#define MAX_LOADSTRING 100
 
 // Need to link with Ws2_32.lib
 #pragma comment(lib, "ws2_32.lib")
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
-TCHAR szTitle[MAX_LOADSTRING];                    // The title bar text
+TCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 TCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
 // Forward declarations of functions included in this code module:
@@ -31,7 +29,7 @@ LRESULT CALLBACK
 WndProc(HWND, UINT, WPARAM, LPARAM
 );
 
-BOT_TYPE the_bot;
+DAIDE::BOT_TYPE the_bot;
 HWND main_wnd;
 
 int APIENTRY
@@ -75,7 +73,7 @@ initialise()
 
 )
 {
-display("Couldn't initialise Bot");
+display("Couldn't initialize Bot");
 the_bot.
 
 end_dialog();

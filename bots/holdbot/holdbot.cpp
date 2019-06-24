@@ -15,47 +15,50 @@
  **/
 
 #include "daide_client/map_and_units.h"
-#include "daide_client/stdafx.h"
 #include "bot_type.h"
 #include "holdbot.h"
+
+using DAIDE::TokenMessage;
 
 void HoldBot::send_nme_or_obs() {
     send_name_and_version_to_server(BOT_FAMILY, BOT_GENERATION);
 }
 
-void HoldBot::process_now_message(TokenMessage &incoming_message) {
-    MapAndUnits::UNIT_SET::iterator unit_itr;
+void HoldBot::process_now_message(const TokenMessage & /*incoming_message*/) {
 
-    if ((m_map_and_units->current_season == TOKEN_SEASON_SPR)
-        || (m_map_and_units->current_season == TOKEN_SEASON_FAL)) {
-        // Order all units to hold.
-        for (unit_itr = m_map_and_units->our_units.begin();
-             unit_itr != m_map_and_units->our_units.end();
-             unit_itr++) {
-            m_map_and_units->set_hold_order(*unit_itr);
+    // Movement - Order all units to hold.
+    if ((m_map_and_units->current_season == DAIDE::TOKEN_SEASON_SPR)
+        || (m_map_and_units->current_season == DAIDE::TOKEN_SEASON_FAL)) {
+
+        for (int our_unit : m_map_and_units->our_units) {
+            m_map_and_units->set_hold_order(our_unit);
         }
-    } else if ((m_map_and_units->current_season == TOKEN_SEASON_SUM)
-               || (m_map_and_units->current_season == TOKEN_SEASON_AUT)) {
-        // Order all dislodged units to disband.
-        for (unit_itr = m_map_and_units->our_dislodged_units.begin();
-             unit_itr != m_map_and_units->our_dislodged_units.end();
-             unit_itr++) {
-            m_map_and_units->set_disband_order(*unit_itr);
+
+    // Retreat - Order all dislodged units to disband.
+    } else if ((m_map_and_units->current_season == DAIDE::TOKEN_SEASON_SUM)
+               || (m_map_and_units->current_season == DAIDE::TOKEN_SEASON_AUT)) {
+
+        for (int our_dislodged_unit : m_map_and_units->our_dislodged_units) {
+            m_map_and_units->set_disband_order(our_dislodged_unit);
         }
+
+    // Adjustment
     } else {
+
+        // Too many units. Disband.
         if (m_map_and_units->our_units.size() > m_map_and_units->our_centres.size()) {
-            // Too many units. Disband.
             while (m_map_and_units->our_units.size() > m_map_and_units->our_centres.size()) {
                 m_map_and_units->set_remove_order(*(m_map_and_units->our_units.begin()));
                 m_map_and_units->our_units.erase(m_map_and_units->our_units.begin());
             }
+
+        // Not enough units. Waive builds.
         } else if (m_map_and_units->our_units.size() < m_map_and_units->our_centres.size()) {
-            // Not enough units. Waive builds.
             m_map_and_units->set_multiple_waive_orders(
                     m_map_and_units->our_centres.size() - m_map_and_units->our_units.size());
         }
     }
 
+    // Submitting orders
     send_orders_to_server();
 }
-
