@@ -6,7 +6,14 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
 #include <iostream>
+
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
 #include "ai_client.h"
 #include "error_log.h"
 #include "socket.h"
@@ -66,7 +73,6 @@ void DAIDE::Socket::SendData() {
             int error = WSAGetLastError();
             if (error != WSAEWOULDBLOCK) {
                 log_error("Failure %d during SendDatar", error);
-                the_bot.end_dialog();
             }
             return;
         }
@@ -88,20 +94,18 @@ void DAIDE::Socket::ReceiveData() {
 
     if (!received) {
         log_error("Failure: closed socket during read from Server");
-        the_bot.end_dialog();
         return;
     }
     if (received == SOCKET_ERROR) {
         int error = WSAGetLastError();
         if (error != WSAEWOULDBLOCK) {
             log_error("Failure %d during ReceiveData", error);
-            the_bot.end_dialog();
         }
         return;
     }
     for (;;) { // while incoming data available
         // max # bytes that may be read into current message
-        int count = min(IncomingLength - IncomingNext, received - bufferNext);
+        int count = std::min(IncomingLength - IncomingNext, received - bufferNext);
         if (!count) return; // no more data available
 
         // copy `count` bytes from `buffer` to IncomingMessage
@@ -150,14 +154,12 @@ void DAIDE::Socket::OnConnect(int error) {
     else {
         log_error("Failure %d during OnConnect", error);
         std::cerr << "Failed to connect" << std::endl;
-        the_bot.end_dialog();
     }
 }
 
 void DAIDE::Socket::OnClose(int error) {
     // Handle socket Close event; NZ `error` indicates failure.
     if (error) log_error("Failure %d during OnClose", error);
-    the_bot.end_dialog();
 }
 
 void DAIDE::Socket::OnReceive(int error) {
@@ -165,7 +167,6 @@ void DAIDE::Socket::OnReceive(int error) {
     if (!error) ReceiveData();
     else {
         log_error("Failure %d during OnReceive", error);
-        the_bot.end_dialog();
     }
 }
 
@@ -174,39 +175,23 @@ void DAIDE::Socket::OnSend(int error) {
     if (!error) SendData();
     else {
         log_error("Failure %d during OnSend", error);
-        the_bot.end_dialog();
     }
 }
 
-bool Socket::Connect(const char *address, int port) {
+bool DAIDE::Socket::Connect(const char *address, int port) {
     // Initiate asynchronous connection of socket to `address` and `port`; return true iff OK.
-    WORD wVersionRequested;
-    WSADATA wsaData;
     int err;
 
-    /* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
-    wVersionRequested = MAKEWORD(2, 2);
-
-    err = WSAStartup(wVersionRequested, &wsaData);
-    if (err) { // could not find a usable Winsock DLL
-        log_error("Failure %d during WSAStartup %d", err);
+    MySocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (MySocket < 0) {
+        log_error("Failure %d during socket", WSAGetLastError());
         return false;
     }
-
-    MySocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     unsigned long mode = 1; // non-blocking
     if (ioctlsocket(MySocket, FIONBIO, &mode)) {
         log_error("Failure %d during ioctlsocket", WSAGetLastError());
         return false;
-    }
-
-    if (WSAAsyncSelect(MySocket, main_wnd, WM_SOCKET_STATE, FD_READ | FD_WRITE | FD_CONNECT | FD_CLOSE)) {
-        err = WSAGetLastError();
-        if (err != WSAEWOULDBLOCK) {
-            log_error("Failure %d during WSAAsyncSelect", err);
-            return false;
-        }
     }
 
     BOOL val = true;
@@ -219,59 +204,30 @@ bool Socket::Connect(const char *address, int port) {
     // Assumed fast enough to do synchronously, albeit may use external name server;
     // else needs separate thread!
     sockaddr *saPtr;
+    struct sockaddr_in sa;
     int saLen;
 
-#define NEWSOCK WINVER >= 0x0600 // true iff using recommended newer socker functions; available in VS10 but not in VS6 
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(port);
+    sa.sin_addr.s_addr = inet_addr(address);
 
-#if NEWSOCK
-    // Setup the hints address info structure which is passed to the getaddrinfo() function
-    ADDRINFOA hints;
-    ZeroMemory(&hints, sizeof hints);
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    ADDRINFOA* ai;
-    if (getaddrinfo(address, string(port), &hints, &ai)) {
-        log_error("Failure %d during getaddrinfo", WSAGetLastError());
+    if (sa.sin_addr.s_addr == INADDR_NONE) { // not valid IP number
+        log_error("Invalid IP address %s", address);
         return false;
     }
 
-    saPtr = ai->ai_addr;
-    saLen = ai->ai_addrlen;
-#else // !NEWSOCK; deprecated
-    sockaddr_in sa;
-    ZeroMemory(&sa, sizeof sa);
-
-    sa.sin_family = AF_INET;
-    sa.sin_addr.s_addr = inet_addr(address); // assume IP number
-
-    if (sa.sin_addr.s_addr == INADDR_NONE) { // not valid IP number
-        HOSTENT *he = gethostbyname(address); // assume IP name
-        if (!he) {
-            log_error("Invalid IP addres");
-            return false;
-        }
-        sa.sin_addr.s_addr = ((IN_ADDR *) he->h_addr)->s_addr;
-    }
-    sa.sin_port = htons(port); // network order
-
-    saPtr = (sockaddr * ) & sa;
+    saPtr = (sockaddr*) &sa;
     saLen = sizeof sa;
-#endif
 
     // Connect to server.
     if (connect(MySocket, saPtr, saLen)) {
         err = WSAGetLastError();
         if (err != WSAEWOULDBLOCK) {
             log_error("Failure %d during Connect", err);
+            if (MySocket) close(MySocket);
             return false;
         }
     }
-
-#if    NEWSOCK
-    freeaddrinfo(ai); // release any space claimed by getaddrinfo
-#endif
 
     // Make IncomingMessage use Header, pending known length of full message.
     IncomingMessage = (char *) &Header;
@@ -286,8 +242,6 @@ bool Socket::Connect(const char *address, int port) {
 
 void DAIDE::Socket::PushIncomingMessage(char *message) {
     // Push incoming `message` on end of IncomingMessageQueue.
-
-    if (IncomingMessageQueue.empty()) PostMessage(main_wnd, WM_SOCKET_MESSAGE, 0, 0);
     IncomingMessageQueue.push(message); // safe to follow the post as we are in the Main thread
 }
 
@@ -305,35 +259,12 @@ char *DAIDE::Socket::PullIncomingMessage() {
 
     char *incomingMessage = IncomingMessageQueue.front(); // message to be processed
     IncomingMessageQueue.pop(); // remove it
-
-    if (!IncomingMessageQueue.empty())
-        PostMessage(main_wnd, WM_SOCKET_MESSAGE, 0, 0); // trigger recall if more messages remain
+    // trigger recall if more messages remain
 
     return incomingMessage;
 }
 
-void DAIDE::Socket::OnSocketState(LPARAM lParam) {
-    // Process a change of socket state, specified by `lParam`.
-    int event = WSAGETSELECTEVENT(lParam);
-    int error = WSAGETSELECTERROR(lParam);
-
-    switch (event) {
-        case FD_READ:
-            OnReceive(error);
-            break;
-        case FD_WRITE:
-            OnSend(error);
-            break;
-        case FD_CONNECT:
-            OnConnect(error);
-            break;
-        case FD_CLOSE:
-            OnClose(error);
-            break;
-    }
-}
-
-DAIDE::Socket **DAIDE::Socket::FindSocket(SOCKET socket) {
+DAIDE::Socket **DAIDE::Socket::FindSocket(int socket) {
     // Return the Socket** in SocketTab that owns `socket`; 0 iff not found.
     Socket **s;
     for (int i = 0; i < SocketCnt; ++i) {
@@ -341,16 +272,6 @@ DAIDE::Socket **DAIDE::Socket::FindSocket(SOCKET socket) {
         if ((*s)->MySocket == socket) return s;
     }
     return 0;
-}
-
-void DAIDE::Socket::OnSocketState(WPARAM wParam, LPARAM lParam) {
-    // Process change of socket state, specified by `lParam` for socket specifed by `wParam`.
-
-    Socket **s = FindSocket((SOCKET) wParam);
-
-    ASSERT(s);
-
-    (*s)->OnSocketState(lParam);
 }
 
 void DAIDE::Socket::AdjustOrdering(short &x) {

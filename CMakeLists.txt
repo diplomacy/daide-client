@@ -34,4 +34,5 @@ add_executable(daide_client
         daide_client/token_text_map.cpp
         daide_client/token_text_map.h
         daide_client/tokens.h
-        daide_client/types.h)
+        daide_client/types.h
+        daide_client/windaide_symboles.h)

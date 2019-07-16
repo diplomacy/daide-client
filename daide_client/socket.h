@@ -11,6 +11,11 @@
 
 #include <queue>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include "windaide_symboles.h"
+
 namespace DAIDE {
 
 class MessageHeader {           // Message header, common to all types.
@@ -45,7 +50,7 @@ class Socket {
 
     void InsertSocket();
 
-    static void RemoveSocket();
+    void RemoveSocket();
 
     void SendData();
 
@@ -66,7 +71,7 @@ class Socket {
 public:
     Socket() : IncomingMessage(nullptr), OutgoingMessage(nullptr) {}
 
-    ~Socket();
+    virtual ~Socket();
 
     virtual bool Connect(const char *address, int port);
 
@@ -74,11 +79,7 @@ public:
 
     void PushOutgoingMessage(char *message);
 
-    void OnSocketState(LPARAM lParam);
-
-    static Socket **FindSocket(SOCKET socket);
-
-    static void OnSocketState(WPARAM wParam, LPARAM lParam);
+    static Socket **FindSocket(int socket);
 
     static void AdjustOrdering(int16_t &x);
 
