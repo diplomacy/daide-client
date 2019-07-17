@@ -6,7 +6,7 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
@@ -37,14 +37,14 @@ BaseBot::~BaseBot() {
     close_logs();
 }
 
-bool BaseBot::initialize() {
+bool BaseBot::initialize(const std::string &command_line_a) {
     COMMAND_LINE_PARAMETERS parameters {};
     const int MAX_COMPUTER_NAME_LEN = 1000;         // Max length of a computer name
     const uint16_t DEFAULT_PORT_NUMBER = 16713;     // Default port number to connect on
 
     // Extract the parameters
     srand((int) time(nullptr));                     // init random number generator
-    extract_parameters(parameters);
+    extract_parameters(command_line_a, parameters);
 
     // Store the command line parameters
     m_parameters = parameters;
@@ -66,10 +66,9 @@ bool BaseBot::initialize() {
     if (!parameters.port_specified) {
         parameters.port_number = DEFAULT_PORT_NUMBER;
     }
-    SetWindowText(main_wnd, BOT_FAMILY " " BOT_GENERATION);
 
     // Connection failure
-    if (!m_socket.Connect(parameters.server_name, parameters.port_number)) {
+    if (!m_socket.Connect(parameters.server_name.c_str(), parameters.port_number)) {
         log_error("Failed to connect to server");
         return false;
     }
@@ -615,12 +614,11 @@ void BaseBot::process_rej_nme_message(const TokenMessage & /*incoming_msg*/, con
     // Disconnect
     } else {
         disconnect_from_server();
-        end_dialog();
     }
 }
 
 // Determine whether to try and reconnect to game. Default uses values passed on command line.
-bool BaseBot::get_reconnect_details(const Token &power, int &passcode) {
+bool BaseBot::get_reconnect_details(Token &power, int &passcode) {
     if (m_parameters.reconnection_specified) {
         power = TokenTextMap::instance()->m_text_to_token_map[m_parameters.reconnect_power];
         passcode = m_parameters.reconnect_passcode;
@@ -779,7 +777,7 @@ void BaseBot::remove_sent_press(const TokenMessage &send_message) {
     }
 }
 
-bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
+bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE_PARAMETERS &parameters) {
     bool extracted_ok {true};               // Whether the parameters were OK
     int search_start {0};                   // Position to start searching command line
     int param_start {0};                    // Start of the next parameter
@@ -794,7 +792,7 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
     parameters.reconnection_specified = false;
 
     // Getting parameters
-    std::string m_command_line = GetCommandLineA();
+    std::string m_command_line = command_line_a;
 
     // Strip the program name off the command line
     // Program name is in quotes.
@@ -885,8 +883,4 @@ void BaseBot::OnSocketMessage() {
     Socket::MessagePtr incomingMessage = m_socket.PullIncomingMessage();
 
     process_message(incomingMessage);
-}
-
-void BaseBot::end_dialog() {
-    PostMessage(main_wnd, WM_CLOSE, 0, 0);
 }

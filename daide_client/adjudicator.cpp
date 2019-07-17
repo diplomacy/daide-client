@@ -1773,7 +1773,7 @@ bool MapAndUnits::move_to_next_turn() {
             current_season = TOKEN_SEASON_SPR;
             current_year++;
         } else {
-            current_season = current_season.get_token() + 1;
+            current_season = Token(current_season.get_token() + 1);
         }
 
         // Movement turns always happen

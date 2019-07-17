@@ -6,7 +6,7 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
@@ -15,6 +15,7 @@
  **/
 
 #include <cstdarg>
+#include <cstdio>
 #include "error_log.h"
 
 // TODO - REWRITE completely
@@ -42,7 +43,7 @@ void log(const std::string &format, ...) {
 #if    WINVER >= 0x0600
     if (vsprintf_s( buffer, size, format, arg_list ) < 0) throw "Buffer ovrflow in `log`";
 #else
-    vsprintf(buffer, format, arg_list); // hope `buffer` is big enough!
+    std::vsprintf(buffer, format.c_str(), arg_list); // hope `buffer` is big enough!
 #endif
 
     if (logging_enabled) {
@@ -109,7 +110,7 @@ void log_daide_message(bool is_incoming, const DAIDE::TokenMessage &message) {
                 fprintf(big_log, "<< ");
             }
 
-            fprintf(big_log, "%s\n", message.get_message_as_text());
+            fprintf(big_log, "%s\n", message.get_message_as_text().c_str());
             fflush(big_log);
         }
     }

@@ -74,7 +74,7 @@ private:
 
     static int rand_no(int max_value);
 
-    virtual bool extract_parameters(DAIDE::COMMAND_LINE_PARAMETERS &parameters);
+    virtual bool extract_parameters(const std::string &command_line_a, DAIDE::COMMAND_LINE_PARAMETERS &parameters);
 
 private:
 

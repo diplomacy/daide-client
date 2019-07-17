@@ -32,7 +32,7 @@ public:
     TokenMessage(const Token *message, int message_length);
 
     // Construct to contain a single token
-    explicit TokenMessage(const Token &token);
+    TokenMessage(const Token &token);
 
     // Copy another token message
     TokenMessage(const TokenMessage &message_to_copy);

@@ -19,11 +19,13 @@
 
 #include "ai_client_types.h"
 #include "token_message.h"
+#include "map_and_units.h"
+#include "error_log.h"
 #include "socket.h"
 
 namespace DAIDE {
 
-using DCSP_HST_MESSAGE = MessageHeader ;
+using DCSP_HST_MESSAGE = MessageHeader;
 
 // DAIDE message types.
 #define DCSP_MSG_TYPE_IM        0       // Initial Message
@@ -50,7 +52,7 @@ public:
 
     // Initialize the AI. May be overridden, but should call the base class version at the top of the derived version
     // if it is
-    virtual bool initialize();
+    virtual bool initialize(const std::string &command_line_a);
 
 protected:
     // Useful utility functions
@@ -145,7 +147,7 @@ protected:
 
     // Get the details to reconnect to the game. Return true if reconnect required, or false if reconnect is not to
     // be attempted. Default implementation uses parameters from the command line
-    virtual bool get_reconnect_details(const Token &power, int &passcode);
+    virtual bool get_reconnect_details(Token &power, int &passcode);
 
     // Handle an incoming REJ( IAM() ) message.
     virtual void process_rej_iam_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
@@ -381,12 +383,10 @@ private:
 
     COMMAND_LINE_PARAMETERS m_parameters;       // The parameters passed on the command line
 
-    bool extract_parameters(COMMAND_LINE_PARAMETERS &parameters);
+    bool extract_parameters(const std::string &command_line_a, COMMAND_LINE_PARAMETERS &parameters);
 
 public:
     void OnSocketMessage();
-
-    void end_dialog();
 };
 
 } // namespace DAIDE
