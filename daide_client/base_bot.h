@@ -318,7 +318,7 @@ private:
     using SentPressList = std::list<SentPressInfo>;
 
     // Process an incoming message
-    void process_message(char *&message);
+    void process_message(Socket::MessagePtr message);
 
     // Process an incoming rm message
     static void process_rm_message(char *message, int message_length);

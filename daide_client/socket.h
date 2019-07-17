@@ -27,24 +27,29 @@ public:
 
 class Socket {
     // Message-oriented socket.
+public:
+    // TODO: refactor so MessagePtr is a std::unique_ptr<char>
+    using MessagePtr = std::shared_ptr<char>;
 
-    using MessageQueue = std::queue<char *>;
+private:
+    using MessageQueue = std::queue<MessagePtr>;
 
     SOCKET MySocket;
 
-    static Socket *SocketTab[FD_SETSIZE];               // table of active Socket*
+    static Socket* SocketTab[FD_SETSIZE];               // table of active Socket*
     static int SocketCnt;                               // # active Socket
 
     MessageQueue IncomingMessageQueue;                  // queue of incoming messages
     MessageQueue OutgoingMessageQueue;                  // queue of outgoing messages
-    char *IncomingMessage {nullptr};                    // current incoming message; points to Header until length read;
+    MessagePtr IncomingMessage {nullptr};               // current incoming message; points to Header until length read;
                                                         // else a full, but incomplete, message
-    char *OutgoingMessage {nullptr};                    // current outgoing message, when partially sent; else 0
+    MessagePtr OutgoingMessage {nullptr};               // current outgoing message, when partially sent; else 0
     int IncomingNext;                                   // index of start of next incoming message in buffer
     int OutgoingNext;                                   // index of start of next outgoingmessage in buffer
     int IncomingLength;                                 // whole length of current incoming message, including header
     int OutgoingLength;                                 // whole length of current outgoing message, including header
-    MessageHeader Header;                               // buffer for header of current incoming message
+    const MessagePtr HeaderDataPtr;
+    MessageHeader* const Header;                        // buffer for header of current incoming message
                                                         // pending new IncomingMessage, when length is known
     bool Connected {false};                             // true iff connected
 
@@ -58,7 +63,7 @@ class Socket {
 
     void Start();
 
-    void PushIncomingMessage(char *message);
+    void PushIncomingMessage(MessagePtr message);
 
     virtual void OnConnect(int error);
 
@@ -69,22 +74,33 @@ class Socket {
     virtual void OnSend(int error);
 
 public:
-    Socket() : IncomingMessage(nullptr), OutgoingMessage(nullptr) {}
+    Socket() :
+        IncomingMessage(nullptr),
+        OutgoingMessage(nullptr),
+        HeaderDataPtr(new char[sizeof(MessageHeader)]),
+        Header((MessageHeader*)HeaderDataPtr.get()) {}
 
     virtual ~Socket();
 
-    virtual bool Connect(const char *address, int port);
+    virtual bool Connect(const char* address, int port);
 
-    char *PullIncomingMessage();
+    MessagePtr PullIncomingMessage();
 
-    void PushOutgoingMessage(char *message);
+    void PushOutgoingMessage(MessagePtr message);
 
-    static Socket **FindSocket(int socket);
+    static Socket** FindSocket(int socket);
 
     static void AdjustOrdering(int16_t &x);
 
-    static void AdjustOrdering(char *message, int16_t length);
+    static void AdjustOrdering(MessagePtr message, int16_t length);
 };
+
+Socket::MessagePtr make_message(size_t length);
+
+MessageHeader* get_message_header(Socket::MessagePtr message);
+
+template <typename T>
+T* get_message_content(Socket::MessagePtr message);
 
 /////////////////////////////////////////////////////////////////////////////
 

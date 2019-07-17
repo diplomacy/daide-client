@@ -86,18 +86,20 @@ void BaseBot::send_nme_or_obs() {
 }
 
 void BaseBot::send_initial_message_to_server() {
-    std::unique_ptr<char> tcp_message;              // Message to send over the link
-    DCSP_HST_MESSAGE *tcp_message_header;           // Header of the message
+    Socket::MessagePtr tcp_message;         // Message to send over the link
+    DCSP_HST_MESSAGE *tcp_message_header;   // Header of the message
+    short *tcp_message_content;
 
     // FIXME - tcp_message was requesting heap memory space without using a smart pointer
-    tcp_message = std::make_unique<char>(sizeof(DCSP_HST_MESSAGE) + 4);
-    tcp_message_header = (DCSP_HST_MESSAGE *) tcp_message;
+    tcp_message = make_message(4);
+    tcp_message_header = get_message_header(tcp_message);
+    tcp_message_content = get_message_content<short>(tcp_message);
 
     // Set message header
     tcp_message_header->type = DCSP_MSG_TYPE_IM;
     tcp_message_header->length = 4;
-    *((short *) (tcp_message + sizeof(DCSP_HST_MESSAGE))) = (short) 1; // version;
-    *((short *) (tcp_message + sizeof(DCSP_HST_MESSAGE)) + 1) = (short) 0xDA10; // magic number
+    tcp_message_content[0] = (short) 1; // version;
+    tcp_message_content[1] = (short) 0xDA10; // magic number
 
     // Send message
     m_socket.PushOutgoingMessage(tcp_message);
@@ -105,8 +107,9 @@ void BaseBot::send_initial_message_to_server() {
 
 void BaseBot::send_message_to_server(const TokenMessage &message) {
     int message_length {0};                         // Length of the message in tokens
-    std::unique_ptr<char> tcp_message;              // Message to send over the link
+    Socket::MessagePtr tcp_message;                 // Message to send over the link
     DCSP_HST_MESSAGE *tcp_message_header {nullptr}; // Header of the message
+    Token *tcp_message_content;
 
     log_daide_message(false, message);
 
@@ -114,15 +117,16 @@ void BaseBot::send_message_to_server(const TokenMessage &message) {
     message_length = message.get_message_length();
 
     // FIXME - tcp_message was requesting heap memory space without using a smart pointer
-    tcp_message = std::make_unique<char>(message_length * 2 + 6);
-    tcp_message_header = (DCSP_HST_MESSAGE *) tcp_message;
+    tcp_message = make_message(message_length * 2 + 2);
+    tcp_message_header = get_message_header(tcp_message);
+    tcp_message_content = get_message_content<Token>(tcp_message);
 
     // Set message header
     tcp_message_header->type = DCSP_MSG_TYPE_DM;
     tcp_message_header->length = message_length * 2;
 
     // Send message
-    message.get_message((Token *) (tcp_message + 4), message_length + 1);
+    message.get_message(tcp_message_content, message_length + 1);
     m_socket.PushOutgoingMessage(tcp_message);
 }
 
@@ -152,9 +156,10 @@ void BaseBot::request_map() {
     send_message_to_server(TokenMessage(TOKEN_COMMAND_MAP));
 }
 
-void BaseBot::process_message(char *&message) {
-    DCSP_HST_MESSAGE *header = (DCSP_HST_MESSAGE *) (message);          // Message Header of the received message
-    WORD error_code;                                                    // Error code from an error message
+void BaseBot::process_message(Socket::MessagePtr message) {
+    DCSP_HST_MESSAGE *header = get_message_header(message);             // Message Header of the received message
+    char* content = get_message_content<char>(message);                 // Message Content of the received message
+    unsigned short error_code;                                          // Error code from an error message
 
     switch (header->type) {
 
@@ -166,13 +171,13 @@ void BaseBot::process_message(char *&message) {
         // Representation message. Needs handling to update the text map eventually
         case DCSP_MSG_TYPE_RM:
             log("Representation Message received");
-            process_rm_message(message + sizeof(DCSP_HST_MESSAGE), header->length);
+            process_rm_message(content, header->length);
             break;
 
         // Diplomacy Message
         case DCSP_MSG_TYPE_DM:
             log("Diplomacy Message received");
-            process_diplomacy_message(message + sizeof(DCSP_HST_MESSAGE), header->length);
+            process_diplomacy_message(content, header->length);
             break;
 
         // Final Message. Nothing to do.
@@ -182,7 +187,7 @@ void BaseBot::process_message(char *&message) {
 
         // Error Message. Report
         case DCSP_MSG_TYPE_EM:
-            error_code = *((WORD *)(message + sizeof(DCSP_HST_MESSAGE)));
+            error_code = *get_message_content<unsigned short>(message);
             log_error("Error Message Received. Error Code = %d", error_code);
             break;
 
@@ -877,12 +882,9 @@ void BaseBot::OnSocketMessage() {
     // Get and remove next DAIDE message to be processed.
     // Triggers recall if more messages remain.
     // (More responsive than processing all such messages at once, without first checking for more urgent events.)
-    char *incomingMessage = m_socket.PullIncomingMessage();
+    Socket::MessagePtr incomingMessage = m_socket.PullIncomingMessage();
 
     process_message(incomingMessage);
-
-    // FIXME use smart pointer
-    delete[] incomingMessage;
 }
 
 void BaseBot::end_dialog() {

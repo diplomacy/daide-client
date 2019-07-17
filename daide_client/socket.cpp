@@ -1,4 +1,4 @@
-// JPN_Socket.cpp: implementation of the JPN::Socket class and related material.
+﻿// JPN_Socket.cpp: implementation of the JPN::Socket class and related material.
 
 // Copyright (C) 2012, John Newbury. See "Conditions of Use" in johnnewbury.co.cc/diplomacy/conditions-of-use.htm.
 
@@ -20,39 +20,42 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-DAIDE::Socket *DAIDE::Socket::SocketTab[FD_SETSIZE];
+using namespace DAIDE;
+using MessagePtr = Socket::MessagePtr;
 
-int DAIDE::Socket::SocketCnt;
+Socket* Socket::SocketTab[FD_SETSIZE];
 
-DAIDE::Socket::~Socket() {
+int Socket::SocketCnt;
+
+Socket::~Socket() {
     // Destructor.
     // FIXME - Avoid using C-casts and delete
     RemoveSocket();
-    delete[] OutgoingMessage;
-    if (IncomingMessage != (char *) &Header) delete[] IncomingMessage;
-    while (!OutgoingMessageQueue.empty()) {
-        delete[] OutgoingMessageQueue.front();
-        OutgoingMessageQueue.pop();
+    OutgoingMessage.reset();
+    IncomingMessage.reset();
+    if (!OutgoingMessageQueue.empty()) {
+        MessageQueue empty;
+        std::swap(OutgoingMessageQueue, empty);
     }
-    while (!IncomingMessageQueue.empty()) {
-        delete[] IncomingMessageQueue.front();
-        IncomingMessageQueue.pop();
+    if (!IncomingMessageQueue.empty()) {
+        MessageQueue empty;
+        std::swap(IncomingMessageQueue, empty);
     }
 }
 
-void DAIDE::Socket::InsertSocket() {
+void Socket::InsertSocket() {
     // Insert `this` into SocketTab. Must not already be present; should be full, else system socket table would already be full.
     ASSERT(!FindSocket(MySocket) && SocketCnt < FD_SETSIZE);
     SocketTab[SocketCnt++] = this;
 }
 
-void DAIDE::Socket::RemoveSocket() {
+void Socket::RemoveSocket() {
     // Remove `this` from SocketTab iff present.
-    Socket **s = FindSocket(MySocket);
+    Socket** s = FindSocket(MySocket);
     if (s) *s = SocketTab[--SocketCnt]; // found; replace by last elem
 }
 
-void DAIDE::Socket::SendData() {
+void Socket::SendData() {
     // Send all available data to socket, while space is available.
     ASSERT(Connected);
     for (;;) { // while data available to send and space avalable
@@ -61,13 +64,13 @@ void DAIDE::Socket::SendData() {
             OutgoingMessage = OutgoingMessageQueue.front(); // next message to send
             OutgoingMessageQueue.pop();
             OutgoingNext = 0;
-            short length = ((MessageHeader *) OutgoingMessage)->length;
+            short length = ((MessageHeader*) OutgoingMessage.get())->length;
             AdjustOrdering(OutgoingMessage, length);
             OutgoingLength = sizeof(MessageHeader) + length;
         }
 
         // # bytes sent, or SOCKET_ERROR
-        int sent = send(MySocket, OutgoingMessage + OutgoingNext, OutgoingLength - OutgoingNext, 0);
+        int sent = send(MySocket, OutgoingMessage.get() + OutgoingNext, OutgoingLength - OutgoingNext, 0);
 
         if (sent == SOCKET_ERROR) {
             int error = WSAGetLastError();
@@ -78,12 +81,12 @@ void DAIDE::Socket::SendData() {
         }
         OutgoingNext += sent;
         if (OutgoingNext < OutgoingLength) return; // current message not fully sent
-        delete[] OutgoingMessage;
+        OutgoingMessage.reset();
         OutgoingMessage = 0;
     }
 }
 
-void DAIDE::Socket::ReceiveData() {
+void Socket::ReceiveData() {
     // Receive all data available from socket.
     ASSERT(Connected);
 
@@ -110,21 +113,22 @@ void DAIDE::Socket::ReceiveData() {
 
         // copy `count` bytes from `buffer` to IncomingMessage
         ASSERT(count > 0);
-        memcpy(IncomingMessage + IncomingNext, buffer + bufferNext, count);
+        memcpy(IncomingMessage.get() + IncomingNext, buffer + bufferNext, count);
 
         IncomingNext += count;
         bufferNext += count;
 
         if (IncomingNext == sizeof(MessageHeader)) { // just completed reading Header; length now known
-            short length = ((MessageHeader *) (IncomingMessage))->length; // length of body
+            short length = ((MessageHeader*) (IncomingMessage.get()))->length; // length of body
             AdjustOrdering(length);
             IncomingLength = sizeof(MessageHeader) + length; // full message length
-            IncomingMessage = new char[IncomingLength]; // space for full message
+            IncomingMessage.reset(new char[IncomingLength]); // space for full message
 
             // Copy Header to full IncomingMessage
-            ((MessageHeader *) IncomingMessage)->type = Header.type;
-            ((MessageHeader *) IncomingMessage)->pad = Header.pad;
-            ((MessageHeader *) IncomingMessage)->length = Header.length;
+            MessageHeader* message_header = get_message_header(IncomingMessage);
+            message_header->type = Header->type;
+            message_header->pad = Header->pad;
+            message_header->length = Header->length;
 
             IncomingNext = sizeof(MessageHeader);
         }
@@ -134,21 +138,21 @@ void DAIDE::Socket::ReceiveData() {
             PushIncomingMessage(IncomingMessage);
 
             // Make IncomingMessage use Header, pending known length of next full message.
-            IncomingMessage = (char *) &Header;
+            IncomingMessage = HeaderDataPtr;
             IncomingNext = 0;
             IncomingLength = sizeof(MessageHeader);
         }
     }
 }
 
-void DAIDE::Socket::Start() {
+void Socket::Start() {
     // Start using the socket.
     Connected = true;
     log("connected");
     SendData();
 }
 
-void DAIDE::Socket::OnConnect(int error) {
+void Socket::OnConnect(int error) {
     // Handle socket Connect event; NZ `error` indicates failure.
     if (!error) Start();
     else {
@@ -157,12 +161,12 @@ void DAIDE::Socket::OnConnect(int error) {
     }
 }
 
-void DAIDE::Socket::OnClose(int error) {
+void Socket::OnClose(int error) {
     // Handle socket Close event; NZ `error` indicates failure.
     if (error) log_error("Failure %d during OnClose", error);
 }
 
-void DAIDE::Socket::OnReceive(int error) {
+void Socket::OnReceive(int error) {
     // Handle socket Receive event; NZ `error` indicates failure.
     if (!error) ReceiveData();
     else {
@@ -170,7 +174,7 @@ void DAIDE::Socket::OnReceive(int error) {
     }
 }
 
-void DAIDE::Socket::OnSend(int error) {
+void Socket::OnSend(int error) {
     // Handle socket Send event; NZ `error` indicates failure.
     if (!error) SendData();
     else {
@@ -178,7 +182,7 @@ void DAIDE::Socket::OnSend(int error) {
     }
 }
 
-bool DAIDE::Socket::Connect(const char *address, int port) {
+bool Socket::Connect(const char *address, int port) {
     // Initiate asynchronous connection of socket to `address` and `port`; return true iff OK.
     int err;
 
@@ -203,7 +207,7 @@ bool DAIDE::Socket::Connect(const char *address, int port) {
     // Prepare `saPtr` and `saLen` args for connect, from `server` and `port`. Requires mystical incantations!
     // Assumed fast enough to do synchronously, albeit may use external name server;
     // else needs separate thread!
-    sockaddr *saPtr;
+    sockaddr* saPtr;
     struct sockaddr_in sa;
     int saLen;
 
@@ -230,7 +234,7 @@ bool DAIDE::Socket::Connect(const char *address, int port) {
     }
 
     // Make IncomingMessage use Header, pending known length of full message.
-    IncomingMessage = (char *) &Header;
+    IncomingMessage = HeaderDataPtr;
     IncomingNext = 0;
     IncomingLength = sizeof(MessageHeader);
     OutgoingMessage = 0;
@@ -240,33 +244,32 @@ bool DAIDE::Socket::Connect(const char *address, int port) {
     return true;
 }
 
-void DAIDE::Socket::PushIncomingMessage(char *message) {
+void Socket::PushIncomingMessage(MessagePtr message) {
     // Push incoming `message` on end of IncomingMessageQueue.
     IncomingMessageQueue.push(message); // safe to follow the post as we are in the Main thread
 }
 
-void DAIDE::Socket::PushOutgoingMessage(char *message) {
+void Socket::PushOutgoingMessage(MessagePtr message) {
     // Push outgoing `message` on end of OutgoingMessageQueue.
-
     OutgoingMessageQueue.push(message);
     if (!OutgoingMessage && Connected) SendData();
 }
 
-char *DAIDE::Socket::PullIncomingMessage() {
+Socket::MessagePtr Socket::PullIncomingMessage() {
     // Pull next message from front of IncomingMessageQueue. Post a new message event if more messages remain on queue.
 
     ASSERT(!IncomingMessageQueue.empty());
 
-    char *incomingMessage = IncomingMessageQueue.front(); // message to be processed
+    MessagePtr incomingMessage = IncomingMessageQueue.front(); // message to be processed
     IncomingMessageQueue.pop(); // remove it
     // trigger recall if more messages remain
 
     return incomingMessage;
 }
 
-DAIDE::Socket **DAIDE::Socket::FindSocket(int socket) {
+Socket** Socket::FindSocket(int socket) {
     // Return the Socket** in SocketTab that owns `socket`; 0 iff not found.
-    Socket **s;
+    Socket** s;
     for (int i = 0; i < SocketCnt; ++i) {
         s = &SocketTab[i];
         if ((*s)->MySocket == socket) return s;
@@ -274,7 +277,7 @@ DAIDE::Socket **DAIDE::Socket::FindSocket(int socket) {
     return 0;
 }
 
-void DAIDE::Socket::AdjustOrdering(short &x) {
+void Socket::AdjustOrdering(short &x) {
     // Adjust the byte ordering of `x`, to or from network ordering of a `short`.
 
 #if LITTLE_ENDIAN
@@ -286,15 +289,29 @@ void DAIDE::Socket::AdjustOrdering(short &x) {
 #endif
 }
 
-void DAIDE::Socket::AdjustOrdering(char *message, short length) {
+void Socket::AdjustOrdering(MessagePtr message, short length) {
     // Adjust 16-bit aligned `message`, having body `length`, to or from network ordering of its components.
     // 'length` must be specified, as that in the header may or may not be in internal order.
     // Header `type` and `pad` are single byte, so need no reordering; the rest are byte-pair `short`, so may need reordering.
 
 #if LITTLE_ENDIAN
-    AdjustOrdering(((MessageHeader *) message)->length);
-    message += sizeof(MessageHeader);
-    char *end = message + length;
-    for (; message < end; message += sizeof(short)) AdjustOrdering(*(short *) message);
+    MessageHeader* message_header = get_message_header(message);
+    short* message_content = get_message_content<short>(message);
+    AdjustOrdering(message_header->length);
+    for (int i = (int)(length / sizeof(short)); i > 0; i--)
+        AdjustOrdering(message_content[i]);
 #endif
+}
+
+Socket::MessagePtr make_message(size_t length) {
+    return Socket::MessagePtr(new char[sizeof(MessageHeader) + length]);
+}
+
+MessageHeader* get_message_header(Socket::MessagePtr message) {
+    return (MessageHeader*) message.get();
+}
+
+template <typename T>
+T* get_message_content(Socket::MessagePtr message) {
+    return (T*) message.get() + sizeof(MessageHeader);
 }
