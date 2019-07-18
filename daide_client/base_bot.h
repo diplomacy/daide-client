@@ -54,6 +54,8 @@ public:
     // if it is
     virtual bool initialize(const std::string &command_line_a);
 
+    bool is_active() const;
+
 protected:
     // Useful utility functions
 
@@ -307,6 +309,7 @@ protected:
 
     MapAndUnits *m_map_and_units;               // Pointer to the map and units object
     std::set<Token> m_cd_powers;                // The powers which are currently CD
+    bool m_is_active {false};
 
 private:
     using SentPressInfo = struct {
@@ -387,6 +390,8 @@ private:
 
 public:
     void OnSocketMessage();
+
+    void stop();
 };
 
 } // namespace DAIDE

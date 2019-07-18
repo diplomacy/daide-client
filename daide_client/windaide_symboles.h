@@ -1,5 +1,5 @@
-#ifndef BRIDGE_H
-#define BRIDGE_H
+#ifndef WINDAIDE_SYMBOLES_H
+#define WINDAIDE_SYMBOLES_H
 
 #include <cassert>
 #include <cerrno>
@@ -14,6 +14,6 @@
 
 #define ioctlsocket ioctl
 
-int WSAGetLastError() { return errno; }
+int WSAGetLastError();
 
-#endif // BRIDGE_H
+#endif // WINDAIDE_SYMBOLES_H

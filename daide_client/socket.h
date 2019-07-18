@@ -57,21 +57,9 @@ private:
 
     void RemoveSocket();
 
-    void SendData();
-
-    void ReceiveData();
-
     void Start();
 
     void PushIncomingMessage(MessagePtr message);
-
-    virtual void OnConnect(int error);
-
-    virtual void OnClose(int error);
-
-    virtual void OnReceive(int error);
-
-    virtual void OnSend(int error);
 
 public:
     Socket() :
@@ -82,13 +70,19 @@ public:
 
     virtual ~Socket();
 
-    virtual bool Connect(const char* address, int port);
+    virtual bool Connect(const std::string& address, int port);
+
+    void Close();
+
+    void SendData();
+
+    void ReceiveData();
 
     MessagePtr PullIncomingMessage();
 
     void PushOutgoingMessage(MessagePtr message);
 
-    static Socket** FindSocket(int socket);
+    static Socket** FindSocket(SOCKET socket);
 
     static void AdjustOrdering(int16_t &x);
 
@@ -100,7 +94,9 @@ Socket::MessagePtr make_message(size_t length);
 MessageHeader* get_message_header(Socket::MessagePtr message);
 
 template <typename T>
-T* get_message_content(Socket::MessagePtr message);
+T* get_message_content(Socket::MessagePtr message) {
+    return (T*) message.get() + sizeof(MessageHeader);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 

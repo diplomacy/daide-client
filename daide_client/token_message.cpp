@@ -116,7 +116,8 @@ TokenMessage TokenMessage::get_submessage(int submessage_index) const {
     int submessage_length {0};              // Length of the submessage to copy
 
     if (m_message != nullptr) {
-        if (m_submessage_starts == nullptr) { find_submessages(); }
+        // TODO: find_submessages() has been moved to set_message(). Make sure this brings no bugs
+//        if (m_submessage_starts == nullptr) { find_submessages(); }
 
         if (submessage_index < m_submessage_count) {
             // Find the length of the submessage
@@ -139,7 +140,8 @@ int TokenMessage::get_submessage_start(int submessage_index) const {
     int submessage_start {NO_MESSAGE};
 
     if ((submessage_index < m_submessage_count) && (submessage_index >= 0)) {
-        if (m_submessage_starts == nullptr) { find_submessages(); }
+        // TODO: find_submessages() has been moved to set_message(). Make sure this brings no bugs
+//        if (m_submessage_starts == nullptr) { find_submessages(); }
         if (m_submessage_starts[submessage_index + 1] - m_submessage_starts[submessage_index] > 1) {
             submessage_start = m_submessage_starts[submessage_index] + 1;
         } else {
@@ -153,7 +155,8 @@ bool TokenMessage::submessage_is_single_token(int submessage_index) {
     bool is_single {false};
 
     if ((submessage_index < m_submessage_count) && (submessage_index >= 0)) {
-        if (m_submessage_starts == nullptr) { find_submessages(); }
+        // TODO: find_submessages() has been moved to set_message(). Make sure this brings no bugs
+//        if (m_submessage_starts == nullptr) { find_submessages(); }
         is_single = m_submessage_starts[submessage_index + 1] - m_submessage_starts[submessage_index] == 1;
     }
     return is_single;
@@ -250,6 +253,8 @@ int TokenMessage::set_message(const Token *message, int message_length) {
     memcpy(m_message, message, message_length * sizeof(Token));
     m_message[message_length] = TOKEN_END_OF_MESSAGE;
     m_message_length = message_length;
+
+    find_submessages();
 
     return error_location;
 }
@@ -562,7 +567,7 @@ TokenMessage TokenMessage::operator+(const Token &token) {
     return operator+(token_message);
 }
 
-void TokenMessage::find_submessages() const {
+void TokenMessage::find_submessages() {
     int bracket_count {0};
     int submessage_count {0};
 

@@ -353,7 +353,7 @@ public:
     void adjudicate();
 
     // Get the results as a set of ORD messages
-    int get_adjudication_results(const TokenMessage ord_messages[]);
+    int get_adjudication_results(TokenMessage ord_messages[]);
 
     // Apply the adjudication. This moves all the units to their new positions.
     bool apply_adjudication();
@@ -431,15 +431,15 @@ private:
 
     bool has_route_to_province(UNIT_AND_ORDER *unit, PROVINCE_INDEX province_index, PROVINCE_INDEX province_to_avoid);
 
-    int get_movement_results(const TokenMessage ord_messages[]);
+    int get_movement_results(TokenMessage ord_messages[]);
 
     TokenMessage describe_movement_result(UNIT_AND_ORDER *unit);
 
-    int get_retreat_results(const TokenMessage ord_messages[]);
+    int get_retreat_results(TokenMessage ord_messages[]);
 
     TokenMessage describe_retreat_result(UNIT_AND_ORDER *unit);
 
-    int get_adjustment_results(const TokenMessage ord_messages[]);
+    int get_adjustment_results(TokenMessage ord_messages[]);
 
     TokenMessage describe_build_result(POWER_INDEX power_ctr,
                                        WINTER_ORDERS_FOR_POWER *orders,

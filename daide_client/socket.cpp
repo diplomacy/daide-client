@@ -1,4 +1,4 @@
-﻿// JPN_Socket.cpp: implementation of the JPN::Socket class and related material.
+// JPN_Socket.cpp: implementation of the JPN::Socket class and related material.
 
 // Copyright (C) 2012, John Newbury. See "Conditions of Use" in johnnewbury.co.cc/diplomacy/conditions-of-use.htm.
 
@@ -74,9 +74,8 @@ void Socket::SendData() {
 
         if (sent == SOCKET_ERROR) {
             int error = WSAGetLastError();
-            if (error != WSAEWOULDBLOCK) {
-                log_error("Failure %d during SendDatar", error);
-            }
+            log_error("Failure %d during SendDatar", error);
+            DAIDE::the_bot.stop();
             return;
         }
         OutgoingNext += sent;
@@ -97,13 +96,13 @@ void Socket::ReceiveData() {
 
     if (!received) {
         log_error("Failure: closed socket during read from Server");
+        the_bot.stop();
         return;
     }
     if (received == SOCKET_ERROR) {
         int error = WSAGetLastError();
-        if (error != WSAEWOULDBLOCK) {
-            log_error("Failure %d during ReceiveData", error);
-        }
+        log_error("Failure %d during ReceiveData", error);
+        the_bot.stop();
         return;
     }
     for (;;) { // while incoming data available
@@ -152,37 +151,17 @@ void Socket::Start() {
     SendData();
 }
 
-void Socket::OnConnect(int error) {
-    // Handle socket Connect event; NZ `error` indicates failure.
-    if (!error) Start();
-    else {
-        log_error("Failure %d during OnConnect", error);
-        std::cerr << "Failed to connect" << std::endl;
+void Socket::Close()
+{
+    Connected = false;
+    if (MySocket) {
+        log("disconnected");
+        close(MySocket);
+        MySocket = 0;
     }
 }
 
-void Socket::OnClose(int error) {
-    // Handle socket Close event; NZ `error` indicates failure.
-    if (error) log_error("Failure %d during OnClose", error);
-}
-
-void Socket::OnReceive(int error) {
-    // Handle socket Receive event; NZ `error` indicates failure.
-    if (!error) ReceiveData();
-    else {
-        log_error("Failure %d during OnReceive", error);
-    }
-}
-
-void Socket::OnSend(int error) {
-    // Handle socket Send event; NZ `error` indicates failure.
-    if (!error) SendData();
-    else {
-        log_error("Failure %d during OnSend", error);
-    }
-}
-
-bool Socket::Connect(const char *address, int port) {
+bool Socket::Connect(const std::string& address, int port) {
     // Initiate asynchronous connection of socket to `address` and `port`; return true iff OK.
     int err;
 
@@ -213,7 +192,7 @@ bool Socket::Connect(const char *address, int port) {
 
     sa.sin_family = AF_INET;
     sa.sin_port = htons(port);
-    sa.sin_addr.s_addr = inet_addr(address);
+    sa.sin_addr.s_addr = inet_addr(address.c_str());
 
     if (sa.sin_addr.s_addr == INADDR_NONE) { // not valid IP number
         log_error("Invalid IP address %s", address);
@@ -225,12 +204,9 @@ bool Socket::Connect(const char *address, int port) {
 
     // Connect to server.
     if (connect(MySocket, saPtr, saLen)) {
-        err = WSAGetLastError();
-        if (err != WSAEWOULDBLOCK) {
-            log_error("Failure %d during Connect", err);
-            if (MySocket) close(MySocket);
-            return false;
-        }
+        log_error("Failure %d during Connect", WSAGetLastError());
+        Close();
+        return false;
     }
 
     // Make IncomingMessage use Header, pending known length of full message.
@@ -303,15 +279,10 @@ void Socket::AdjustOrdering(MessagePtr message, short length) {
 #endif
 }
 
-Socket::MessagePtr make_message(size_t length) {
+Socket::MessagePtr DAIDE::make_message(size_t length) {
     return Socket::MessagePtr(new char[sizeof(MessageHeader) + length]);
 }
 
-MessageHeader* get_message_header(Socket::MessagePtr message) {
+MessageHeader* DAIDE::get_message_header(Socket::MessagePtr message) {
     return (MessageHeader*) message.get();
-}
-
-template <typename T>
-T* get_message_content(Socket::MessagePtr message) {
-    return (T*) message.get() + sizeof(MessageHeader);
 }

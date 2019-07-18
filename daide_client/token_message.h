@@ -116,7 +116,7 @@ public:
     enum { NO_MESSAGE = -1 };
 
 private:
-    void find_submessages() const;
+    void find_submessages();
 
     Token *m_message;                       // The message
     int m_message_length;                   // Number of tokens in the message

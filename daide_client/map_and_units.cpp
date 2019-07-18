@@ -1803,7 +1803,7 @@ bool MapAndUnits::has_route_to_province(UNIT_AND_ORDER *unit,
     return has_route;
 }
 
-int MapAndUnits::get_adjudication_results(const TokenMessage ord_messages[]) {
+int MapAndUnits::get_adjudication_results(TokenMessage ord_messages[]) {
     int number_of_results {0};
     if ((current_season == TOKEN_SEASON_SPR) || (current_season == TOKEN_SEASON_FAL)) {
         number_of_results = get_movement_results(ord_messages);
@@ -1815,7 +1815,7 @@ int MapAndUnits::get_adjudication_results(const TokenMessage ord_messages[]) {
     return number_of_results;
 }
 
-int MapAndUnits::get_movement_results(const TokenMessage ord_messages[]) {
+int MapAndUnits::get_movement_results(TokenMessage ord_messages[]) {
     int unit_ctr {0};
     UNIT_AND_ORDER *unit {nullptr};
 
@@ -1914,7 +1914,7 @@ TokenMessage MapAndUnits::describe_unit(UNIT_AND_ORDER *unit) {
     return unit_message;
 }
 
-int MapAndUnits::get_retreat_results(const TokenMessage ord_messages[]) {
+int MapAndUnits::get_retreat_results(TokenMessage ord_messages[]) {
     int unit_ctr {0};
     UNIT_AND_ORDER *unit {nullptr};
 
@@ -1956,7 +1956,7 @@ TokenMessage MapAndUnits::describe_retreat_result(UNIT_AND_ORDER *unit) {
     return retreat_result;
 }
 
-int MapAndUnits::get_adjustment_results(const TokenMessage ord_messages[]) {
+int MapAndUnits::get_adjustment_results(TokenMessage ord_messages[]) {
     int order_ctr {0};
     WINTER_ORDERS_FOR_POWER *orders {nullptr};
 
@@ -1989,10 +1989,10 @@ TokenMessage MapAndUnits::describe_build_result(POWER_INDEX power_ctr,
 
     // Building order
     order = Token(CATEGORY_POWER, power_ctr);
-    order += (order_itr->first.coast_token == TOKEN_UNIT_AMY ? TOKEN_UNIT_AMY : TOKEN_UNIT_FLT);
-    order += describe_coast(order_itr->first);
+    order = order + (order_itr->first.coast_token == TOKEN_UNIT_AMY ? TOKEN_UNIT_AMY : TOKEN_UNIT_FLT);
+    order = order + describe_coast(order_itr->first);
     order.enclose_this();
-    order += (orders->is_building ? TOKEN_ORDER_BLD : TOKEN_ORDER_REM);
+    order = order + (orders->is_building ? TOKEN_ORDER_BLD : TOKEN_ORDER_REM);
 
     build_result_message = TOKEN_COMMAND_ORD + describe_turn() & order & TOKEN_RESULT_SUC;
     return build_result_message;
@@ -2024,7 +2024,7 @@ TokenMessage MapAndUnits::describe_dislodged_unit(UNIT_AND_ORDER *unit) {
     unit_message = Token(CATEGORY_POWER, unit->nationality) + unit->unit_type + describe_coast(unit->coast_id)
                    + TOKEN_PARAMETER_MRT;
     for (const auto &retreat_option : unit->retreat_options) {
-        retreat_locations += describe_coast(retreat_option);
+        retreat_locations + retreat_locations + describe_coast(retreat_option);
     }
 
     unit_message = (unit_message & retreat_locations).enclose();

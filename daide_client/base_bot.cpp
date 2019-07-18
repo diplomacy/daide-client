@@ -33,14 +33,22 @@ BaseBot::BaseBot() {
 
 BaseBot::~BaseBot() {
     enable_logging(true);
+    m_socket.Close();
     log_error("Finished");              // not an error, but indicates end of logging; also writes to normal log
     close_logs();
+}
+
+bool BaseBot::is_active() const
+{
+    return m_is_active;
 }
 
 bool BaseBot::initialize(const std::string &command_line_a) {
     COMMAND_LINE_PARAMETERS parameters {};
     const int MAX_COMPUTER_NAME_LEN = 1000;         // Max length of a computer name
     const uint16_t DEFAULT_PORT_NUMBER = 16713;     // Default port number to connect on
+
+    m_socket.Close();
 
     // Extract the parameters
     srand((int) time(nullptr));                     // init random number generator
@@ -72,6 +80,8 @@ bool BaseBot::initialize(const std::string &command_line_a) {
         log_error("Failed to connect to server");
         return false;
     }
+
+    m_is_active = true;
 
     // Connection success
     send_initial_message_to_server();
@@ -614,6 +624,7 @@ void BaseBot::process_rej_nme_message(const TokenMessage & /*incoming_msg*/, con
     // Disconnect
     } else {
         disconnect_from_server();
+        stop();
     }
 }
 
@@ -883,4 +894,9 @@ void BaseBot::OnSocketMessage() {
     Socket::MessagePtr incomingMessage = m_socket.PullIncomingMessage();
 
     process_message(incomingMessage);
+}
+
+void BaseBot::stop() {
+    m_socket.Close();
+    m_is_active = false;
 }
