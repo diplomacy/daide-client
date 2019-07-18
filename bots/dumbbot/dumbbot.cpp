@@ -20,11 +20,17 @@
 #include "bot_type.h"
 #include "dumbbot.h"
 
+using DAIDE::DumbBot;
 using DAIDE::MapAndUnits;
 using DAIDE::Token;
 using DAIDE::TokenMessage;
 
 const int NEUTRAL_POWER_INDEX = MapAndUnits::MAX_POWERS;
+
+constexpr DumbBot::WEIGHTING DumbBot::m_spring_proximity_weight[PROXIMITY_DEPTH];
+constexpr DumbBot::WEIGHTING DumbBot::m_fall_proximity_weight[PROXIMITY_DEPTH];
+constexpr DumbBot::WEIGHTING DumbBot::m_build_proximity_weight[PROXIMITY_DEPTH];
+constexpr DumbBot::WEIGHTING DumbBot::m_remove_proximity_weight[PROXIMITY_DEPTH];
 
 /**
  * How it works.

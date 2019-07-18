@@ -20,6 +20,8 @@
 #include "daide_client/base_bot.h"
 #include "daide_client/map_and_units.h"
 
+namespace DAIDE {
+
 class DumbBot : public DAIDE::BaseBot {
 public:
     DumbBot();
@@ -161,5 +163,7 @@ private:
     const static WEIGHTING m_size_coefficient {4};
     const static WEIGHTING m_size_constant {16};
 };
+
+} // namespace DAIDE
 
 #endif // _DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H

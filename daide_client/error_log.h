@@ -23,11 +23,11 @@ namespace DAIDE {
 
 void enable_logging(bool enable);
 
-template<typename... Args>
-void log(const std::string &format, Args... args);
+FILE *open(const char *filename, const char *mode);
 
-template<typename... Args>
-void log_error(const std::string &format, Args... args);
+void log(const char *format, ...);
+
+void log_error(const char *format, ...);
 
 void log_daide_message(bool is_incoming, const TokenMessage &message);
 

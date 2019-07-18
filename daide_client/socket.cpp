@@ -20,7 +20,9 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-using namespace DAIDE;
+using DAIDE::Socket;
+using DAIDE::MessageHeader;
+
 using MessagePtr = Socket::MessagePtr;
 
 Socket* Socket::SocketTab[FD_SETSIZE];
@@ -195,7 +197,7 @@ bool Socket::Connect(const std::string& address, int port) {
     sa.sin_addr.s_addr = inet_addr(address.c_str());
 
     if (sa.sin_addr.s_addr == INADDR_NONE) { // not valid IP number
-        log_error("Invalid IP address %s", address);
+        log_error("Invalid IP address %s", address.c_str());
         return false;
     }
 
@@ -279,10 +281,10 @@ void Socket::AdjustOrdering(MessagePtr message, short length) {
 #endif
 }
 
-Socket::MessagePtr DAIDE::make_message(size_t length) {
-    return Socket::MessagePtr(new char[sizeof(MessageHeader) + length]);
+MessagePtr DAIDE::make_message(size_t length) {
+    return MessagePtr(new char[sizeof(MessageHeader) + length]);
 }
 
-MessageHeader* DAIDE::get_message_header(Socket::MessagePtr message) {
+MessageHeader* DAIDE::get_message_header(MessagePtr message) {
     return (MessageHeader*) message.get();
 }

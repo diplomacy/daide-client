@@ -96,7 +96,7 @@ protected:
 
     // Handle an incoming HUH message. Default logs it
     virtual void process_huh_message(const TokenMessage &incoming_msg) {
-        log_error("HUH message received : %s", incoming_msg.get_message_as_text());
+        log_error("HUH message received : %s", incoming_msg.get_message_as_text().c_str());
     };
 
     // Handle an incoming LOD message. Default replies with REJ (LOD (...) )
@@ -153,77 +153,77 @@ protected:
 
     // Handle an incoming REJ( IAM() ) message.
     virtual void process_rej_iam_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( IAM() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( IAM() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( HLO() ) message. Default logs it
     void process_rej_hlo_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( HLO() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( HLO() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( NOW() ) message. Default logs it
     void process_rej_now_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( NOW() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( NOW() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( SCO() ) message. Default logs it
     void process_rej_sco_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( SCO() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( SCO() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( HST() ) message. Default logs it
     void process_rej_hst_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( HST() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( HST() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( SUB() ) message. Default logs it
     void process_rej_sub_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( SUB() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( SUB() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( GOF() ) message. Default logs it
     void process_rej_gof_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( GOF() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( GOF() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( ORD() ) message. Default logs it
     void process_rej_ord_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( ORD() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( ORD() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( TME() ) message. Default logs it
     void process_rej_tme_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( TME() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( TME() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( DRW() ) message. Default logs it
     void process_rej_drw_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( DRW() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( DRW() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( SND() ) message. Default logs it
     void process_rej_snd_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( SND() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( SND() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( ADM() ) message. Default logs it
     virtual void process_rej_adm_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( ADM() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( ADM() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     };
 
     // Handle an incoming REJ( MIS() ) message. Default logs it
     virtual void process_rej_mis_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( MIS() ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( MIS() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     };
 
     // Handle an incoming REJ( NOT( GOF() ) ) message. Default logs it
     void process_rej_not_gof_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( NOT( GOF() ) ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( NOT( GOF() ) ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( NOT( DRW() ) ) message. Default logs it
     void process_rej_not_drw_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
-        log_error("REJ( NOT( DRW() ) ) message received : %s", incoming_msg.get_message_as_text());
+        log_error("REJ( NOT( DRW() ) ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming YES( NME() ) message.

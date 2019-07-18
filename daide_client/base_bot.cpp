@@ -310,7 +310,7 @@ void BaseBot::process_diplomacy_message(char *message, int message_length) {
             } else if (lead_token == TOKEN_COMMAND_ADM) {
                 process_adm_message(incoming_msg);
             } else {
-                log_error("Unexpected first token in message : %s", incoming_msg.get_message_as_text());
+                log_error("Unexpected first token in message : %s", incoming_msg.get_message_as_text().c_str());
             }
 
         } else {
@@ -594,16 +594,16 @@ void BaseBot::process_thx_message(const TokenMessage &incoming_msg) {
     // Sending new order
     if ((send_new_order) && (new_order != order)) {
         log_error("THX returned %s for order '%s'. Replacing with '%s'",
-                  incoming_msg.get_submessage(2).get_message_as_text(),
-                  order.get_message_as_text(),
-                  new_order.get_message_as_text());
+                  incoming_msg.get_submessage(2).get_message_as_text().c_str(),
+                  order.get_message_as_text().c_str(),
+                  new_order.get_message_as_text().c_str());
         send_message_to_server(new_order);
 
     // Logging error if no new orders were sent
     } else if (note != TOKEN_ORDER_NOTE_MBV) {
         log_error("THX returned %s for order '%s'. No replacement order sent.",
-                  incoming_msg.get_submessage(2).get_message_as_text(),
-                  order.get_message_as_text());
+                  incoming_msg.get_submessage(2).get_message_as_text().c_str(),
+                  order.get_message_as_text().c_str());
     }
 }
 

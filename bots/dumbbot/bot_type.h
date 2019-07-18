@@ -26,7 +26,7 @@
 
 #include "dumbbot.h"
 
-using BOT_TYPE = DumbBot;
+using BOT_TYPE = DAIDE::DumbBot;
 
 #define BOT_FAMILY "DumbBot"
 #define BOT_GENERATION "8~2~b"

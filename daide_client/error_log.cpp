@@ -16,112 +16,111 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <vector>
 #include "error_log.h"
 
 // TODO - REWRITE completely
 // Avoid using variadic functions
 // Also log to file
 
-FILE *bad_log = nullptr;
-FILE *big_log = nullptr;
-bool logging_enabled = true;
+using namespace DAIDE;
 
-const char BAD_LOG_FILENAME[] = "badlog.txt";
-const char BIG_LOG_FILENAME[] = "biglog.txt";
+static FILE *bad_log = nullptr;
+static FILE *big_log = nullptr;
+static bool logging_enabled = true;
 
-void enable_logging(bool enable) { logging_enabled = enable; }
+static const char *BAD_LOG_FILENAME = "badlog.txt";
+static const char *BIG_LOG_FILENAME = "biglog.txt";
 
-FILE *open(const char *filename, const char *mode) { return fopen(filename, mode); }
+void DAIDE::enable_logging(bool enable) { logging_enabled = enable; }
 
-void log(const std::string &format, ...) {
-    va_list arg_list;
-    va_start(arg_list, format);
+FILE *DAIDE::open(const char *filename, const char *mode) { return fopen(filename, mode); }
 
-    const int size = 10000;
-    char buffer[size];
-
-#if    WINVER >= 0x0600
-    if (vsprintf_s( buffer, size, format, arg_list ) < 0) throw "Buffer ovrflow in `log`";
-#else
-    std::vsprintf(buffer, format.c_str(), arg_list); // hope `buffer` is big enough!
-#endif
-
-    if (logging_enabled) {
-        if (big_log == nullptr) {
-            big_log = open(BIG_LOG_FILENAME, "w");
-        }
-
-        if (big_log != nullptr) {
-            fprintf(big_log, "== %s\n", buffer);
-
-            fflush(big_log);
-        }
-    }
-
-    va_end(arg_list);
-}
-
-void log_error(const std::string &message) {
-    // Fix me
-}
-
-void log_error(char *format, ...) {
-    /** va_list arg_list;
-
-    va_start(arg_list, format);
-
+FILE *_get_bad_log() {
     if (bad_log == nullptr) {
         bad_log = open(BAD_LOG_FILENAME, "w");
     }
+    return bad_log;
+}
 
-    if (bad_log != nullptr) {
-        vfprintf(bad_log, format, arg_list);
-        fprintf(bad_log, "\n");
-
-        fflush(bad_log);
+FILE *_get_big_log() {
+    if (logging_enabled && big_log == nullptr) {
+        big_log = open(BIG_LOG_FILENAME, "w");
     }
+    return big_log;
+}
 
-    // Send message to normal log too, so that it appears in context.
-    const int size = 10000;
-    char buffer[size];
+void _log(FILE *file, const char *log, const std::string &prefix = "== ")
+{
+    if (file != nullptr) {
+        fprintf(file, (prefix + "%s\n").c_str(), log);
+        fflush(file);
+    }
+}
 
-#if    WINVER >= 0x0600
-    if ( vsprintf_s( buffer, size, format, arg_list ) < 0) throw "Buffer overflow in `log_error`";
-#else
-    vsprintf(buffer, format, arg_list); // hope `buffer` is big enough!
-#endif
+void DAIDE::log(const char *format, ...) {
+    // initialize use of the variable argument array
+    va_list arg_list;
+    va_start(arg_list, format);
 
-    log(buffer);
+    // reliably acquire the size from a copy of
+    // the variable argument array
+    // and a functionally reliable call
+    // to mock the formatting
+    va_list vaCopy;
+    va_copy(vaCopy, arg_list);
+    const size_t length = static_cast<size_t>(std::vsnprintf(nullptr, 0, format, vaCopy));
+    va_end(vaCopy);
 
+    // return a formatted string without
+    // risking memory mismanagement
+    // and without assuming any compiler
+    // or platform specific behavior
+    std::vector<char> buffer(length + 1);
+    std::vsnprintf(buffer.data(), buffer.size(), format, arg_list);
     va_end(arg_list);
-    */
+
+    _log(_get_big_log(), buffer.data(), "== ");
 }
 
-void log_daide_message(bool is_incoming, const DAIDE::TokenMessage &message) {
-    if (logging_enabled) {
-        if (big_log == nullptr) {
-            big_log = open(BIG_LOG_FILENAME, "w");
-        }
+void DAIDE::log_error(const char* format, ...) {
+    // initialize use of the variable argument array
+    va_list arg_list;
+    va_start(arg_list, format);
 
-        if (big_log != nullptr) {
-            if (is_incoming) {
-                fprintf(big_log, ">> ");
-            } else {
-                fprintf(big_log, "<< ");
-            }
+    // reliably acquire the size from a copy of
+    // the variable argument array
+    // and a functionally reliable call
+    // to mock the formatting
+    va_list vaCopy;
+    va_copy(vaCopy, arg_list);
+    const size_t length = static_cast<size_t>(std::vsnprintf(nullptr, 0, format, vaCopy));
+    va_end(vaCopy);
 
-            fprintf(big_log, "%s\n", message.get_message_as_text().c_str());
-            fflush(big_log);
-        }
-    }
+    // return a formatted string without
+    // risking memory mismanagement
+    // and without assuming any compiler
+    // or platform specific behavior
+    std::vector<char> buffer(length + 1);
+    std::vsnprintf(buffer.data(), buffer.size(), format, arg_list);
+    va_end(arg_list);
+
+    _log(_get_bad_log(), buffer.data(), "");
+    _log(_get_big_log(), buffer.data(), "== ");
 }
 
-void close_logs() {
+void DAIDE::log_daide_message(bool is_incoming, const DAIDE::TokenMessage &message) {
+    _log(_get_big_log(), message.get_message_as_text().c_str(), is_incoming ? ">> " : "<< ");
+}
+
+void DAIDE::close_logs() {
     if (bad_log != nullptr) {
         fclose(bad_log);
+        bad_log = nullptr;
     }
 
     if (big_log != nullptr) {
         fclose(big_log);
+        bad_log = nullptr;
     }
 }
