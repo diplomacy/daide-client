@@ -12,8 +12,8 @@
  * Release 8~2
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
 
 #include "types.h"
 #include "tokens.h"
@@ -47,16 +47,16 @@ public:
     bool get_message(Token message[], int buffer_length) const;
 
     // Get the length of the message
-    int get_message_length() const { return m_message_length; };
+    int get_message_length() const { return m_message_length; }
 
     // Find out if the message is a single token
-    bool is_single_token() const { return (m_message_length == 1); };
+    bool is_single_token() const { return (m_message_length == 1); }
 
     // Find out if the message contains submessages or just individual tokens
-    bool contains_submessages() const { return (m_message_length != m_submessage_count); };
+    bool contains_submessages() const { return (m_message_length != m_submessage_count); }
 
     // Get the first token (if a single token, it is the only one
-    Token get_token() const { return m_message[0]; };
+    Token get_token() const { return m_message[0]; }
 
     // Get a token by index
     Token get_token(int index) const;
@@ -126,4 +126,4 @@ private:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H

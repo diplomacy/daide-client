@@ -66,13 +66,13 @@ void Socket::SendData() {
             OutgoingMessage = OutgoingMessageQueue.front(); // next message to send
             OutgoingMessageQueue.pop();
             OutgoingNext = 0;
-            short length = ((MessageHeader*) OutgoingMessage.get())->length;
+            short length = reinterpret_cast<MessageHeader*>(OutgoingMessage.get())->length;
             AdjustOrdering(OutgoingMessage, length);
-            OutgoingLength = sizeof(MessageHeader) + length;
+            OutgoingLength = sizeof(MessageHeader) + static_cast<size_t>(length);
         }
 
         // # bytes sent, or SOCKET_ERROR
-        int sent = send(MySocket, OutgoingMessage.get() + OutgoingNext, OutgoingLength - OutgoingNext, 0);
+        ssize_t sent = send(MySocket, OutgoingMessage.get() + OutgoingNext, OutgoingLength - OutgoingNext, 0);
 
         if (sent == SOCKET_ERROR) {
             int error = WSAGetLastError();
@@ -80,10 +80,9 @@ void Socket::SendData() {
             DAIDE::the_bot.stop();
             return;
         }
-        OutgoingNext += sent;
+        OutgoingNext += static_cast<size_t>(sent);
         if (OutgoingNext < OutgoingLength) return; // current message not fully sent
         OutgoingMessage.reset();
-        OutgoingMessage = 0;
     }
 }
 
@@ -91,10 +90,10 @@ void Socket::ReceiveData() {
     // Receive all data available from socket.
     ASSERT(Connected);
 
-    const int bufferLength = 1024; // arbitrary
+    const size_t bufferLength = 1024; // arbitrary
     char buffer[bufferLength];
-    int bufferNext = 0; // index of next byte in `buffer`
-    int received = recv(MySocket, buffer, bufferLength, 0);
+    size_t bufferNext = 0; // index of next byte in `buffer`
+    ssize_t received = recv(MySocket, buffer, bufferLength, 0);
 
     if (!received) {
         log_error("Failure: closed socket during read from Server");
@@ -109,7 +108,7 @@ void Socket::ReceiveData() {
     }
     for (;;) { // while incoming data available
         // max # bytes that may be read into current message
-        int count = std::min(IncomingLength - IncomingNext, received - bufferNext);
+        size_t count = std::min(IncomingLength - IncomingNext, static_cast<size_t>(received) - bufferNext);
         if (!count) return; // no more data available
 
         // copy `count` bytes from `buffer` to IncomingMessage
@@ -120,9 +119,9 @@ void Socket::ReceiveData() {
         bufferNext += count;
 
         if (IncomingNext == sizeof(MessageHeader)) { // just completed reading Header; length now known
-            short length = ((MessageHeader*) (IncomingMessage.get()))->length; // length of body
+            short length = reinterpret_cast<MessageHeader*>(IncomingMessage.get())->length; // length of body
             AdjustOrdering(length);
-            IncomingLength = sizeof(MessageHeader) + length; // full message length
+            IncomingLength = sizeof(MessageHeader) + static_cast<size_t>(length); // full message length
             IncomingMessage.reset(new char[IncomingLength]); // space for full message
 
             // Copy Header to full IncomingMessage
@@ -135,7 +134,7 @@ void Socket::ReceiveData() {
         }
 
         if (IncomingNext >= IncomingLength) { // current incoming message is complete
-            AdjustOrdering(IncomingMessage, IncomingLength - sizeof(MessageHeader));
+            AdjustOrdering(IncomingMessage, static_cast<short>(IncomingLength - sizeof(MessageHeader)));
             PushIncomingMessage(IncomingMessage);
 
             // Make IncomingMessage use Header, pending known length of next full message.
@@ -165,8 +164,6 @@ void Socket::Close()
 
 bool Socket::Connect(const std::string& address, int port) {
     // Initiate asynchronous connection of socket to `address` and `port`; return true iff OK.
-    int err;
-
     MySocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (MySocket < 0) {
         log_error("Failure %d during socket", WSAGetLastError());
@@ -180,7 +177,7 @@ bool Socket::Connect(const std::string& address, int port) {
     }
 
     BOOL val = true;
-    if (setsockopt(MySocket, SOL_SOCKET, SO_KEEPALIVE, (const char *) &val, sizeof(BOOL))) {
+    if (setsockopt(MySocket, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<const char *>(&val), sizeof(BOOL))) {
         log_error("Failure %d during setsockopt", WSAGetLastError());
         return false;
     }
@@ -190,7 +187,7 @@ bool Socket::Connect(const std::string& address, int port) {
     // else needs separate thread!
     sockaddr* saPtr;
     struct sockaddr_in sa;
-    int saLen;
+    socklen_t saLen;
 
     sa.sin_family = AF_INET;
     sa.sin_port = htons(port);
@@ -201,8 +198,8 @@ bool Socket::Connect(const std::string& address, int port) {
         return false;
     }
 
-    saPtr = (sockaddr*) &sa;
-    saLen = sizeof sa;
+    saPtr = reinterpret_cast<sockaddr*>(&sa);
+    saLen = sizeof(sa);
 
     // Connect to server.
     if (connect(MySocket, saPtr, saLen)) {
@@ -215,7 +212,7 @@ bool Socket::Connect(const std::string& address, int port) {
     IncomingMessage = HeaderDataPtr;
     IncomingNext = 0;
     IncomingLength = sizeof(MessageHeader);
-    OutgoingMessage = 0;
+    OutgoingMessage.reset();
 
     InsertSocket();
 
@@ -252,7 +249,7 @@ Socket** Socket::FindSocket(int socket) {
         s = &SocketTab[i];
         if ((*s)->MySocket == socket) return s;
     }
-    return 0;
+    return nullptr;
 }
 
 void Socket::AdjustOrdering(short &x) {
@@ -261,7 +258,7 @@ void Socket::AdjustOrdering(short &x) {
 #if LITTLE_ENDIAN
     ASSERT(htons(1) != 1);
 
-    x = (x << 8) | (((unsigned short) x) >> 8);
+    x = static_cast<short>((x << 8) | (static_cast<unsigned short>(x) >> 8));
 #else
     ASSERT(htons(1) == 1);
 #endif
@@ -276,7 +273,7 @@ void Socket::AdjustOrdering(MessagePtr message, short length) {
     MessageHeader* message_header = get_message_header(message);
     short* message_content = get_message_content<short>(message);
     AdjustOrdering(message_header->length);
-    for (int i = (int)(length / sizeof(short)); i > 0; i--)
+    for (short i = length / static_cast<short>(sizeof(short)); i > 0; i--)
         AdjustOrdering(message_content[i]);
 #endif
 }
@@ -286,5 +283,5 @@ MessagePtr DAIDE::make_message(size_t length) {
 }
 
 MessageHeader* DAIDE::get_message_header(MessagePtr message) {
-    return (MessageHeader*) message.get();
+    return reinterpret_cast<MessageHeader*>(message.get());
 }

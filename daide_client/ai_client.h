@@ -4,8 +4,8 @@
 
 // Release 8~2~b
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
 
 #include "bot_type.h"
 
@@ -15,4 +15,4 @@ extern BOT_TYPE the_bot;
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H

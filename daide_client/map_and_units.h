@@ -12,8 +12,8 @@
  * Release 8~2
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
 
 #include "types.h"
 #include "tokens.h"
@@ -271,7 +271,7 @@ public:
 
     bool set_move_by_single_step_convoy_order(PROVINCE_INDEX unit, PROVINCE_INDEX destination, PROVINCE_INDEX step) {
         return set_move_by_convoy_order(unit, destination, 1, &step);
-    };
+    }
 
     bool set_disband_order(PROVINCE_INDEX unit);
 
@@ -281,13 +281,13 @@ public:
 
     bool set_remove_order(PROVINCE_INDEX unit);
 
-    void set_waive_order() { our_winter_orders.number_of_waives++; };
+    void set_waive_order() { our_winter_orders.number_of_waives++; }
 
     void set_multiple_waive_orders(int waives) {
         our_winter_orders.number_of_waives = our_winter_orders.number_of_waives + waives;
-    };
+    }
 
-    void set_total_number_of_waive_orders(int waives) { our_winter_orders.number_of_waives = waives; };
+    void set_total_number_of_waive_orders(int waives) { our_winter_orders.number_of_waives = waives; }
 
     // Accept a complete set of orders for a power as a single TokenMessage
     int process_orders(const TokenMessage &sub_message, POWER_INDEX power_index, Token *order_result);
@@ -295,7 +295,7 @@ public:
     // Cancel adjustment orders
     bool cancel_build_order(PROVINCE_INDEX location);
 
-    bool cancel_remove_order(PROVINCE_INDEX location) { return cancel_build_order(location); };
+    bool cancel_remove_order(PROVINCE_INDEX location) { return cancel_build_order(location); }
 
     bool unorder_adjustment(const TokenMessage &not_sub_message, int power_index);
 
@@ -556,4 +556,4 @@ private:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H

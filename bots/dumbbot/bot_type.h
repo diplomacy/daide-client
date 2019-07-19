@@ -21,8 +21,8 @@
  * Change the #define BOT_GENERATION to specify the generation (base version) of your Bot. *
  *******************************************************************************************/
 
-#ifndef _DAIDE_CLIENT_BOTS_DUMBBOT_BOT_TYPE_H
-#define _DAIDE_CLIENT_BOTS_DUMBBOT_BOT_TYPE_H
+#ifndef DAIDE_CLIENT_BOTS_DUMBBOT_BOT_TYPE_H
+#define DAIDE_CLIENT_BOTS_DUMBBOT_BOT_TYPE_H
 
 #include "dumbbot.h"
 
@@ -31,4 +31,4 @@ using BOT_TYPE = DAIDE::DumbBot;
 #define BOT_FAMILY "DumbBot"
 #define BOT_GENERATION "8~2~b"
 
-#endif // _DAIDE_CLIENT_BOTS_DUMBBOT_BOT_TYPE_H
+#endif // DAIDE_CLIENT_BOTS_DUMBBOT_BOT_TYPE_H

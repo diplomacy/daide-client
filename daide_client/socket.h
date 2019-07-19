@@ -6,8 +6,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
 
 #include <queue>
 
@@ -32,6 +32,9 @@ public:
     using MessagePtr = std::shared_ptr<char>;
 
 private:
+    Socket(const Socket&) = delete;
+    Socket& operator=(const Socket&) = delete;
+
     using MessageQueue = std::queue<MessagePtr>;
 
     SOCKET MySocket;
@@ -44,10 +47,10 @@ private:
     MessagePtr IncomingMessage {nullptr};               // current incoming message; points to Header until length read;
                                                         // else a full, but incomplete, message
     MessagePtr OutgoingMessage {nullptr};               // current outgoing message, when partially sent; else 0
-    int IncomingNext;                                   // index of start of next incoming message in buffer
-    int OutgoingNext;                                   // index of start of next outgoingmessage in buffer
-    int IncomingLength;                                 // whole length of current incoming message, including header
-    int OutgoingLength;                                 // whole length of current outgoing message, including header
+    size_t IncomingNext;                                // index of start of next incoming message in buffer
+    size_t OutgoingNext;                                // index of start of next outgoingmessage in buffer
+    size_t IncomingLength;                              // whole length of current incoming message, including header
+    size_t OutgoingLength;                              // whole length of current outgoing message, including header
     const MessagePtr HeaderDataPtr;
     MessageHeader* const Header;                        // buffer for header of current incoming message
                                                         // pending new IncomingMessage, when length is known
@@ -66,7 +69,7 @@ public:
         IncomingMessage(nullptr),
         OutgoingMessage(nullptr),
         HeaderDataPtr(new char[sizeof(MessageHeader)]),
-        Header((MessageHeader*)HeaderDataPtr.get()) {}
+        Header(reinterpret_cast<MessageHeader*>(HeaderDataPtr.get())) {}
 
     virtual ~Socket();
 
@@ -95,11 +98,11 @@ MessageHeader* get_message_header(Socket::MessagePtr message);
 
 template <typename T>
 T* get_message_content(Socket::MessagePtr message) {
-    return (T*) message.get() + sizeof(MessageHeader);
+    return reinterpret_cast<T*>(message.get() + sizeof(MessageHeader));
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H

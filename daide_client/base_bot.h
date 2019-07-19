@@ -14,8 +14,8 @@
  * Release 8~2~b
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
 
 #include "ai_client_types.h"
 #include "token_message.h"
@@ -39,16 +39,17 @@ class MapAndUnits;            // The map and units class
 // BaseBot : The base class for all Bots
 
 class BaseBot {
+    BaseBot(const BaseBot &other) = delete;                 // Copy constructor
+    BaseBot(BaseBot &&rhs) = delete;                        // Move constructor
+
+    BaseBot& operator=(const BaseBot &other) = delete;      // Copy Assignment
+    BaseBot& operator=(BaseBot &&rhs) = delete;             // Move Assignment
+
 public:
     Socket m_socket;
 
     BaseBot();
-    BaseBot(const BaseBot &other) = default;                // Copy constructor
-    BaseBot(BaseBot &&rhs) = default;                       // Move constructor
     virtual ~BaseBot();
-
-    BaseBot& operator=(const BaseBot &other) = default;     // Copy Assignment
-    BaseBot& operator=(BaseBot &&rhs) = default;            // Move Assignment
 
     // Initialize the AI. May be overridden, but should call the base class version at the top of the derived version
     // if it is
@@ -86,10 +87,10 @@ protected:
     virtual void send_nme_or_obs();
 
     // Handle an incoming CCD message - Ignored by default
-    virtual void process_ccd_message(const TokenMessage &incoming_msg, bool is_new_disconnection) {};
+    virtual void process_ccd_message(const TokenMessage &/*incoming_msg*/, bool /*is_new_disconnection*/) {}
 
     // Handle an incoming DRW message. Default sets the game to over
-    virtual void process_drw_message(const TokenMessage & /*incoming_msg*/) { m_map_and_units->game_over = true; };
+    virtual void process_drw_message(const TokenMessage &/*incoming_msg*/) { m_map_and_units->game_over = true; }
 
     // Handle an incoming FRM message. Default version replies with HUH( message ). TRY().
     virtual void process_frm_message(const TokenMessage &incoming_msg);
@@ -97,21 +98,21 @@ protected:
     // Handle an incoming HUH message. Default logs it
     virtual void process_huh_message(const TokenMessage &incoming_msg) {
         log_error("HUH message received : %s", incoming_msg.get_message_as_text().c_str());
-    };
+    }
 
     // Handle an incoming LOD message. Default replies with REJ (LOD (...) )
     virtual void process_lod_message(const TokenMessage &incoming_msg) {
         send_message_to_server(TOKEN_COMMAND_REJ & incoming_msg);
-    };
+    }
 
     // Handle an incoming MIS message.
-    virtual void process_mis_message(const TokenMessage &incoming_msg) {};
+    virtual void process_mis_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming OFF message. Default disconnects from server and exits
-    virtual void process_off_message(const TokenMessage & /*incoming_msg*/) { disconnect_from_server(); };
+    virtual void process_off_message(const TokenMessage &/*incoming_msg*/) { disconnect_from_server(); }
 
     // Handle an incoming OUT message.
-    virtual void process_out_message(const TokenMessage &incoming_msg) {};
+    virtual void process_out_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming PRN message. Default logs it
     virtual void process_prn_message(const Token *incoming_msg, int /*message_length*/) {
@@ -120,29 +121,29 @@ protected:
     }
 
     // Handle an incoming SMR message.
-    virtual void process_smr_message(const TokenMessage &incoming_msg) {};
+    virtual void process_smr_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming SVE message. Default replies with YES (SVE( ... ) )
     virtual void process_sve_message(const TokenMessage &incoming_msg) {
         send_message_to_server(TOKEN_COMMAND_YES & incoming_msg);
-    };
+    }
 
     // Handle an incoming THX message. Default supplies a simple replacement order if not MBV.
     virtual void process_thx_message(const TokenMessage &incoming_msg);
 
     // Handle an incoming TME message.
-    virtual void process_tme_message(const TokenMessage &incoming_msg) {};
+    virtual void process_tme_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming ADM message.
-    virtual void process_adm_message(const TokenMessage &incoming_msg) {};
+    virtual void process_adm_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming NOT( CCD() ) message.
-    virtual void process_not_ccd_message(const TokenMessage &incoming_msg,
-                                         const TokenMessage &msg_params,
-                                         bool is_new_reconnection) {};
+    virtual void process_not_ccd_message(const TokenMessage &/*incoming_msg*/,
+                                         const TokenMessage &/*msg_params*/,
+                                         bool /*is_new_reconnection*/) {}
 
     // Handle an incoming NOT( TME() ) message.
-    virtual void process_not_tme_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_not_tme_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming REJ( NME() ) message.
     virtual void process_rej_nme_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params);
@@ -152,155 +153,155 @@ protected:
     virtual bool get_reconnect_details(Token &power, int &passcode);
 
     // Handle an incoming REJ( IAM() ) message.
-    virtual void process_rej_iam_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    virtual void process_rej_iam_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( IAM() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( HLO() ) message. Default logs it
-    void process_rej_hlo_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_hlo_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( HLO() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( NOW() ) message. Default logs it
-    void process_rej_now_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_now_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( NOW() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( SCO() ) message. Default logs it
-    void process_rej_sco_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_sco_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( SCO() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( HST() ) message. Default logs it
-    void process_rej_hst_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_hst_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( HST() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( SUB() ) message. Default logs it
-    void process_rej_sub_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_sub_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( SUB() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( GOF() ) message. Default logs it
-    void process_rej_gof_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_gof_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( GOF() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( ORD() ) message. Default logs it
-    void process_rej_ord_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_ord_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( ORD() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( TME() ) message. Default logs it
-    void process_rej_tme_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_tme_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( TME() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( DRW() ) message. Default logs it
-    void process_rej_drw_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_drw_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( DRW() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( SND() ) message. Default logs it
-    void process_rej_snd_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_snd_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( SND() ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( ADM() ) message. Default logs it
-    virtual void process_rej_adm_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    virtual void process_rej_adm_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( ADM() ) message received : %s", incoming_msg.get_message_as_text().c_str());
-    };
+    }
 
     // Handle an incoming REJ( MIS() ) message. Default logs it
-    virtual void process_rej_mis_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    virtual void process_rej_mis_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( MIS() ) message received : %s", incoming_msg.get_message_as_text().c_str());
-    };
+    }
 
     // Handle an incoming REJ( NOT( GOF() ) ) message. Default logs it
-    void process_rej_not_gof_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_not_gof_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( NOT( GOF() ) ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming REJ( NOT( DRW() ) ) message. Default logs it
-    void process_rej_not_drw_message(const TokenMessage &incoming_msg, const TokenMessage & /*msg_params*/) {
+    void process_rej_not_drw_message(const TokenMessage &incoming_msg, const TokenMessage &/*msg_params*/) {
         log_error("REJ( NOT( DRW() ) ) message received : %s", incoming_msg.get_message_as_text().c_str());
     }
 
     // Handle an incoming YES( NME() ) message.
-    virtual void process_yes_nme_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_nme_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( OBS() ) message.
-    virtual void process_yes_obs_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_obs_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( IAM() ) message.
-    virtual void process_yes_iam_message(const TokenMessage & /*incoming_msg*/, const TokenMessage & /*msg_params*/) {
+    virtual void process_yes_iam_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {
         request_map();
     }
 
     // Handle an incoming YES( GOF() ) message.
-    virtual void process_yes_gof_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_gof_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( TME() ) message.
-    virtual void process_yes_tme_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_tme_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( DRW() ) message.
-    virtual void process_yes_drw_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_drw_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( SND() ) message.
-    virtual void process_yes_snd_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_snd_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( NOT( GOF() ) ) message.
-    virtual void process_yes_not_gof_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_not_gof_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( NOT( DRW() ) ) message.
-    virtual void process_yes_not_drw_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_not_drw_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming YES( NOT( SUB() ) ) message.
-    virtual void process_yes_not_sub_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params) {};
+    virtual void process_yes_not_sub_message(const TokenMessage &/*incoming_msg*/, const TokenMessage &/*msg_params*/) {}
 
     // Handle an incoming NOT message with a parameter we don't expect
-    virtual void process_unexpected_not_message(const TokenMessage &incoming_msg) {};
+    virtual void process_unexpected_not_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming REJ message with a parameter we don't expect
-    virtual void process_unexpected_rej_message(const TokenMessage &incoming_msg) {};
+    virtual void process_unexpected_rej_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming REJ( NOT( ) ) message with a parameter we don't expect
-    virtual void process_unexpected_rej_not_message(const TokenMessage &incoming_msg) {};
+    virtual void process_unexpected_rej_not_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming YES message with a parameter we don't expect
-    virtual void process_unexpected_yes_message(const TokenMessage &incoming_msg) {};
+    virtual void process_unexpected_yes_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming YES( NOT() ) message with a parameter we don't expect
-    virtual void process_unexpected_yes_not_message(const TokenMessage &incoming_msg) {};
+    virtual void process_unexpected_yes_not_message(const TokenMessage &/*incoming_msg*/) {}
 
     // The following have a default implementation which does nothing. However, before it is called,
     // a pre-processor does some work to update the internal information ready for the user.
 
     // Process a HLO message. Power played has already been stored.
-    virtual void process_hlo_message(const TokenMessage &incoming_msg) {};
+    virtual void process_hlo_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Process a MAP message. Map name has already been stored, and an MDF sent to the server.
-    virtual void process_map_message(const TokenMessage &incoming_msg) {};
+    virtual void process_map_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Process a MDF message. Map Definition has already been stored.
-    virtual void process_mdf_message(const TokenMessage &incoming_msg) {};
+    virtual void process_mdf_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Process an ORD message. Results have already been stored.
-    virtual void process_ord_message(const TokenMessage &incoming_msg) {};
+    virtual void process_ord_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Process an SCO message. Supply Centre Ownership has already been stored.
-    virtual void process_sco_message(const TokenMessage &incoming_msg) {};
+    virtual void process_sco_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Process a NOW message. Position has already been stored.
-    virtual void process_now_message(const TokenMessage &incoming_msg) {};
+    virtual void process_now_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Handle an incoming SLO message. Game has already been set to over
-    virtual void process_slo_message(const TokenMessage &incoming_msg) {};
+    virtual void process_slo_message(const TokenMessage &/*incoming_msg*/) {}
 
     // Inform the AI that the press send has failed
-    virtual void report_failed_press(bool is_broadcast,
-                                     const TokenMessage &receiving_powers,
-                                     const TokenMessage &press_message) {};
+    virtual void report_failed_press(bool /*is_broadcast*/,
+                                     const TokenMessage &/*receiving_powers*/,
+                                     const TokenMessage &/*press_message*/) {}
 
     // Send press to the server, and add it to the sent press map
     void send_press_to_server(const TokenMessage &press_to, const TokenMessage &press_message, bool resend_partial);
@@ -357,7 +358,7 @@ private:
     void process_slo(const TokenMessage &incoming_msg) {
         m_map_and_units->game_over = true;
         process_slo_message(incoming_msg);
-    };
+    }
 
     void process_ccd(const TokenMessage &incoming_msg);
 
@@ -396,4 +397,4 @@ public:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H

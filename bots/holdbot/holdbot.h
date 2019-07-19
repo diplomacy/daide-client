@@ -14,24 +14,25 @@
  * Release 8~2~b
  **/
 
-#ifndef _DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
-#define _DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
+#ifndef DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
+#define DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
 
 #include "daide_client/base_bot.h"
 
 class HoldBot : public DAIDE::BaseBot {
+    HoldBot(const HoldBot &other) = delete;                 // Copy constructor
+    HoldBot(HoldBot &&rhs) = delete;                        // Move constructor
+
+    HoldBot& operator=(const HoldBot &other) = delete;      // Copy Assignment
+    HoldBot& operator=(HoldBot &&rhs) = delete;             // Move Assignment
+
 public:
     HoldBot() = default;
-    HoldBot(const HoldBot &other) = default;                // Copy constructor
-    HoldBot(HoldBot &&rhs) = default;                       // Move constructor
     ~HoldBot() override = default;
-
-    HoldBot& operator=(const HoldBot &other) = default;     // Copy Assignment
-    HoldBot& operator=(HoldBot &&rhs) = default;            // Move Assignment
 
     void send_nme_or_obs() override;
 
     void process_now_message(const DAIDE::TokenMessage &incoming_msg) override;
 };
 
-#endif // _DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
+#endif // DAIDE_CLIENT_BOTS_HOLDBOT_HOLDBOT_H
