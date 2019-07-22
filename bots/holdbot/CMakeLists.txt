@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.14)
-project(daide_client)
+project(hold_bot)
 
 set(CMAKE_CXX_STANDARD 14)
-set(SRC_DIR .)
+set(SRC_DIR ../..)
 
+include_directories(.)
 include_directories(bots/basebot)
 include_directories(${SRC_DIR})
 
-add_executable(daide_client
+add_executable(hold_bot
+    holdbot.cpp
 
     ${SRC_DIR}/daide_client/main.cpp
     ${SRC_DIR}/daide_client/adjudicator.cpp

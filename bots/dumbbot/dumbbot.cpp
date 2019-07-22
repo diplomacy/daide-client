@@ -6,7 +6,7 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
@@ -39,7 +39,7 @@ constexpr DumbBot::WEIGHTING DumbBot::m_remove_proximity_weight[PROXIMITY_DEPTH]
  * second stage, it works out an order for each unit, based on those values.
  *
  * For each province, it calculates the following :
- * 
+ *
  * - If it is our supply centre, the size of the largest adjacent power
  * - If it is not our supply centre, the size of the owning power
  * - If it is not a supply centre, zero.
