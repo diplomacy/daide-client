@@ -60,8 +60,6 @@ private:
 
     void RemoveSocket();
 
-    void Start();
-
     void PushIncomingMessage(MessagePtr message);
 
 public:
@@ -74,6 +72,8 @@ public:
     virtual ~Socket();
 
     virtual bool Connect(const std::string& address, int port);
+
+    void Start();
 
     void Close();
 
@@ -92,7 +92,7 @@ public:
     static void AdjustOrdering(MessagePtr message, int16_t length);
 };
 
-Socket::MessagePtr make_message(size_t length);
+Socket::MessagePtr make_message(int length);
 
 MessageHeader* get_message_header(Socket::MessagePtr message);
 

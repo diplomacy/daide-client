@@ -45,13 +45,12 @@ bool BaseBot::is_active() const
 
 bool BaseBot::initialize(const std::string &command_line_a) {
     COMMAND_LINE_PARAMETERS parameters {};
-    const int MAX_COMPUTER_NAME_LEN = 1000;         // Max length of a computer name
     const uint16_t DEFAULT_PORT_NUMBER = 16713;     // Default port number to connect on
 
     m_socket.Close();
 
     // Extract the parameters
-    srand((int) time(nullptr));                     // init random number generator
+    srand(static_cast<uint>(time(nullptr)));        // init random number generator
     extract_parameters(command_line_a, parameters);
 
     // Store the command line parameters
@@ -68,7 +67,7 @@ bool BaseBot::initialize(const std::string &command_line_a) {
     enable_logging(parameters.log_level > 0);
 
     // Start the TCP/IP
-    if (!parameters.name_specified) {
+    if (!parameters.name_specified && !parameters.ip_specified) {
         parameters.server_name = "localhost";
     }
     if (!parameters.port_specified) {
@@ -80,6 +79,8 @@ bool BaseBot::initialize(const std::string &command_line_a) {
         log_error("Failed to connect to server");
         return false;
     }
+
+    m_socket.Start();
 
     m_is_active = true;
 
@@ -107,8 +108,8 @@ void BaseBot::send_initial_message_to_server() {
     // Set message header
     tcp_message_header->type = DCSP_MSG_TYPE_IM;
     tcp_message_header->length = 4;
-    tcp_message_content[0] = (short) 1; // version;
-    tcp_message_content[1] = (short) 0xDA10; // magic number
+    tcp_message_content[0] = static_cast<short>(1); // version;
+    tcp_message_content[1] = static_cast<short>(0xDA10); // magic number
 
     // Send message
     m_socket.PushOutgoingMessage(tcp_message);
@@ -132,7 +133,7 @@ void BaseBot::send_message_to_server(const TokenMessage &message) {
 
     // Set message header
     tcp_message_header->type = DCSP_MSG_TYPE_DM;
-    tcp_message_header->length = message_length * 2;
+    tcp_message_header->length = static_cast<int16_t>(message_length * 2);
 
     // Send message
     message.get_message(tcp_message_content, message_length + 1);
@@ -359,8 +360,8 @@ void BaseBot::process_map(const TokenMessage &incoming_msg) {
 }
 
 void BaseBot::remove_quotes(std::string &message_string) {
-    int start_quote_locn {0};
-    int end_quote_locn {0};
+    size_t start_quote_locn {0};
+    size_t end_quote_locn {0};
 
     start_quote_locn = message_string.find('\'');
     end_quote_locn = message_string.find_last_of('\'');
@@ -660,9 +661,9 @@ void BaseBot::send_broadcast_to_server(const TokenMessage &broadcast_message) {
 
     for (int power_ctr = 0; power_ctr < m_map_and_units->number_of_powers; power_ctr++) {
         if ((m_map_and_units->power_played.get_subtoken() != power_ctr)
-                && (m_cd_powers.find(Token(CATEGORY_POWER, power_ctr)) == m_cd_powers.end())) {
+            && (m_cd_powers.find(Token(CATEGORY_POWER, static_cast<BYTE>(power_ctr))) == m_cd_powers.end())) {
 
-            receiving_powers = receiving_powers + Token(CATEGORY_POWER, power_ctr);
+            receiving_powers = receiving_powers + Token(CATEGORY_POWER, static_cast<BYTE>(power_ctr));
         }
     }
 
@@ -790,9 +791,9 @@ void BaseBot::remove_sent_press(const TokenMessage &send_message) {
 
 bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE_PARAMETERS &parameters) {
     bool extracted_ok {true};               // Whether the parameters were OK
-    int search_start {0};                   // Position to start searching command line
-    int param_start {0};                    // Start of the next parameter
-    int param_end {0};                      // End of the next parameter
+    size_t search_start {0};                // Position to start searching command line
+    size_t param_start {0};                 // Start of the next parameter
+    size_t param_end {0};                   // End of the next parameter
     char param_token {};                    // The token specifying the parameter type
     std::string parameter;                  // The parameter
 
@@ -848,7 +849,7 @@ bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE
 
             case 'p':
                 parameters.port_specified = true;
-                parameters.port_number = stoi(parameter);
+                parameters.port_number = static_cast<uint16_t>(stoi(parameter));
                 break;
 
             case 'l':
@@ -860,7 +861,7 @@ bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE
                 if (parameter[3] == ':') {
                     parameters.reconnection_specified = true;
                     parameters.reconnect_power = parameter.substr(0, 3);
-                    for (auto &c : parameters.reconnect_power) { c = toupper(c); }
+                    for (auto &c : parameters.reconnect_power) { c = static_cast<char>(toupper(c)); }
                     parameters.reconnect_passcode = stoi(parameter.substr(4));
                 } else {
                     std::cout << "-r should be followed by 'POW:passcode'\nPOW should be three characters" << std::endl;
@@ -883,7 +884,7 @@ bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE
     return extracted_ok;
 }
 
-void BaseBot::OnSocketMessage() {
+bool BaseBot::OnSocketMessage() {
     // Process a DAIDE event: there are 1 or more unprocessed incoming DAIDE messages, in order of arrival.
     // Ensure all are processed, in order.
     // Assumes messages were queued in the same thread.
@@ -893,7 +894,11 @@ void BaseBot::OnSocketMessage() {
     // (More responsive than processing all such messages at once, without first checking for more urgent events.)
     Socket::MessagePtr incomingMessage = m_socket.PullIncomingMessage();
 
-    process_message(incomingMessage);
+    if (incomingMessage) {
+        process_message(incomingMessage);
+    }
+
+    return incomingMessage != nullptr;
 }
 
 void BaseBot::stop() {

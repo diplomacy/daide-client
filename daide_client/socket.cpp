@@ -66,7 +66,7 @@ void Socket::SendData() {
             OutgoingMessage = OutgoingMessageQueue.front(); // next message to send
             OutgoingMessageQueue.pop();
             OutgoingNext = 0;
-            short length = reinterpret_cast<MessageHeader*>(OutgoingMessage.get())->length;
+            short length = get_message_header(OutgoingMessage)->length;
             AdjustOrdering(OutgoingMessage, length);
             OutgoingLength = sizeof(MessageHeader) + static_cast<size_t>(length);
         }
@@ -119,13 +119,15 @@ void Socket::ReceiveData() {
         bufferNext += count;
 
         if (IncomingNext == sizeof(MessageHeader)) { // just completed reading Header; length now known
-            short length = reinterpret_cast<MessageHeader*>(IncomingMessage.get())->length; // length of body
+            MessageHeader* message_header = get_message_header(IncomingMessage);
+            short length = message_header->length; // length of body
             AdjustOrdering(length);
+
+            IncomingMessage = make_message(length);
             IncomingLength = sizeof(MessageHeader) + static_cast<size_t>(length); // full message length
-            IncomingMessage.reset(new char[IncomingLength]); // space for full message
 
             // Copy Header to full IncomingMessage
-            MessageHeader* message_header = get_message_header(IncomingMessage);
+            message_header = get_message_header(IncomingMessage);
             message_header->type = Header->type;
             message_header->pad = Header->pad;
             message_header->length = Header->length;
@@ -166,19 +168,22 @@ bool Socket::Connect(const std::string& address, int port) {
     // Initiate asynchronous connection of socket to `address` and `port`; return true iff OK.
     MySocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (MySocket < 0) {
-        log_error("Failure %d during socket", WSAGetLastError());
+        int error = WSAGetLastError();
+        log_error("Failure %d during socket: %s", error, strerror(error));
         return false;
     }
 
-    unsigned long mode = 1; // non-blocking
-    if (ioctlsocket(MySocket, FIONBIO, &mode)) {
-        log_error("Failure %d during ioctlsocket", WSAGetLastError());
-        return false;
-    }
+//    unsigned long mode = 1; // non-blocking
+//    if (ioctlsocket(MySocket, FIONBIO, &mode)) {
+//        int error = WSAGetLastError();
+//        log_error("Failure %d during ioctlsocket: %s", error, strerror(error));
+//        return false;
+//    }
 
-    BOOL val = true;
-    if (setsockopt(MySocket, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<const char *>(&val), sizeof(BOOL))) {
-        log_error("Failure %d during setsockopt", WSAGetLastError());
+    int val = true;
+    if (setsockopt(MySocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val))) {
+        int error = WSAGetLastError();
+        log_error("Failure %d during setsockopt: %s", error, strerror(error));
         return false;
     }
 
@@ -203,7 +208,8 @@ bool Socket::Connect(const std::string& address, int port) {
 
     // Connect to server.
     if (connect(MySocket, saPtr, saLen)) {
-        log_error("Failure %d during Connect", WSAGetLastError());
+        int error = WSAGetLastError();
+        log_error("Failure %d during Connect: %s", error, strerror(error));
         Close();
         return false;
     }
@@ -233,11 +239,15 @@ void Socket::PushOutgoingMessage(MessagePtr message) {
 Socket::MessagePtr Socket::PullIncomingMessage() {
     // Pull next message from front of IncomingMessageQueue. Post a new message event if more messages remain on queue.
 
-    ASSERT(!IncomingMessageQueue.empty());
+//    ASSERT(!IncomingMessageQueue.empty());
 
-    MessagePtr incomingMessage = IncomingMessageQueue.front(); // message to be processed
-    IncomingMessageQueue.pop(); // remove it
-    // trigger recall if more messages remain
+    MessagePtr incomingMessage = nullptr;
+
+    if (!IncomingMessageQueue.empty()) {
+        incomingMessage = IncomingMessageQueue.front(); // message to be processed
+        IncomingMessageQueue.pop(); // remove it
+        // trigger recall if more messages remain
+    }
 
     return incomingMessage;
 }
@@ -258,7 +268,7 @@ void Socket::AdjustOrdering(short &x) {
 #if LITTLE_ENDIAN
     ASSERT(htons(1) != 1);
 
-    x = static_cast<short>((x << 8) | (static_cast<unsigned short>(x) >> 8));
+    x = static_cast<short>((x << 8) | (static_cast<uint16_t>(x) >> 8));
 #else
     ASSERT(htons(1) == 1);
 #endif
@@ -273,13 +283,17 @@ void Socket::AdjustOrdering(MessagePtr message, short length) {
     MessageHeader* message_header = get_message_header(message);
     short* message_content = get_message_content<short>(message);
     AdjustOrdering(message_header->length);
-    for (short i = length / static_cast<short>(sizeof(short)); i > 0; i--)
+    for (int i = length / static_cast<short>(sizeof(short)) - 1; i >= 0; i--) {
         AdjustOrdering(message_content[i]);
+    }
 #endif
 }
 
-MessagePtr DAIDE::make_message(size_t length) {
-    return MessagePtr(new char[sizeof(MessageHeader) + length]);
+MessagePtr DAIDE::make_message(int length) {
+    MessagePtr message = MessagePtr(new char[sizeof(MessageHeader) + static_cast<size_t>(length)]);
+    MessageHeader* header = get_message_header(message);
+    header->length = static_cast<short>(length);
+    return message;
 }
 
 MessageHeader* DAIDE::get_message_header(MessagePtr message) {

@@ -6,7 +6,7 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
@@ -125,7 +125,7 @@ protected:
 
     // Handle an incoming SVE message. Default replies with YES (SVE( ... ) )
     virtual void process_sve_message(const TokenMessage &incoming_msg) {
-        send_message_to_server(TOKEN_COMMAND_YES & incoming_msg);
+        send_message_to_server(TOKEN_COMMAND_YES &incoming_msg);
     }
 
     // Handle an incoming THX message. Default supplies a simple replacement order if not MBV.
@@ -390,7 +390,7 @@ private:
     bool extract_parameters(const std::string &command_line_a, COMMAND_LINE_PARAMETERS &parameters);
 
 public:
-    void OnSocketMessage();
+    bool OnSocketMessage();
 
     void stop();
 };
