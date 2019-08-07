@@ -150,9 +150,15 @@ void BaseBot::send_name_and_version_to_server(const std::string &name, const std
     TokenMessage name_message {};
     TokenMessage name_tokens {};
     TokenMessage version_tokens {};
+    std::string name_prefix {};
+
+    // Prepending 'POW:' if a power has been requested
+    if (!m_parameters.reconnect_power.empty()) {
+        name_prefix = m_parameters.reconnect_power + ":";
+    }
 
     // Setting and sending
-    name_tokens.set_message_from_text("'" + name + "'");
+    name_tokens.set_message_from_text("'" + name_prefix + name + "'");
     version_tokens.set_message_from_text("'" + version + "'");
     name_message = TOKEN_COMMAND_NME & name_tokens & version_tokens;
     send_message_to_server(name_message);
