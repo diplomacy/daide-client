@@ -2,36 +2,37 @@ cmake_minimum_required(VERSION 3.14)
 project(daide_client)
 
 set(CMAKE_CXX_STANDARD 14)
+set(SRC_DIR .)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
-include_directories(.)
+# -----------------------
+# Includes
+# -----------------------
+set(COMMON_DAIDE_CLIENT
+        ${SRC_DIR}/daide_client/main.cpp
+        ${SRC_DIR}/daide_client/adjudicator.cpp
+        ${SRC_DIR}/daide_client/base_bot.cpp
+        ${SRC_DIR}/daide_client/error_log.cpp
+        ${SRC_DIR}/daide_client/map_and_units.cpp
+        ${SRC_DIR}/daide_client/socket.cpp
+        ${SRC_DIR}/daide_client/token_message.cpp
+        ${SRC_DIR}/daide_client/token_text_map.cpp
+        ${SRC_DIR}/daide_client/windaide_symbols.cpp)
 
-add_executable(daide_client
-        bots/basebot/bot_type.h
-        bots/dumbbot/bot_type.h
-        bots/dumbbot/dumbbot.cpp
-        bots/dumbbot/dumbbot.h
-        bots/holdbot/bot_type.h
-        bots/holdbot/holdbot.cpp
-        bots/holdbot/holdbot.h
-        bots/randbot/bot_type.h
-        bots/randbot/randbot.cpp
-        bots/randbot/randbot.h
-        daide_client/adjudicator.cpp
-        daide_client/ai_client.cpp
-        daide_client/ai_client.h
-        daide_client/ai_client_types.h
-        daide_client/base_bot.cpp
-        daide_client/base_bot.h
-        daide_client/bot_type.h
-        daide_client/error_log.cpp
-        daide_client/error_log.h
-        daide_client/map_and_units.cpp
-        daide_client/map_and_units.h
-        daide_client/socket.cpp
-        daide_client/socket.h
-        daide_client/token_message.cpp
-        daide_client/token_message.h
-        daide_client/token_text_map.cpp
-        daide_client/token_text_map.h
-        daide_client/tokens.h
-        daide_client/types.h)
+# -----------------------
+# Bots
+# -----------------------
+add_executable(dumbbot
+        ${SRC_DIR}/bots/dumbbot/dumbbot.cpp
+        ${COMMON_DAIDE_CLIENT})
+target_include_directories(dumbbot PUBLIC ${SRC_DIR}/bots/dumbbot ${SRC_DIR}/bots/basebot ${SRC_DIR})
+
+add_executable(randbot
+        ${SRC_DIR}/bots/randbot/randbot.cpp
+        ${COMMON_DAIDE_CLIENT})
+target_include_directories(randbot PUBLIC ${SRC_DIR}/bots/randbot ${SRC_DIR}/bots/basebot ${SRC_DIR})
+
+add_executable(holdbot
+        ${SRC_DIR}/bots/holdbot/holdbot.cpp
+        ${COMMON_DAIDE_CLIENT})
+target_include_directories(holdbot PUBLIC ${SRC_DIR}/bots/holdbot ${SRC_DIR}/bots/basebot ${SRC_DIR})
