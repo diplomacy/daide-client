@@ -2,14 +2,20 @@
 
 // Copyright (C) 2012, John Newbury. See "Conditions of Use" in johnnewbury.co.cc/diplomacy/conditions-of-use.htm.
 
-// Release 8~2~b
+// Release 8~3
 
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
 #define _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
 
+#include <memory>
 #include <queue>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include "daide_client/windaide_symbols.h"
 
 namespace DAIDE {
 
@@ -22,68 +28,76 @@ public:
 
 class Socket {
     // Message-oriented socket.
+public:
+    using MessagePtr = std::shared_ptr<char>;
 
-    using MessageQueue = std::queue<char *>;
+private:
+    using MessageQueue = std::queue<MessagePtr>;
 
     SOCKET MySocket;
 
-    static Socket *SocketTab[FD_SETSIZE];               // table of active Socket*
+    static Socket* SocketTab[FD_SETSIZE];               // table of active Socket*
     static int SocketCnt;                               // # active Socket
 
     MessageQueue IncomingMessageQueue;                  // queue of incoming messages
     MessageQueue OutgoingMessageQueue;                  // queue of outgoing messages
-    char *IncomingMessage {nullptr};                    // current incoming message; points to Header until length read;
+    MessagePtr IncomingMessage {nullptr};               // current incoming message; points to Header until length read;
                                                         // else a full, but incomplete, message
-    char *OutgoingMessage {nullptr};                    // current outgoing message, when partially sent; else 0
-    int IncomingNext;                                   // index of start of next incoming message in buffer
-    int OutgoingNext;                                   // index of start of next outgoingmessage in buffer
-    int IncomingLength;                                 // whole length of current incoming message, including header
-    int OutgoingLength;                                 // whole length of current outgoing message, including header
-    MessageHeader Header;                               // buffer for header of current incoming message
+    MessagePtr OutgoingMessage {nullptr};               // current outgoing message, when partially sent; else 0
+    size_t IncomingNext;                                // index of start of next incoming message in buffer
+    size_t OutgoingNext;                                // index of start of next outgoingmessage in buffer
+    size_t IncomingLength;                              // whole length of current incoming message, including header
+    size_t OutgoingLength;                              // whole length of current outgoing message, including header
+    const MessagePtr HeaderDataPtr;
+    MessageHeader* const Header;                        // buffer for header of current incoming message
                                                         // pending new IncomingMessage, when length is known
     bool Connected {false};                             // true iff connected
 
     void InsertSocket();
 
-    static void RemoveSocket();
+    void RemoveSocket();
+
+    void PushIncomingMessage(const MessagePtr &message);
+
+public:
+    Socket() :
+        IncomingMessage(nullptr),
+        OutgoingMessage(nullptr),
+        HeaderDataPtr(new char[sizeof(MessageHeader)]),
+        Header(reinterpret_cast<MessageHeader*>(HeaderDataPtr.get())) {}
+    Socket(const Socket&) = delete;
+    Socket& operator=(const Socket&) = delete;
+    virtual ~Socket();
+
+    virtual bool Connect(const std::string& address, int port);
+
+    void Start();
+
+    void Close();
 
     void SendData();
 
     void ReceiveData();
 
-    void Start();
+    MessagePtr PullIncomingMessage();
 
-    void PushIncomingMessage(char *message);
+    void PushOutgoingMessage(const MessagePtr &message);
 
-    virtual void OnConnect(int error);
-
-    virtual void OnClose(int error);
-
-    virtual void OnReceive(int error);
-
-    virtual void OnSend(int error);
-
-public:
-    Socket() : IncomingMessage(nullptr), OutgoingMessage(nullptr) {}
-
-    ~Socket();
-
-    virtual bool Connect(const char *address, int port);
-
-    char *PullIncomingMessage();
-
-    void PushOutgoingMessage(char *message);
-
-    void OnSocketState(LPARAM lParam);
-
-    static Socket **FindSocket(SOCKET socket);
-
-    static void OnSocketState(WPARAM wParam, LPARAM lParam);
+    static Socket** FindSocket(SOCKET socket);
 
     static void AdjustOrdering(int16_t &x);
 
-    static void AdjustOrdering(char *message, int16_t length);
+    static void AdjustOrdering(const MessagePtr &message, int16_t length);
 };
+
+Socket::MessagePtr make_message(int length);
+
+MessageHeader* get_message_header(const Socket::MessagePtr &message);
+
+template <typename T>
+T* get_message_content(const Socket::MessagePtr &message) {
+    return reinterpret_cast<T*>(message.get() + sizeof(MessageHeader));
+}
 
 /////////////////////////////////////////////////////////////////////////////
 

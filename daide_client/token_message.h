@@ -6,17 +6,17 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
- * Release 8~2
+ * Release 8~3
  **/
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
 #define _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
 
-#include "types.h"
-#include "tokens.h"
+#include "daide_client/tokens.h"
+#include "daide_client/types.h"
 
 namespace DAIDE {
 
@@ -32,7 +32,7 @@ public:
     TokenMessage(const Token *message, int message_length);
 
     // Construct to contain a single token
-    explicit TokenMessage(const Token &token);
+    TokenMessage(const Token &token);
 
     // Copy another token message
     TokenMessage(const TokenMessage &message_to_copy);
@@ -47,16 +47,16 @@ public:
     bool get_message(Token message[], int buffer_length) const;
 
     // Get the length of the message
-    int get_message_length() const { return m_message_length; };
+    int get_message_length() const { return m_message_length; }
 
     // Find out if the message is a single token
-    bool is_single_token() const { return (m_message_length == 1); };
+    bool is_single_token() const { return (m_message_length == 1); }
 
     // Find out if the message contains submessages or just individual tokens
-    bool contains_submessages() const { return (m_message_length != m_submessage_count); };
+    bool contains_submessages() const { return (m_message_length != m_submessage_count); }
 
     // Get the first token (if a single token, it is the only one
-    Token get_token() const { return m_message[0]; };
+    Token get_token() const { return m_message[0]; }
 
     // Get a token by index
     Token get_token(int index) const;
@@ -116,7 +116,7 @@ public:
     enum { NO_MESSAGE = -1 };
 
 private:
-    void find_submessages() const;
+    void find_submessages();
 
     Token *m_message;                       // The message
     int m_message_length;                   // Number of tokens in the message

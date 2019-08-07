@@ -6,18 +6,19 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
  *
- * Release 8~2~b
+ * Release 8~3
  **/
 
+#include "bots/holdbot/bot_type.h"
+#include "bots/holdbot/holdbot.h"
 #include "daide_client/map_and_units.h"
-#include "bot_type.h"
-#include "holdbot.h"
 
+using DAIDE::HoldBot;
 using DAIDE::TokenMessage;
 
 void HoldBot::send_nme_or_obs() {

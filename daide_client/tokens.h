@@ -6,16 +6,16 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
- * Release 8~2
+ * Release 8~3
  **/
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H
 #define _DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H
 
-#include "types.h"
+#include "daide_client/types.h"
 
 namespace DAIDE {
 
@@ -46,8 +46,8 @@ public:
 
     // Constructor
     Token() : m_token {0} {}
-    explicit Token(LANGUAGE_TOKEN token) : m_token {token} {}
-    explicit Token(int token) { m_token = token; }
+    Token(LANGUAGE_TOKEN token) : m_token {token} {}
+    Token(int token) { m_token = token; }
     Token(const Token &token) = default;                                // Copy constructor
     Token(Token &&rhs) = default;                                       // Move constructor
     Token(const LANGUAGE_CATEGORY category, const BYTE sub_category) {

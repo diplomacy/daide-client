@@ -6,16 +6,16 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
- * Release 8~2
+ * Release 8~3
  **/
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
 #define _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
 
-#include "tokens.h"
+#include "daide_client/tokens.h"
 
 namespace DAIDE {
 

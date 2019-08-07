@@ -6,12 +6,12 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
  *
- * Release 8~2~b
+ * Release 8~3
  **/
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
@@ -21,7 +21,7 @@
 
 namespace DAIDE {
 
-using COMMAND_LINE_PARAMETERS = struct {
+typedef struct {
     bool ip_specified;              // Whether the IP address was specified
     bool name_specified;            // Whether the server name was specified
     std::string server_name;        // The name of the server machine
@@ -32,7 +32,7 @@ using COMMAND_LINE_PARAMETERS = struct {
     bool reconnection_specified;    // Whether the reconnection parameters have been provided
     std::string reconnect_power;    // Power to reconnect as
     int reconnect_passcode;         // Passcode to reconnect as
-};
+} COMMAND_LINE_PARAMETERS;
 
 } // namespace DAIDE
 
