@@ -6,28 +6,28 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
  *
- * Release 8~2
+ * Release 8~3
  **/
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
 #define _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
 
-#include "token_message.h"
+#include "daide_client/token_message.h"
 
 namespace DAIDE {
 
 void enable_logging(bool enable);
 
-template<typename... Args>
-void log(const std::string &format, Args... args);
+FILE *open(const char *filename, const char *mode);
 
-template<typename... Args>
-void log_error(const std::string &format, Args... args);
+void log(const char *format, ...);
+
+void log_error(const char *format, ...);
 
 void log_daide_message(bool is_incoming, const TokenMessage &message);
 

@@ -6,18 +6,18 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
- * Release 8~2
+ * Release 8~3
  **/
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
 #define _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
 
-#include "types.h"
-#include "tokens.h"
-#include "token_message.h"
+#include "daide_client/types.h"
+#include "daide_client/tokens.h"
+#include "daide_client/token_message.h"
 
 namespace DAIDE {
 
@@ -271,7 +271,7 @@ public:
 
     bool set_move_by_single_step_convoy_order(PROVINCE_INDEX unit, PROVINCE_INDEX destination, PROVINCE_INDEX step) {
         return set_move_by_convoy_order(unit, destination, 1, &step);
-    };
+    }
 
     bool set_disband_order(PROVINCE_INDEX unit);
 
@@ -281,13 +281,13 @@ public:
 
     bool set_remove_order(PROVINCE_INDEX unit);
 
-    void set_waive_order() { our_winter_orders.number_of_waives++; };
+    void set_waive_order() { our_winter_orders.number_of_waives++; }
 
     void set_multiple_waive_orders(int waives) {
         our_winter_orders.number_of_waives = our_winter_orders.number_of_waives + waives;
-    };
+    }
 
-    void set_total_number_of_waive_orders(int waives) { our_winter_orders.number_of_waives = waives; };
+    void set_total_number_of_waive_orders(int waives) { our_winter_orders.number_of_waives = waives; }
 
     // Accept a complete set of orders for a power as a single TokenMessage
     int process_orders(const TokenMessage &sub_message, POWER_INDEX power_index, Token *order_result);
@@ -295,7 +295,7 @@ public:
     // Cancel adjustment orders
     bool cancel_build_order(PROVINCE_INDEX location);
 
-    bool cancel_remove_order(PROVINCE_INDEX location) { return cancel_build_order(location); };
+    bool cancel_remove_order(PROVINCE_INDEX location) { return cancel_build_order(location); }
 
     bool unorder_adjustment(const TokenMessage &not_sub_message, int power_index);
 
@@ -353,7 +353,7 @@ public:
     void adjudicate();
 
     // Get the results as a set of ORD messages
-    int get_adjudication_results(const TokenMessage ord_messages[]);
+    int get_adjudication_results(TokenMessage ord_messages[]);
 
     // Apply the adjudication. This moves all the units to their new positions.
     bool apply_adjudication();
@@ -431,15 +431,15 @@ private:
 
     bool has_route_to_province(UNIT_AND_ORDER *unit, PROVINCE_INDEX province_index, PROVINCE_INDEX province_to_avoid);
 
-    int get_movement_results(const TokenMessage ord_messages[]);
+    int get_movement_results(TokenMessage ord_messages[]);
 
     TokenMessage describe_movement_result(UNIT_AND_ORDER *unit);
 
-    int get_retreat_results(const TokenMessage ord_messages[]);
+    int get_retreat_results(TokenMessage ord_messages[]);
 
     TokenMessage describe_retreat_result(UNIT_AND_ORDER *unit);
 
-    int get_adjustment_results(const TokenMessage ord_messages[]);
+    int get_adjustment_results(TokenMessage ord_messages[]);
 
     TokenMessage describe_build_result(POWER_INDEX power_ctr,
                                        WINTER_ORDERS_FOR_POWER *orders,

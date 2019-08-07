@@ -6,12 +6,12 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
  *
- * Release 8~2~b
+ * Release 8~3
  **/
 
 /*******************************************************************************************
@@ -24,11 +24,15 @@
 #ifndef _DAIDE_CLIENT_BOTS_RANDBOT_BOT_TYPE_H
 #define _DAIDE_CLIENT_BOTS_RANDBOT_BOT_TYPE_H
 
-#include "randbot.h"
+#include "bots/randbot/randbot.h"
+
+namespace DAIDE {
 
 using BOT_TYPE = RandBot;
 
 #define BOT_FAMILY "RandBot"
-#define BOT_GENERATION "8~2~b"
+#define BOT_GENERATION "8~3"
+
+} // namespace DAIDE
 
 #endif // _DAIDE_CLIENT_BOTS_RANDBOT_BOT_TYPE_H

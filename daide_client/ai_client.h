@@ -2,7 +2,7 @@
 
 // Copyright (C) 2012, John Newbury. See "Conditions of Use" in johnnewbury.co.cc/diplomacy/conditions-of-use.htm.
 
-// Release 8~2~b
+// Release 8~3
 
 #ifndef _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H
 #define _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_H

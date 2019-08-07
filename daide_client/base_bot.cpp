@@ -6,22 +6,22 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
  *
- * Release 8~2~b
+ * Release 8~3
  **/
 
 #include <iostream>
 #include <memory>
-#include "socket.h"
-#include "error_log.h"
-#include "map_and_units.h"
-#include "token_text_map.h"
-#include "ai_client.h"
-#include "base_bot.h"
+#include "daide_client/ai_client.h"
+#include "daide_client/base_bot.h"
+#include "daide_client/error_log.h"
+#include "daide_client/map_and_units.h"
+#include "daide_client/socket.h"
+#include "daide_client/token_text_map.h"
 
 using DAIDE::BaseBot;
 
@@ -33,18 +33,24 @@ BaseBot::BaseBot() {
 
 BaseBot::~BaseBot() {
     enable_logging(true);
+    m_socket.Close();
     log_error("Finished");              // not an error, but indicates end of logging; also writes to normal log
     close_logs();
 }
 
-bool BaseBot::initialize() {
+bool BaseBot::is_active() const {
+    return m_is_active;
+}
+
+bool BaseBot::initialize(const std::string &command_line_a) {
     COMMAND_LINE_PARAMETERS parameters {};
-    const int MAX_COMPUTER_NAME_LEN = 1000;         // Max length of a computer name
     const uint16_t DEFAULT_PORT_NUMBER = 16713;     // Default port number to connect on
 
+    m_socket.Close();
+
     // Extract the parameters
-    srand((int) time(nullptr));                     // init random number generator
-    extract_parameters(parameters);
+    srand(static_cast<uint>(time(nullptr)));        // init random number generator
+    extract_parameters(command_line_a, parameters);
 
     // Store the command line parameters
     m_parameters = parameters;
@@ -60,19 +66,22 @@ bool BaseBot::initialize() {
     enable_logging(parameters.log_level > 0);
 
     // Start the TCP/IP
-    if (!parameters.name_specified) {
+    if (!parameters.name_specified && !parameters.ip_specified) {
         parameters.server_name = "localhost";
     }
     if (!parameters.port_specified) {
         parameters.port_number = DEFAULT_PORT_NUMBER;
     }
-    SetWindowText(main_wnd, BOT_FAMILY " " BOT_GENERATION);
 
     // Connection failure
     if (!m_socket.Connect(parameters.server_name, parameters.port_number)) {
         log_error("Failed to connect to server");
         return false;
     }
+
+    m_socket.Start();
+
+    m_is_active = true;
 
     // Connection success
     send_initial_message_to_server();
@@ -86,18 +95,20 @@ void BaseBot::send_nme_or_obs() {
 }
 
 void BaseBot::send_initial_message_to_server() {
-    std::unique_ptr<char> tcp_message;              // Message to send over the link
-    DCSP_HST_MESSAGE *tcp_message_header;           // Header of the message
+    Socket::MessagePtr tcp_message;         // Message to send over the link
+    DCSP_HST_MESSAGE *tcp_message_header;   // Header of the message
+    short *tcp_message_content;
 
     // FIXME - tcp_message was requesting heap memory space without using a smart pointer
-    tcp_message = std::make_unique<char>(sizeof(DCSP_HST_MESSAGE) + 4);
-    tcp_message_header = (DCSP_HST_MESSAGE *) tcp_message;
+    tcp_message = make_message(4);
+    tcp_message_header = get_message_header(tcp_message);
+    tcp_message_content = get_message_content<short>(tcp_message);
 
     // Set message header
     tcp_message_header->type = DCSP_MSG_TYPE_IM;
     tcp_message_header->length = 4;
-    *((short *) (tcp_message + sizeof(DCSP_HST_MESSAGE))) = (short) 1; // version;
-    *((short *) (tcp_message + sizeof(DCSP_HST_MESSAGE)) + 1) = (short) 0xDA10; // magic number
+    tcp_message_content[0] = static_cast<short>(1); // version;
+    tcp_message_content[1] = static_cast<short>(0xDA10); // magic number
 
     // Send message
     m_socket.PushOutgoingMessage(tcp_message);
@@ -105,24 +116,26 @@ void BaseBot::send_initial_message_to_server() {
 
 void BaseBot::send_message_to_server(const TokenMessage &message) {
     int message_length {0};                         // Length of the message in tokens
-    std::unique_ptr<char> tcp_message;              // Message to send over the link
+    Socket::MessagePtr tcp_message;                 // Message to send over the link
     DCSP_HST_MESSAGE *tcp_message_header {nullptr}; // Header of the message
+    Token *tcp_message_content;
 
     log_daide_message(false, message);
 
     // Get the length of the message
     message_length = message.get_message_length();
 
-    // FIXME - tcp_message was requesting heap memory space without using a smart pointer
-    tcp_message = std::make_unique<char>(message_length * 2 + 6);
-    tcp_message_header = (DCSP_HST_MESSAGE *) tcp_message;
+    // FIXME - tcp_message is requesting heap memory space without using a smart pointer
+    tcp_message = make_message(message_length * 2 + 2);
+    tcp_message_header = get_message_header(tcp_message);
+    tcp_message_content = get_message_content<Token>(tcp_message);
 
     // Set message header
     tcp_message_header->type = DCSP_MSG_TYPE_DM;
-    tcp_message_header->length = message_length * 2;
+    tcp_message_header->length = static_cast<int16_t>(message_length * 2);
 
     // Send message
-    message.get_message((Token *) (tcp_message + 4), message_length + 1);
+    message.get_message(tcp_message_content, message_length + 1);
     m_socket.PushOutgoingMessage(tcp_message);
 }
 
@@ -152,9 +165,10 @@ void BaseBot::request_map() {
     send_message_to_server(TokenMessage(TOKEN_COMMAND_MAP));
 }
 
-void BaseBot::process_message(char *&message) {
-    DCSP_HST_MESSAGE *header = (DCSP_HST_MESSAGE *) (message);          // Message Header of the received message
-    WORD error_code;                                                    // Error code from an error message
+void BaseBot::process_message(const Socket::MessagePtr &message) {
+    DCSP_HST_MESSAGE *header = get_message_header(message);             // Message Header of the received message
+    char* content = get_message_content<char>(message);                 // Message Content of the received message
+    unsigned short error_code;                                          // Error code from an error message
 
     switch (header->type) {
 
@@ -166,13 +180,13 @@ void BaseBot::process_message(char *&message) {
         // Representation message. Needs handling to update the text map eventually
         case DCSP_MSG_TYPE_RM:
             log("Representation Message received");
-            process_rm_message(message + sizeof(DCSP_HST_MESSAGE), header->length);
+            process_rm_message(content, header->length);
             break;
 
         // Diplomacy Message
         case DCSP_MSG_TYPE_DM:
             log("Diplomacy Message received");
-            process_diplomacy_message(message + sizeof(DCSP_HST_MESSAGE), header->length);
+            process_diplomacy_message(content, header->length);
             break;
 
         // Final Message. Nothing to do.
@@ -182,7 +196,7 @@ void BaseBot::process_message(char *&message) {
 
         // Error Message. Report
         case DCSP_MSG_TYPE_EM:
-            error_code = *((WORD *)(message + sizeof(DCSP_HST_MESSAGE)));
+            error_code = *get_message_content<unsigned short>(message);
             log_error("Error Message Received. Error Code = %d", error_code);
             break;
 
@@ -241,7 +255,6 @@ void BaseBot::process_diplomacy_message(char *message, int message_length) {
             // Act on that token
             lead_token = incoming_msg.get_token(0);
 
-            // FIXME use a switch statement
             // Messages that BaseBot handles initially
             if (lead_token == TOKEN_COMMAND_HLO) {
                 process_hlo(incoming_msg);
@@ -296,7 +309,7 @@ void BaseBot::process_diplomacy_message(char *message, int message_length) {
             } else if (lead_token == TOKEN_COMMAND_ADM) {
                 process_adm_message(incoming_msg);
             } else {
-                log_error("Unexpected first token in message : %s", incoming_msg.get_message_as_text());
+                log_error("Unexpected first token in message : %s", incoming_msg.get_message_as_text().c_str());
             }
 
         } else {
@@ -345,8 +358,8 @@ void BaseBot::process_map(const TokenMessage &incoming_msg) {
 }
 
 void BaseBot::remove_quotes(std::string &message_string) {
-    int start_quote_locn {0};
-    int end_quote_locn {0};
+    size_t start_quote_locn {0};
+    size_t end_quote_locn {0};
 
     start_quote_locn = message_string.find('\'');
     end_quote_locn = message_string.find_last_of('\'');
@@ -402,7 +415,6 @@ void BaseBot::process_sco(const TokenMessage &incoming_msg) {
 void BaseBot::process_not(const TokenMessage &incoming_msg) {
     TokenMessage not_message = incoming_msg.get_submessage(1);
 
-    // FIXME using switch statement
     if (not_message.get_token(0) == TOKEN_COMMAND_CCD) {
         process_not_ccd(incoming_msg, not_message.get_submessage(1));
     } else if (not_message.get_token(0) == TOKEN_COMMAND_TME) {
@@ -416,7 +428,6 @@ void BaseBot::process_not(const TokenMessage &incoming_msg) {
 void BaseBot::process_rej(const TokenMessage &incoming_msg) {
     TokenMessage rej_message = incoming_msg.get_submessage(1);
 
-    // FIXME using switch statement
     if (rej_message.get_token(0) == TOKEN_COMMAND_NME) {
         process_rej_nme_message(incoming_msg, rej_message.get_submessage(1));
     } else if (rej_message.get_token(0) == TOKEN_COMMAND_IAM) {
@@ -454,7 +465,7 @@ void BaseBot::process_rej(const TokenMessage &incoming_msg) {
 
 // Process the REJ(NOT()) message. Split according to next token
 void BaseBot::process_rej_not(const TokenMessage &incoming_msg, const TokenMessage &rej_not_params) {
-    // FIXME using switch statement
+
     if (rej_not_params.get_token(0) == TOKEN_COMMAND_GOF) {
         process_rej_not_gof_message(incoming_msg, rej_not_params.get_submessage(1));
     } else if (rej_not_params.get_token(0) == TOKEN_COMMAND_DRW) {
@@ -468,7 +479,6 @@ void BaseBot::process_rej_not(const TokenMessage &incoming_msg, const TokenMessa
 void BaseBot::process_yes(const TokenMessage &incoming_msg) {
     TokenMessage yes_message = incoming_msg.get_submessage(1);
 
-    // FIXME use switch statement
     if (yes_message.get_token(0) == TOKEN_COMMAND_NME) {
         process_yes_nme_message(incoming_msg, yes_message.get_submessage(1));
     } else if (yes_message.get_token(0) == TOKEN_COMMAND_OBS) {
@@ -492,8 +502,6 @@ void BaseBot::process_yes(const TokenMessage &incoming_msg) {
 
 // Process the YES(NOT()) message. Split according to next token
 void BaseBot::process_yes_not(const TokenMessage &incoming_msg, const TokenMessage &yes_not_params) {
-
-    // FIXME use switch staetment
     if (yes_not_params.get_token(0) == TOKEN_COMMAND_GOF) {
         process_yes_not_gof_message(incoming_msg, yes_not_params.get_submessage(1));
     } else if (yes_not_params.get_token(0) == TOKEN_COMMAND_DRW) {
@@ -580,16 +588,16 @@ void BaseBot::process_thx_message(const TokenMessage &incoming_msg) {
     // Sending new order
     if ((send_new_order) && (new_order != order)) {
         log_error("THX returned %s for order '%s'. Replacing with '%s'",
-                  incoming_msg.get_submessage(2).get_message_as_text(),
-                  order.get_message_as_text(),
-                  new_order.get_message_as_text());
+                  incoming_msg.get_submessage(2).get_message_as_text().c_str(),
+                  order.get_message_as_text().c_str(),
+                  new_order.get_message_as_text().c_str());
         send_message_to_server(new_order);
 
     // Logging error if no new orders were sent
     } else if (note != TOKEN_ORDER_NOTE_MBV) {
         log_error("THX returned %s for order '%s'. No replacement order sent.",
-                  incoming_msg.get_submessage(2).get_message_as_text(),
-                  order.get_message_as_text());
+                  incoming_msg.get_submessage(2).get_message_as_text().c_str(),
+                  order.get_message_as_text().c_str());
     }
 }
 
@@ -610,12 +618,12 @@ void BaseBot::process_rej_nme_message(const TokenMessage & /*incoming_msg*/, con
     // Disconnect
     } else {
         disconnect_from_server();
-        end_dialog();
+        stop();
     }
 }
 
 // Determine whether to try and reconnect to game. Default uses values passed on command line.
-bool BaseBot::get_reconnect_details(const Token &power, int &passcode) {
+bool BaseBot::get_reconnect_details(Token &power, int &passcode) {
     if (m_parameters.reconnection_specified) {
         power = TokenTextMap::instance()->m_text_to_token_map[m_parameters.reconnect_power];
         passcode = m_parameters.reconnect_passcode;
@@ -646,9 +654,9 @@ void BaseBot::send_broadcast_to_server(const TokenMessage &broadcast_message) {
 
     for (int power_ctr = 0; power_ctr < m_map_and_units->number_of_powers; power_ctr++) {
         if ((m_map_and_units->power_played.get_subtoken() != power_ctr)
-                && (m_cd_powers.find(Token(CATEGORY_POWER, power_ctr)) == m_cd_powers.end())) {
+            && (m_cd_powers.find(Token(CATEGORY_POWER, static_cast<BYTE>(power_ctr))) == m_cd_powers.end())) {
 
-            receiving_powers = receiving_powers + Token(CATEGORY_POWER, power_ctr);
+            receiving_powers = receiving_powers + Token(CATEGORY_POWER, static_cast<BYTE>(power_ctr));
         }
     }
 
@@ -774,11 +782,11 @@ void BaseBot::remove_sent_press(const TokenMessage &send_message) {
     }
 }
 
-bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
+bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE_PARAMETERS &parameters) {
     bool extracted_ok {true};               // Whether the parameters were OK
-    int search_start {0};                   // Position to start searching command line
-    int param_start {0};                    // Start of the next parameter
-    int param_end {0};                      // End of the next parameter
+    size_t search_start {0};                // Position to start searching command line
+    size_t param_start {0};                 // Start of the next parameter
+    size_t param_end {0};                   // End of the next parameter
     char param_token {};                    // The token specifying the parameter type
     std::string parameter;                  // The parameter
 
@@ -789,7 +797,7 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
     parameters.reconnection_specified = false;
 
     // Getting parameters
-    std::string m_command_line = GetCommandLineA();
+    std::string m_command_line = command_line_a;
 
     // Strip the program name off the command line
     // Program name is in quotes.
@@ -834,7 +842,7 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
 
             case 'p':
                 parameters.port_specified = true;
-                parameters.port_number = stoi(parameter);
+                parameters.port_number = static_cast<uint16_t>(stoi(parameter));
                 break;
 
             case 'l':
@@ -846,7 +854,7 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
                 if (parameter[3] == ':') {
                     parameters.reconnection_specified = true;
                     parameters.reconnect_power = parameter.substr(0, 3);
-                    for (auto &c : parameters.reconnect_power) { c = toupper(c); }
+                    for (auto &c : parameters.reconnect_power) { c = static_cast<char>(toupper(c)); }
                     parameters.reconnect_passcode = stoi(parameter.substr(4));
                 } else {
                     std::cout << "-r should be followed by 'POW:passcode'\nPOW should be three characters" << std::endl;
@@ -869,7 +877,7 @@ bool BaseBot::extract_parameters(COMMAND_LINE_PARAMETERS &parameters) {
     return extracted_ok;
 }
 
-void BaseBot::OnSocketMessage() {
+bool BaseBot::OnSocketMessage() {
     // Process a DAIDE event: there are 1 or more unprocessed incoming DAIDE messages, in order of arrival.
     // Ensure all are processed, in order.
     // Assumes messages were queued in the same thread.
@@ -877,14 +885,16 @@ void BaseBot::OnSocketMessage() {
     // Get and remove next DAIDE message to be processed.
     // Triggers recall if more messages remain.
     // (More responsive than processing all such messages at once, without first checking for more urgent events.)
-    char *incomingMessage = m_socket.PullIncomingMessage();
+    Socket::MessagePtr incomingMessage = m_socket.PullIncomingMessage();
 
-    process_message(incomingMessage);
+    if (incomingMessage) {
+        process_message(incomingMessage);
+    }
 
-    // FIXME use smart pointer
-    delete[] incomingMessage;
+    return incomingMessage != nullptr;
 }
 
-void BaseBot::end_dialog() {
-    PostMessage(main_wnd, WM_CLOSE, 0, 0);
+void BaseBot::stop() {
+    m_socket.Close();
+    m_is_active = false;
 }

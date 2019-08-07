@@ -1,6 +1,6 @@
-AiClient 8~2 Conditions of Use
+AiClient 8~3 Conditions of Use
 
-AI in the Game of Diplomacy: AiClient 8~2 Conditions of Use
+AI in the Game of Diplomacy: AiClient 8~3 Conditions of Use
 
 The Conditions of Use that apply to any product supplied by John Newbury are as specified in the Conditions of Use file
 that is specific to the particular release of the product, which should accompany that product. That file should be read
@@ -8,19 +8,19 @@ first. If no such file or equivalent is supplied, its terms are not acceptable i
 ambiguous in any way, no usage whatsoever is permitted. Any usage of such a product is deemed as acceptance of those
 conditions.
 
-This document applies to AiClient Release 8~2, as described in the AiClient 8~2 Release Notice.
+This document applies to AiClient Release 8~3, as described in the AiClient 8~3 Release Notice.
 
 Contact John Newbury (johnnewbury1@yahoo.co.uk) or David Norman (david@ellought.demon.co.uk) or further information
 about this product.
 
 Specific Conditions of Use:
 
-1) The following rules apply to any part of this product, as defined by the AiClient 8~2 Release Notice, when obtained
+1) The following rules apply to any part of this product, as defined by the AiClient 8~3 Release Notice, when obtained
    directly or indirectly from John Newbury; only he may vary them.
 
-2) New source and HTML files are copyright © John Newbury (2012). All other files (the bulk) within the Visual Studio
+2) New source and HTML files are copyright ï¿½ John Newbury (2012). All other files (the bulk) within the Visual Studio
    project folder that are used to produce the binary, whether or not stated, text or modified by John Newbury, are
-   Copyright © David Norman (2002). The copyright of the binary is shared by both authors.
+   Copyright ï¿½ David Norman (2002). The copyright of the binary is shared by both authors.
 
 3) David Norman's files that have been modified by John Newbury, other than just addition of release number, are
    identified by the statement "Modified by John Newbury". Individual modification are not identified; if required, these

@@ -6,12 +6,12 @@
  * (C) David Norman 2002 david@ellought.demon.co.uk
  *
  * This software may be reused for non-commercial purposes without charge, and
- * without notifying the author. Use of any part of this software for commercial 
+ * without notifying the author. Use of any part of this software for commercial
  * purposes without permission from the Author is prohibited.
  *
  * Modified by John Newbury
  *
- * Release 8~2~b
+ * Release 8~3
  **/
 
 #ifndef _DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H
@@ -20,15 +20,16 @@
 #include "daide_client/base_bot.h"
 #include "daide_client/map_and_units.h"
 
+namespace DAIDE {
+
 class DumbBot : public DAIDE::BaseBot {
 public:
     DumbBot();
-    DumbBot(const DumbBot &other) = default;                // Copy constructor
-    DumbBot(DumbBot &&rhs) = default;                       // Move constructor
+    DumbBot(const DumbBot &other) = delete;                 // Copy constructor
+    DumbBot(DumbBot &&rhs) = delete;                        // Move constructor
+    DumbBot& operator=(const DumbBot &other) = delete;      // Copy Assignment
+    DumbBot& operator=(DumbBot &&rhs) = delete;             // Move Assignment
     ~DumbBot() override = default;
-
-    DumbBot& operator=(const DumbBot &other) = default;     // Copy Assignment
-    DumbBot& operator=(DumbBot &&rhs) = default;            // Move Assignment
 
     void send_nme_or_obs() override;
 
@@ -74,7 +75,7 @@ private:
 
     static int rand_no(int max_value);
 
-    virtual bool extract_parameters(DAIDE::COMMAND_LINE_PARAMETERS &parameters);
+    virtual bool extract_parameters(const std::string &command_line_a, DAIDE::COMMAND_LINE_PARAMETERS &parameters);
 
 private:
 
@@ -161,5 +162,7 @@ private:
     const static WEIGHTING m_size_coefficient {4};
     const static WEIGHTING m_size_constant {16};
 };
+
+} // namespace DAIDE
 
 #endif // _DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H
