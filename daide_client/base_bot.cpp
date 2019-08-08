@@ -868,8 +868,9 @@ bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE
                 break;
 
             default:
-                std::cout << "Usage: " << BOT_FAMILY << ".exe "
-                          << "[-sServerName|-iIPAddress] [-pPortNumber] [-lLogLevel] [-rPOW:passcode]" << std::endl;
+                std::cout << std::string(BOT_FAMILY) << " - version " << std::string(BOT_GENERATION) << std::endl;
+                std::cout << "Usage: " << std::string(BOT_FAMILY)
+                          << " [-sServerName|-iIPAddress] [-pPortNumber] [-lLogLevel] [-rPOW:passcode]" << std::endl;
                 extracted_ok = false;
         }
         param_start = m_command_line.find('-', search_start);
