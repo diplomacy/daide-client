@@ -981,10 +981,10 @@ bool DumbBot::extract_parameters(const std::string &command_line_a, DAIDE::COMMA
             }
 
             default: {
+                std::cout << std::string(BOT_FAMILY) << " - version " << std::string(BOT_GENERATION) << std::endl;
                 std::cout << "Usage: " << std::string(BOT_FAMILY) <<
-                             ".exe [-sServerName|-iIPAddress] [-pPortNumber] "
+                             " [-sServerName|-iIPAddress] [-pPortNumber] "
                              "[-lLogLevel] [-rPOW:passcode] [-d]" << std::endl;
-
                 extracted_ok = false;
             }
         }
