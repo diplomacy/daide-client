@@ -1,0 +1,4 @@
+The game of Diplomacy was invented by Allan Calhamer in the 1950's.  Hasbro Inc. now holds the rights to the game.
+
+The bots are all copyright of their respective authors.  They are intended for free end user enjoyment. They can not be
+used for any commercial use or as part of a gaming site, unless agreed to in writing by their authors.
