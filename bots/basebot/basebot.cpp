@@ -16,8 +16,8 @@
 
 #include <iostream>
 #include <memory>
+#include "basebot.h"
 #include "daide_client/ai_client.h"
-#include "daide_client/base_bot.h"
 #include "daide_client/error_log.h"
 #include "daide_client/map_and_units.h"
 #include "daide_client/socket.h"
@@ -74,7 +74,7 @@ bool BaseBot::initialize(const std::string &command_line_a) {
     }
 
     // Connection failure
-    if (!m_socket.Connect(parameters.server_name, parameters.port_number)) {
+    if (!m_socket.Connect(parameters.server_name.c_str(), parameters.port_number)) {
         log_error("Failed to connect to server");
         return false;
     }
@@ -150,15 +150,9 @@ void BaseBot::send_name_and_version_to_server(const std::string &name, const std
     TokenMessage name_message {};
     TokenMessage name_tokens {};
     TokenMessage version_tokens {};
-    std::string name_prefix {};
-
-    // Prepending 'POW:' if a power has been requested
-    if (!m_parameters.reconnect_power.empty()) {
-        name_prefix = m_parameters.reconnect_power + ":";
-    }
 
     // Setting and sending
-    name_tokens.set_message_from_text("'" + name_prefix + name + "'");
+    name_tokens.set_message_from_text("'" + name + "'");
     version_tokens.set_message_from_text("'" + version + "'");
     name_message = TOKEN_COMMAND_NME & name_tokens & version_tokens;
     send_message_to_server(name_message);
@@ -261,6 +255,7 @@ void BaseBot::process_diplomacy_message(char *message, int message_length) {
             // Act on that token
             lead_token = incoming_msg.get_token(0);
 
+            // FIXME use a switch statement
             // Messages that BaseBot handles initially
             if (lead_token == TOKEN_COMMAND_HLO) {
                 process_hlo(incoming_msg);
@@ -421,6 +416,7 @@ void BaseBot::process_sco(const TokenMessage &incoming_msg) {
 void BaseBot::process_not(const TokenMessage &incoming_msg) {
     TokenMessage not_message = incoming_msg.get_submessage(1);
 
+    // FIXME using switch statement
     if (not_message.get_token(0) == TOKEN_COMMAND_CCD) {
         process_not_ccd(incoming_msg, not_message.get_submessage(1));
     } else if (not_message.get_token(0) == TOKEN_COMMAND_TME) {
@@ -434,6 +430,7 @@ void BaseBot::process_not(const TokenMessage &incoming_msg) {
 void BaseBot::process_rej(const TokenMessage &incoming_msg) {
     TokenMessage rej_message = incoming_msg.get_submessage(1);
 
+    // FIXME using switch statement
     if (rej_message.get_token(0) == TOKEN_COMMAND_NME) {
         process_rej_nme_message(incoming_msg, rej_message.get_submessage(1));
     } else if (rej_message.get_token(0) == TOKEN_COMMAND_IAM) {
@@ -471,7 +468,7 @@ void BaseBot::process_rej(const TokenMessage &incoming_msg) {
 
 // Process the REJ(NOT()) message. Split according to next token
 void BaseBot::process_rej_not(const TokenMessage &incoming_msg, const TokenMessage &rej_not_params) {
-
+    // FIXME using switch statement
     if (rej_not_params.get_token(0) == TOKEN_COMMAND_GOF) {
         process_rej_not_gof_message(incoming_msg, rej_not_params.get_submessage(1));
     } else if (rej_not_params.get_token(0) == TOKEN_COMMAND_DRW) {
@@ -485,6 +482,7 @@ void BaseBot::process_rej_not(const TokenMessage &incoming_msg, const TokenMessa
 void BaseBot::process_yes(const TokenMessage &incoming_msg) {
     TokenMessage yes_message = incoming_msg.get_submessage(1);
 
+    // FIXME use switch statement
     if (yes_message.get_token(0) == TOKEN_COMMAND_NME) {
         process_yes_nme_message(incoming_msg, yes_message.get_submessage(1));
     } else if (yes_message.get_token(0) == TOKEN_COMMAND_OBS) {
@@ -508,6 +506,7 @@ void BaseBot::process_yes(const TokenMessage &incoming_msg) {
 
 // Process the YES(NOT()) message. Split according to next token
 void BaseBot::process_yes_not(const TokenMessage &incoming_msg, const TokenMessage &yes_not_params) {
+    // FIXME use switch staetment
     if (yes_not_params.get_token(0) == TOKEN_COMMAND_GOF) {
         process_yes_not_gof_message(incoming_msg, yes_not_params.get_submessage(1));
     } else if (yes_not_params.get_token(0) == TOKEN_COMMAND_DRW) {
@@ -628,10 +627,15 @@ void BaseBot::process_rej_nme_message(const TokenMessage & /*incoming_msg*/, con
     }
 }
 
+std::string BaseBot::get_bot_name() const
+{
+    return (m_parameters.power_specified ? m_parameters.power + "__" + BOT_FAMILY : BOT_FAMILY);
+}
+
 // Determine whether to try and reconnect to game. Default uses values passed on command line.
 bool BaseBot::get_reconnect_details(Token &power, int &passcode) {
     if (m_parameters.reconnection_specified) {
-        power = TokenTextMap::instance()->m_text_to_token_map[m_parameters.reconnect_power];
+        power = TokenTextMap::instance()->m_text_to_token_map[m_parameters.power];
         passcode = m_parameters.reconnect_passcode;
     }
     return m_parameters.reconnection_specified;
@@ -856,11 +860,18 @@ bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE
                 parameters.log_level = stoi(parameter);
                 break;
 
+            case 'c':
+                parameters.power_specified = true;
+                parameters.power = parameter.substr(0, 3);
+                for (auto &c : parameters.power) { c = static_cast<char>(toupper(c)); }
+                break;
+
             case 'r':
                 if (parameter[3] == ':') {
                     parameters.reconnection_specified = true;
-                    parameters.reconnect_power = parameter.substr(0, 3);
-                    for (auto &c : parameters.reconnect_power) { c = static_cast<char>(toupper(c)); }
+                    parameters.power_specified = true;
+                    parameters.power = parameter.substr(0, 3);
+                    for (auto &c : parameters.power) { c = static_cast<char>(toupper(c)); }
                     parameters.reconnect_passcode = stoi(parameter.substr(4));
                 } else {
                     std::cout << "-r should be followed by 'POW:passcode'\nPOW should be three characters" << std::endl;
@@ -868,9 +879,9 @@ bool BaseBot::extract_parameters(const std::string &command_line_a, COMMAND_LINE
                 break;
 
             default:
-                std::cout << std::string(BOT_FAMILY) << " - version " << std::string(BOT_GENERATION) << std::endl;
-                std::cout << "Usage: " << std::string(BOT_FAMILY)
-                          << " [-sServerName|-iIPAddress] [-pPortNumber] [-lLogLevel] [-rPOW:passcode]" << std::endl;
+                std::cout << BOT_FAMILY << " - version " << BOT_GENERATION << std::endl;
+                std::cout << "Usage: " << BOT_FAMILY
+                          << " [-sServerName|-iIPAddress] [-pPortNumber] [-lLogLevel] [-cPOW] [-rPOW:passcode]" << std::endl;
                 extracted_ok = false;
         }
         param_start = m_command_line.find('-', search_start);

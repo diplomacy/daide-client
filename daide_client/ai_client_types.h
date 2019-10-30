@@ -14,8 +14,8 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
 
 #include <string>
 
@@ -30,10 +30,11 @@ typedef struct {
     bool log_level_specified;       // Whether the log level was specified
     int log_level;                  // The level to log at
     bool reconnection_specified;    // Whether the reconnection parameters have been provided
-    std::string reconnect_power;    // Power to reconnect as
+    bool power_specified;           // Whether the desired power was specified
+    std::string power;              // Power to (re)connect as
     int reconnect_passcode;         // Passcode to reconnect as
 } COMMAND_LINE_PARAMETERS;
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_AI_CLIENT_TYPES_H

@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "daide_client/ai_client.h"
+#include "ai_client.h"
 
 using DAIDE::BOT_TYPE;
 using DAIDE::the_bot;

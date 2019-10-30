@@ -17,7 +17,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <vector>
-#include "daide_client/error_log.h"
+#include "error_log.h"
 
 // TODO - REWRITE completely
 // Avoid using variadic functions

@@ -1,3 +1,3 @@
-#include "daide_client/windaide_symbols.h"
+#include "windaide_symbols.h"
 
 int WSAGetLastError() { return errno; }

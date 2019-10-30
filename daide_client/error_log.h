@@ -14,10 +14,10 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
 
-#include "daide_client/token_message.h"
+#include "token_message.h"
 
 namespace DAIDE {
 
@@ -35,4 +35,4 @@ void close_logs();
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_ERROR_LOG_H

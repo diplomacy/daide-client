@@ -14,18 +14,19 @@
  * Release 8~3
  **/
 
-#include "bots/holdbot/bot_type.h"
-#include "bots/holdbot/holdbot.h"
+#include "bot_type.h"
+#include "holdbot.h"
 #include "daide_client/map_and_units.h"
 
 using DAIDE::HoldBot;
 using DAIDE::TokenMessage;
 
 void HoldBot::send_nme_or_obs() {
-    send_name_and_version_to_server(BOT_FAMILY, BOT_GENERATION);
+    send_name_and_version_to_server(get_bot_name(), BOT_GENERATION);
 }
 
 void HoldBot::process_now_message(const TokenMessage & /*incoming_message*/) {
+    send_message_to_server(TOKEN_COMMAND_NOT & TOKEN_COMMAND_GOF);
 
     // Movement - Order all units to hold.
     if ((m_map_and_units->current_season == DAIDE::TOKEN_SEASON_SPR)
@@ -62,4 +63,5 @@ void HoldBot::process_now_message(const TokenMessage & /*incoming_message*/) {
 
     // Submitting orders
     send_orders_to_server();
+    send_message_to_server(TOKEN_COMMAND_NOT & TOKEN_COMMAND_GOF);
 }

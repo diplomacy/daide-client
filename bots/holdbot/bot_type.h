@@ -21,10 +21,10 @@
  * Change the #define BOT_GENERATION to specify the generation (base version) of your Bot. *
  *******************************************************************************************/
 
-#ifndef _DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H
-#define _DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H
+#ifndef DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H
+#define DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H
 
-#include "bots/holdbot/holdbot.h"
+#include "holdbot.h"
 
 namespace DAIDE {
 
@@ -35,4 +35,4 @@ using BOT_TYPE = HoldBot;
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H
+#endif // DAIDE_CLIENT_BOTS_HOLDBOT_BOT_TYPE_H

@@ -12,10 +12,10 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
 
-#include "daide_client/tokens.h"
+#include "tokens.h"
 
 namespace DAIDE {
 
@@ -41,4 +41,4 @@ private:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_TEXT_MAP_H

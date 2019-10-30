@@ -12,11 +12,11 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
 
-#include "daide_client/tokens.h"
-#include "daide_client/types.h"
+#include "tokens.h"
+#include "types.h"
 
 namespace DAIDE {
 
@@ -126,4 +126,4 @@ private:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_TOKEN_MESSAGE_H

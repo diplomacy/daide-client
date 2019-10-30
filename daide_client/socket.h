@@ -6,8 +6,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
 
 #include <memory>
 #include <queue>
@@ -15,7 +15,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include "daide_client/windaide_symbols.h"
+#include "windaide_symbols.h"
 
 namespace DAIDE {
 
@@ -103,4 +103,4 @@ T* get_message_content(const Socket::MessagePtr &message) {
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_SOCKET_H

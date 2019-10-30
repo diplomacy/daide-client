@@ -14,8 +14,8 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
 
 #include "daide_client/ai_client_types.h"
 #include "daide_client/error_log.h"
@@ -145,6 +145,9 @@ protected:
 
     // Handle an incoming REJ( NME() ) message.
     virtual void process_rej_nme_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params);
+
+    // Get the name of the bot including the requested power if any
+    std::string get_bot_name() const;
 
     // Get the details to reconnect to the game. Return true if reconnect required, or false if reconnect is not to
     // be attempted. Default implementation uses parameters from the command line
@@ -395,4 +398,4 @@ public:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H

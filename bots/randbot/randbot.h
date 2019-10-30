@@ -14,10 +14,10 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
-#define _DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
+#ifndef DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
+#define DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
 
-#include "daide_client/base_bot.h"
+#include "basebot.h"
 
 namespace DAIDE {
 
@@ -37,4 +37,4 @@ public:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
+#endif // DAIDE_CLIENT_BOTS_RANDBOT_RANDBOT_H
