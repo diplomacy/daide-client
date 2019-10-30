@@ -146,6 +146,9 @@ protected:
     // Handle an incoming REJ( NME() ) message.
     virtual void process_rej_nme_message(const TokenMessage &incoming_msg, const TokenMessage &msg_params);
 
+    // Get the name of the bot including the requested power if any
+    std::string get_bot_name() const;
+
     // Get the details to reconnect to the game. Return true if reconnect required, or false if reconnect is not to
     // be attempted. Default implementation uses parameters from the command line
     virtual bool get_reconnect_details(Token &power, int &passcode);

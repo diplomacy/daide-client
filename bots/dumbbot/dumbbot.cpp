@@ -80,7 +80,7 @@ DumbBot::DumbBot() :
 {}
 
 void DumbBot::send_nme_or_obs() {
-    send_name_and_version_to_server(BOT_FAMILY, BOT_GENERATION);
+    send_name_and_version_to_server(get_bot_name(), BOT_GENERATION);
 }
 
 void DumbBot::process_mdf_message(const TokenMessage & /*incoming_msg*/) {
@@ -174,6 +174,7 @@ int DumbBot::get_power_index(const Token &power_token) {
 }
 
 void DumbBot::process_now_message(const TokenMessage & /*incoming_msg*/) {
+    send_message_to_server(TOKEN_COMMAND_NOT & TOKEN_COMMAND_GOF);
 
     // Spring Moves/Retreats
     if ((m_map_and_units->current_season == DAIDE::TOKEN_SEASON_SPR)
@@ -227,6 +228,7 @@ void DumbBot::process_now_message(const TokenMessage & /*incoming_msg*/) {
 
     // Submitting orders
     send_orders_to_server();
+    send_message_to_server(TOKEN_COMMAND_GOF);
 }
 
 void DumbBot::calculate_factors(const WEIGHTING proximity_attack_weight, const WEIGHTING proximity_defense_weight) {
@@ -885,118 +887,4 @@ void DumbBot::generate_random_unit_list(const MapAndUnits::UNIT_SET &units) {
 int DumbBot::rand_no(int max_value) {
     int answer = rand() % max_value;
     return answer;
-}
-
-bool DumbBot::extract_parameters(const std::string &command_line_a, DAIDE::COMMAND_LINE_PARAMETERS &parameters) {
-    int search_start;                    // Position to start searching command line
-    int param_start;                     // Start of the next parameter
-    int param_end;                       // End of the next parameter
-    char param_token;                    // The token specifying the parameter type
-    std::string parameter;               // The parameter
-    bool extracted_ok = true;            // Whether the parameters were OK
-
-    parameters.ip_specified = false;
-    parameters.name_specified = false;
-    parameters.port_specified = false;
-    parameters.log_level_specified = false;
-    parameters.reconnection_specified = false;
-
-    std::string m_command_line = command_line_a;
-
-    // Strip the program name off the command line
-    if (m_command_line[0] == '"') {
-        // Program name is in quotes.
-        param_start = m_command_line.find('"', 1);
-
-        if (param_start != std::string::npos) {
-            m_command_line = m_command_line.substr(param_start + 1);
-        }
-    } else {
-        // Program name is not quoted, so is terminated by a space
-        param_start = m_command_line.find(' ');
-
-        if (param_start != std::string::npos) {
-            m_command_line = m_command_line.substr(param_start);
-        }
-    }
-
-    param_start = m_command_line.find('-', 0);
-
-    while (param_start != std::string::npos) {
-        param_token = m_command_line[param_start + 1];
-
-        param_end = m_command_line.find(' ', param_start);
-
-        if (param_end == std::string::npos) {
-            parameter = m_command_line.substr(param_start + 2);
-
-            search_start = m_command_line.size();
-        } else {
-            parameter = m_command_line.substr(0, param_end).substr(param_start + 2);
-
-            search_start = param_end;
-        }
-
-        switch (param_token) {
-            case 's': {
-                parameters.name_specified = true;
-                parameters.server_name = parameter;
-
-                break;
-            }
-
-            case 'i': {
-                parameters.ip_specified = true;
-                parameters.server_name = parameter;
-
-                break;
-            }
-
-            case 'p': {
-                parameters.port_specified = true;
-                parameters.port_number = stoi(parameter);
-
-                break;
-            }
-
-            case 'l': {
-                parameters.log_level_specified = true;
-                parameters.log_level = stoi(parameter);
-
-                break;
-            }
-
-            case 'r': {
-                if (parameter[3] == ':') {
-                    parameters.reconnection_specified = true;
-                    parameters.reconnect_power = parameter.substr(0, 3);
-                    for (auto &c : parameters.reconnect_power) { c = toupper(c); }
-                    parameters.reconnect_passcode = stoi(parameter.substr(4));
-                } else {
-                    std::cout << "-r should be followed by 'POW:passcode'\n"
-                                 "POW should be three characters" << std::endl;
-                }
-
-                break;
-            }
-
-            default: {
-                std::cout << std::string(BOT_FAMILY) << " - version " << std::string(BOT_GENERATION) << std::endl;
-                std::cout << "Usage: " << std::string(BOT_FAMILY) <<
-                             " [-sServerName|-iIPAddress] [-pPortNumber] "
-                             "[-lLogLevel] [-rPOW:passcode] [-d]" << std::endl;
-                extracted_ok = false;
-            }
-        }
-
-        param_start = m_command_line.find('-', search_start);
-    }
-
-    if ((parameters.ip_specified) && (parameters.name_specified)) {
-        std::cout << "You must not specify Server name and IP address" << std::endl;
-
-        extracted_ok = false;
-    }
-
-    return extracted_ok;
 }

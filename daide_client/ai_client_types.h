@@ -30,7 +30,8 @@ typedef struct {
     bool log_level_specified;       // Whether the log level was specified
     int log_level;                  // The level to log at
     bool reconnection_specified;    // Whether the reconnection parameters have been provided
-    std::string reconnect_power;    // Power to reconnect as
+    bool power_specified;           // Whether the desired power was specified
+    std::string power;              // Power to (re)connect as
     int reconnect_passcode;         // Passcode to reconnect as
 } COMMAND_LINE_PARAMETERS;
 
