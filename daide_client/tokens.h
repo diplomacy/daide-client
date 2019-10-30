@@ -12,10 +12,10 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H
 
-#include "daide_client/types.h"
+#include "types.h"
 
 namespace DAIDE {
 
@@ -363,4 +363,4 @@ const Token TOKEN_END_OF_MESSAGE {0x5FFF};
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_TOKENS_H

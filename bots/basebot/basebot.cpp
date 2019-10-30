@@ -16,8 +16,8 @@
 
 #include <iostream>
 #include <memory>
+#include "basebot.h"
 #include "daide_client/ai_client.h"
-#include "daide_client/base_bot.h"
 #include "daide_client/error_log.h"
 #include "daide_client/map_and_units.h"
 #include "daide_client/socket.h"
@@ -74,7 +74,7 @@ bool BaseBot::initialize(const std::string &command_line_a) {
     }
 
     // Connection failure
-    if (!m_socket.Connect(parameters.server_name, parameters.port_number)) {
+    if (!m_socket.Connect(parameters.server_name.c_str(), parameters.port_number)) {
         log_error("Failed to connect to server");
         return false;
     }
@@ -261,6 +261,7 @@ void BaseBot::process_diplomacy_message(char *message, int message_length) {
             // Act on that token
             lead_token = incoming_msg.get_token(0);
 
+            // FIXME use a switch statement
             // Messages that BaseBot handles initially
             if (lead_token == TOKEN_COMMAND_HLO) {
                 process_hlo(incoming_msg);
@@ -421,6 +422,7 @@ void BaseBot::process_sco(const TokenMessage &incoming_msg) {
 void BaseBot::process_not(const TokenMessage &incoming_msg) {
     TokenMessage not_message = incoming_msg.get_submessage(1);
 
+    // FIXME using switch statement
     if (not_message.get_token(0) == TOKEN_COMMAND_CCD) {
         process_not_ccd(incoming_msg, not_message.get_submessage(1));
     } else if (not_message.get_token(0) == TOKEN_COMMAND_TME) {
@@ -434,6 +436,7 @@ void BaseBot::process_not(const TokenMessage &incoming_msg) {
 void BaseBot::process_rej(const TokenMessage &incoming_msg) {
     TokenMessage rej_message = incoming_msg.get_submessage(1);
 
+    // FIXME using switch statement
     if (rej_message.get_token(0) == TOKEN_COMMAND_NME) {
         process_rej_nme_message(incoming_msg, rej_message.get_submessage(1));
     } else if (rej_message.get_token(0) == TOKEN_COMMAND_IAM) {
@@ -471,7 +474,7 @@ void BaseBot::process_rej(const TokenMessage &incoming_msg) {
 
 // Process the REJ(NOT()) message. Split according to next token
 void BaseBot::process_rej_not(const TokenMessage &incoming_msg, const TokenMessage &rej_not_params) {
-
+    // FIXME using switch statement
     if (rej_not_params.get_token(0) == TOKEN_COMMAND_GOF) {
         process_rej_not_gof_message(incoming_msg, rej_not_params.get_submessage(1));
     } else if (rej_not_params.get_token(0) == TOKEN_COMMAND_DRW) {
@@ -485,6 +488,7 @@ void BaseBot::process_rej_not(const TokenMessage &incoming_msg, const TokenMessa
 void BaseBot::process_yes(const TokenMessage &incoming_msg) {
     TokenMessage yes_message = incoming_msg.get_submessage(1);
 
+    // FIXME use switch statement
     if (yes_message.get_token(0) == TOKEN_COMMAND_NME) {
         process_yes_nme_message(incoming_msg, yes_message.get_submessage(1));
     } else if (yes_message.get_token(0) == TOKEN_COMMAND_OBS) {
@@ -508,6 +512,7 @@ void BaseBot::process_yes(const TokenMessage &incoming_msg) {
 
 // Process the YES(NOT()) message. Split according to next token
 void BaseBot::process_yes_not(const TokenMessage &incoming_msg, const TokenMessage &yes_not_params) {
+    // FIXME use switch staetment
     if (yes_not_params.get_token(0) == TOKEN_COMMAND_GOF) {
         process_yes_not_gof_message(incoming_msg, yes_not_params.get_submessage(1));
     } else if (yes_not_params.get_token(0) == TOKEN_COMMAND_DRW) {

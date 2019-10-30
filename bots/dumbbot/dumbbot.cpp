@@ -15,8 +15,8 @@
  **/
 
 #include <iostream>
-#include "bots/dumbbot/bot_type.h"
-#include "bots/dumbbot/dumbbot.h"
+#include "bot_type.h"
+#include "dumbbot.h"
 #include "daide_client/error_log.h"
 #include "daide_client/token_text_map.h"
 

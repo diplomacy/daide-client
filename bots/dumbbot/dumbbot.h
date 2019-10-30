@@ -14,10 +14,10 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H
-#define _DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H
+#ifndef DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H
+#define DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H
 
-#include "daide_client/base_bot.h"
+#include "basebot.h"
 #include "daide_client/map_and_units.h"
 
 namespace DAIDE {
@@ -165,4 +165,4 @@ private:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H
+#endif // DAIDE_CLIENT_BOTS_DUMBBOT_DUMBBOT_H

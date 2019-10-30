@@ -14,8 +14,8 @@
  * Release 8~3
  **/
 
-#include "bots/randbot/bot_type.h"
-#include "bots/randbot/randbot.h"
+#include "bot_type.h"
+#include "randbot.h"
 #include "daide_client/map_and_units.h"
 
 using DAIDE::RandBot;

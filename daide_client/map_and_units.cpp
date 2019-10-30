@@ -12,8 +12,8 @@
  * Release 8~3
  **/
 
-#include "daide_client/map_and_units.h"
-#include "daide_client/token_message.h"
+#include "map_and_units.h"
+#include "token_message.h"
 
 using DAIDE::MapAndUnits;
 using DAIDE::Token;

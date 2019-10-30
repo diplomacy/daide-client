@@ -12,8 +12,8 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H
 
 #include <set>
 #include <list>
@@ -28,4 +28,4 @@ const int ADJUDICATOR_NO_ERROR = -1;
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_TYPES_H

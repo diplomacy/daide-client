@@ -12,7 +12,7 @@
  * Release 8~3
  **/
 
-#include "daide_client/token_text_map.h"
+#include "token_text_map.h"
 
 using DAIDE::TokenTextMap;
 

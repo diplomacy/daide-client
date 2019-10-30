@@ -12,7 +12,7 @@
  * Release 8~3
  **/
 
-#include "daide_client/map_and_units.h"
+#include "map_and_units.h"
 
 using DAIDE::MapAndUnits;
 

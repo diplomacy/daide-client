@@ -14,8 +14,8 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
 
 #include "daide_client/ai_client_types.h"
 #include "daide_client/error_log.h"
@@ -395,4 +395,4 @@ public:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_BASE_BOT_H

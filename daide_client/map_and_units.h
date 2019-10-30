@@ -12,12 +12,12 @@
  * Release 8~3
  **/
 
-#ifndef _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
-#define _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
+#ifndef DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
+#define DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
 
-#include "daide_client/types.h"
-#include "daide_client/tokens.h"
-#include "daide_client/token_message.h"
+#include "types.h"
+#include "tokens.h"
+#include "token_message.h"
 
 namespace DAIDE {
 
@@ -556,4 +556,4 @@ private:
 
 } // namespace DAIDE
 
-#endif // _DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H
+#endif // DAIDE_CLIENT_DAIDE_CLIENT_MAP_AND_UNITS_H

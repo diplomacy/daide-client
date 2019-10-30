@@ -13,9 +13,9 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#include "daide_client/ai_client.h"
-#include "daide_client/error_log.h"
-#include "daide_client/socket.h"
+#include "ai_client.h"
+#include "error_log.h"
+#include "socket.h"
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -279,7 +279,7 @@ void Socket::AdjustOrdering(const MessagePtr &message, short length) {
 
 #if LITTLE_ENDIAN
     MessageHeader* message_header = get_message_header(message);
-    auto* message_content = get_message_content<short>(message);
+    short* message_content = get_message_content<short>(message);
     AdjustOrdering(message_header->length);
     for (int i = length / static_cast<short>(sizeof(short)) - 1; i >= 0; i--) {
         AdjustOrdering(message_content[i]);

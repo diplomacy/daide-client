@@ -15,8 +15,8 @@
 
 #include <sstream>
 #include <cstring>
-#include "daide_client/token_message.h"
-#include "daide_client/token_text_map.h"
+#include "token_message.h"
+#include "token_text_map.h"
 
 using DAIDE::Token;
 using DAIDE::TokenMessage;
